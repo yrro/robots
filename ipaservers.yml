@@ -1,0 +1,151 @@
+---
+- hosts: ipaservers
+  become: yes
+  force_handlers: true
+  tasks:
+    - name: configure yum
+      ini_file:
+        path: /etc/yum.conf
+        section: '{{item.section}}'
+        option: '{{item.option}}'
+        value: '{{item.value}}'
+      loop:
+        - {'section': 'main', 'option': 'metadata_expire', 'value': '90m'}
+
+    - name: enable epel repo
+      yum: name=epel-release state=present
+
+    - name: install etckeeper
+      yum: name=etckeeper state=present
+    - name: recon etckeeper init
+      stat: path=/etc/etckeeper/.git
+      register: etckeeper_dotgit
+    - name: etckeeper init
+      command: etckeeper init
+      when: not etckeeper_dotgit.stat.exists
+
+    - name: install useful packages
+      yum: name={{item}} state=present
+      loop:
+        - atop
+        - etckeeper
+        - htop
+        - vim-enhanced
+        - ldapvi
+
+    - name: install yum-cron
+      yum: name=yum-cron state=present
+    - name: configure yum-cron
+      ini_file:
+        path: /etc/yum/yum-cron.conf
+        section: '{{item.section}}'
+        option: '{{item.option}}'
+        value: '{{item.value}}'
+      loop:
+        - {'section': 'commands', 'option': 'update_cmd', 'value': 'default'}
+        - {'section': 'commands', 'option': 'update_messages', 'value': 'no'}
+        - {'section': 'commands', 'option': 'download_updates', 'value': 'no'}
+        - {'section': 'commands', 'option': 'apply_updates', 'value': 'no'}
+    - name: configure yum-cron-hourly
+      ini_file:
+        path: /etc/yum/yum-cron-hourly.conf
+        section: '{{item.section}}'
+        option: '{{item.option}}'
+        value: '{{item.value}}'
+      loop:
+        - {'section': 'commands', 'option': 'update_cmd', 'value': 'default'}
+        - {'section': 'commands', 'option': 'update_messages', 'value': 'yes'}
+        - {'section': 'commands', 'option': 'download_updates', 'value': 'yes'}
+        - {'section': 'commands', 'option': 'apply_updates', 'value': 'yes'}
+    - name: start yum-cron
+      systemd: name=yum-cron state=started enabled=yes
+
+    - name: install firewalld
+      yum: name=firewalld state=present
+    - name: start firewalld
+      systemd: name=firewalld state=started enabled=yes
+
+    - name: recon firewalld log-denied
+      command: firewall-cmd --get-log-denied
+      check_mode: no
+      changed_when: False
+      register: firewalld_log_denied
+    - name: set firewalld log-denied
+      command: firewall-cmd --set-log-denied=unicast
+      when: firewalld_log_denied.stdout != 'unicast'
+
+    - name: recon firewalld default zone
+      command: firewall-cmd --get-default-zone
+      check_mode: no
+      changed_when: False
+      register: firewalld_default_zone
+    - name: set firewalld default zone
+      command: firewall-cmd --set-default-zone=public
+      when: firewalld_default_zone.stdout != 'public'
+
+    - name: firewall service configuration
+      firewalld:
+        zone: public
+        service: '{{item.service}}'
+        state: '{{item.state}}'
+        permanent: yes
+        immediate: yes
+      loop:
+        - {service: 'dns', state: 'enabled'}
+        - {service: 'freeipa-ldap', state: 'enabled'}
+        - {service: 'freeipa-ldaps', state: 'enabled'}
+        - {service: 'freeipa-replication', state: 'enabled'}
+
+    - name: set named to be authoratitive-only
+      lineinfile:
+        path: /etc/named.conf
+        line: "\trecursion no;"
+        regexp: ^\s*recursion\b
+        insertafter: \ballow-recursion\b
+      notify: reload bind
+
+    - name: configure httpd security
+      lineinfile:
+        path: /etc/httpd/conf.d/nss.conf
+        line: '{{item.name}} {{item.value}}'
+        regexp: \b{{item.name}}\b
+      loop:
+        - {'name': 'NSSProtocol', 'value': 'TLSv1.2'}
+        - {'name': 'NSSCipherSuite', 'value': '+ecdhe_ecdsa_aes_128_sha,+ecdhe_ecdsa_aes_256_sha,+ecdhe_rsa_aes_128_sha,+ecdhe_rsa_aes_256_sha,+rsa_aes_128_sha,+rsa_aes_256_sha'}
+      notify: restart httpd
+
+    - name: configure slapd security
+      ldap_attr:
+        server_uri: ldapi://%2fvar%2frun%2fslapd-IPA-ROBOTS-ORG-UK.socket
+        dn: '{{item.dn}}'
+        name: '{{item.name}}'
+        values: '{{item.value}}'
+        state: exact
+      loop:
+        - {'dn': 'cn=encryption,cn=config', 'name': 'sslVersionMin', 'value': 'TLS1.2'}
+        - {'dn': 'cn=config', 'name': 'nsslapd-minssf', 'value': '56'}
+        - {'dn': 'cn=config', 'name': 'nsslapd-allow-anonymous-access', 'value': 'rootdse'}
+      notify: restart slapd
+
+    - name: restrict tomcat to TLSv1.2
+      xml:
+        path: /etc/pki/pki-tomcat/server.xml
+        xpath: /Server/Service[@name='Catalina']/Connector[@name='Secure']
+        attribute: '{{item}}'
+        value: 'tls1_2:tls1_2'
+      loop:
+        - sslVersionRangeDatagram
+        - sslVersionRangeStream
+      notify: restart tomcat
+
+  handlers:
+    - name: reload firewalld
+      systemd: name=firewalld state=restarted
+    - name: reload bind
+      systemd: name=named-pkcs11 state=reloaded
+    - name: restart httpd
+      systemd: name=httpd state=restarted
+    - name: restart slapd
+      systemd: name=dirsrv@IPA-ROBOTS-ORG-UK state=restarted
+    - name: restart tomcat
+      systemd: name=pki-tomcatd@pki-tomcat state=restarted
