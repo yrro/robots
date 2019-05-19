@@ -1,0 +1,58 @@
+---
+- name: install etckeeper
+  yum: name=etckeeper state=present
+- name: recon etckeeper init
+  stat: path=/etc/etckeeper/.git
+  register: etckeeper_dotgit
+- name: etckeeper init
+  command: etckeeper init
+  when: not etckeeper_dotgit.stat.exists
+
+- name: configure yum
+  ini_file:
+    path: /etc/yum.conf
+    section: '{{item.section}}'
+    option: '{{item.option}}'
+    value: '{{item.value}}'
+  loop:
+    - {'section': 'main', 'option': 'metadata_expire', 'value': '90m'}
+
+- name: enable epel repo
+  yum: name=epel-release state=present
+
+- name: install useful packages
+  yum: name={{item}} state=present
+  loop:
+    - atop
+    - etckeeper
+    - htop
+    - vim-enhanced
+    - ldapvi
+
+- name: install yum-cron
+  yum: name=yum-cron state=present
+- name: configure yum-cron
+  ini_file:
+    path: /etc/yum/yum-cron.conf
+    section: '{{item.section}}'
+    option: '{{item.option}}'
+    value: '{{item.value}}'
+  loop:
+    - {'section': 'commands', 'option': 'update_cmd', 'value': 'default'}
+    - {'section': 'commands', 'option': 'update_messages', 'value': 'no'}
+    - {'section': 'commands', 'option': 'download_updates', 'value': 'no'}
+    - {'section': 'commands', 'option': 'apply_updates', 'value': 'no'}
+- name: configure yum-cron-hourly
+  ini_file:
+    path: /etc/yum/yum-cron-hourly.conf
+    section: '{{item.section}}'
+    option: '{{item.option}}'
+    value: '{{item.value}}'
+  loop:
+    - {'section': 'commands', 'option': 'update_cmd', 'value': 'default'}
+    - {'section': 'commands', 'option': 'update_messages', 'value': 'yes'}
+    - {'section': 'commands', 'option': 'download_updates', 'value': 'yes'}
+    - {'section': 'commands', 'option': 'apply_updates', 'value': 'yes'}
+- name: start yum-cron
+  systemd: name=yum-cron state=started enabled=yes
+
