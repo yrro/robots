@@ -1,0 +1,22 @@
+---
+- hosts: samhosts
+  become: yes
+  force_handlers: true
+  tasks:
+    - name: configure log access
+      user:
+        name: sam
+        groups: systemd-journal
+        append: true
+
+    - name: configure polkit admin rules
+      copy:
+        src: files/polkit/rules/20-robots.rules
+        dest: /etc/polkit-1/rules.d
+        owner: root
+        group: root
+        mode: 0644
+        seuser: system_u
+        serole: object_r
+        setype: etc_t
+      when: ansible_facts['distribution'] == 'Fedora'

@@ -1,0 +1,5 @@
+---
+- name: enable fstrim
+  systemd:
+    name: fstrim.timer
+    enabled: yes

@@ -1,3 +1,6 @@
 [ipaservers]
 ipa0.ipa.robots.org.uk
 ipa1.ipa.robots.org.uk
+
+[samhosts]
+merodach.ipa.robots.org.uk
