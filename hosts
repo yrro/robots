@@ -4,3 +4,4 @@ ipa1.ipa.robots.org.uk
 
 [samhosts]
 merodach.ipa.robots.org.uk ansible_python_interpreter=/usr/bin/python3
+wintermute.ipa.robots.org.uk
