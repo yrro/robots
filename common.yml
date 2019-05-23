@@ -1,0 +1,9 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: enable fstrim
+      systemd:
+        name: fstrim.timer
+        state: started
+        enabled: yes

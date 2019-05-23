@@ -4,5 +4,6 @@
   tasks:
     - include_tasks: "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
 
+- import_playbook: common.yml
 - import_playbook: ipaservers.yml
 - import_playbook: samhosts.yml
