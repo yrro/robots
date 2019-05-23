@@ -19,4 +19,4 @@
         seuser: system_u
         serole: object_r
         setype: etc_t
-      when: ansible_facts['distribution'] == 'Fedora'
+      when: ansible_facts['os_family'] == 'RedHat'
