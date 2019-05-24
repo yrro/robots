@@ -38,3 +38,25 @@
     #- name: set default firewalld zone
       #command: firewall-cmd --set-default-zone=public
       #when: firewalld_default_zone != 'public'
+
+    - name: enable sssd infopipe responder
+      when:
+        ansible_facts['os_family'] == 'Debian'
+      block:
+        - name: install sssd-dbus
+          apt:
+            name: sssd-dbus
+            state: present
+        - name: enable sssd-dbus
+          ini_file:
+            path: /etc/sssd/sssd.conf
+            section: sssd
+            option: services
+            value: nss, sudo, pam, ssh, ifp
+          notify: restart sssd
+
+  handlers:
+    - name: restart sssd
+      systemd:
+        name: sssd
+        state: restarted
