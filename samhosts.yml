@@ -55,6 +55,22 @@
             value: nss, sudo, pam, ssh, ifp
           notify: restart sssd
 
+    - name: enable sssd kerberos credentials manager
+      when:
+        ansible_facts['os_family'] == 'Debian'
+      block:
+        - name: install sssd-kcm
+          apt:
+            name: sssd-kcm
+            state: present
+        - name: configure libkrb5 to use KCM
+          copy:
+            src: files/krb5/debian
+            dest: /etc/krb5.conf.d
+            owner: root
+            group: root
+            mode: 0644
+
   handlers:
     - name: restart sssd
       systemd:
