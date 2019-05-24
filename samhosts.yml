@@ -30,11 +30,11 @@
         mode: 0644
       when: ansible_facts['os_family'] == 'Debian'
 
-    - name: recon default firewalld zone
-      changed_when: False
-      check_mode: False
-      command: firewall-cmd --get-default-zone
-      register: firewalld_default_zone
-    - name: set default firewalld zone
-      command: firewall-cmd --set-default-zone=public
-      when: firewalld_default_zone != 'public'
+    #- name: recon default firewalld zone
+      #changed_when: False
+      #check_mode: False
+      #command: firewall-cmd --get-default-zone
+      #register: firewalld_default_zone
+    #- name: set default firewalld zone
+      #command: firewall-cmd --set-default-zone=public
+      #when: firewalld_default_zone != 'public'
