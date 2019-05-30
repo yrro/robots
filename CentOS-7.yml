@@ -2,7 +2,7 @@
 - name: install etckeeper
   yum: name=etckeeper state=present
 - name: recon etckeeper init
-  stat: path=/etc/etckeeper/.git
+  stat: path=/etc/.git
   register: etckeeper_dotgit
 - name: etckeeper init
   command: etckeeper init
