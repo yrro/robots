@@ -71,8 +71,6 @@
             group: root
             mode: 0644
 
-    - import_tasks: sssd-debug.yml
-
   handlers:
     - name: restart sssd
       systemd:

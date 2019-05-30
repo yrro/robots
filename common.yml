@@ -1,9 +1,35 @@
 ---
 - hosts: all
   become: yes
+  force_handlers: true
   tasks:
     - name: enable fstrim
       systemd:
         name: fstrim.timer
         state: started
         enabled: yes
+
+    - name: install sssd-tools
+      package:
+        name: sssd-tools
+        state: present
+
+    - name: configure sssd debug_level
+      ini_file:
+        path: /etc/sssd/sssd.conf
+        section: '{{item}}'
+        option: debug_level
+        value: 2
+      notify: restart sssd
+      loop:
+        - domain/ipa.robots.org.uk
+        - sssd
+        - nss
+        - pam
+        - sudo
+
+  handlers:
+    - name: restart sssd
+      systemd:
+        name: sssd
+        state: restarted
