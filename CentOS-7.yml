@@ -20,6 +20,22 @@
 - name: enable epel repo
   yum: name=epel-release state=present
 
+- name: enable ghettoforge repos
+  yum:
+    name: http://mirror.ghettoforge.org/distributions/gf/gf-release-latest.gf.el7.noarch.rpm
+    state: present
+- name: configure use of gf repo for particular packages default
+  ini_file:
+    path: /etc/yum.repos.d/gf.repo
+    section: gf-plus
+    option: '{{item.option}}'
+    value: '{{item.value}}'
+  loop:
+    - option: enabled
+      value: 1
+    - option: includepkgs
+      value: tmux vim-enhanced vim-common vim-minimal vim-filesystem
+
 - name: install useful packages
   yum: name={{item}} state=present
   loop:
