@@ -1,1 +1,3 @@
 ---
+- name: install auditd
+  apt: name=auditd state=present
