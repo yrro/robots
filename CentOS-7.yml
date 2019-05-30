@@ -44,6 +44,7 @@
     - htop
     - vim-enhanced
     - ldapvi
+    - tmux
 
 - name: install yum-cron
   yum: name=yum-cron state=present
