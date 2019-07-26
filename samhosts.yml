@@ -45,15 +45,24 @@
         state: present
     - name: enable sssd infopipe responder
       when:
-        ansible_facts['os_family'] == 'Debian'
-      block:
-        - name: enable sssd-dbus
-          ini_file:
-            path: /etc/sssd/sssd.conf
-            section: sssd
-            option: services
-            value: nss, sudo, pam, ssh, ifp
-          notify: restart sssd
+        - ansible_facts.os_family == 'Debian'
+        - ansible_facts.packages.sssd[0].version is version('2', '<')
+      ini_file:
+        path: /etc/sssd/sssd.conf
+        section: sssd
+        option: services
+        value: nss, sudo, pam, ssh, ifp
+      notify: restart sssd
+    - name: use socket-activated responders
+      when:
+        - ansible_facts.os_family == 'Debian'
+        - ansible_facts.packages.sssd[0].version is version('2', '>=')
+      ini_file:
+        path: /etc/sssd/sssd.conf
+        section: sssd
+        option: services
+        state: absent
+      notify: restart sssd
     - name: disable socket-activated pac responder
       systemd:
         name: sssd-pac.socket

@@ -2,6 +2,7 @@
 - hosts: all
   become: yes
   tasks:
+    - package_facts:
     - include_tasks: "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
 
 - import_playbook: common.yml
