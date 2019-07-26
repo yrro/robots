@@ -63,6 +63,8 @@
         option: services
         state: absent
       notify: restart sssd
+
+    # https://pagure.io/SSSD/sssd/issue/4045
     - name: disable socket-activated pac responder
       systemd:
         name: sssd-pac.socket
