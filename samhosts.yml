@@ -71,6 +71,15 @@
             group: root
             mode: 0644
 
+    # https://pagure.io/SSSD/sssd/issue/4047
+    - name: force periodic dynamic dns updates
+      ini_file:
+        path: /etc/sssd/sssd.conf
+        section: domain/ipa.robots.org.uk
+        option: dyndns_refresh_interval
+        value: '300'
+      notify: restart sssd
+
   handlers:
     - name: restart sssd
       systemd:
