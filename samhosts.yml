@@ -54,6 +54,15 @@
             option: services
             value: nss, sudo, pam, ssh, ifp
           notify: restart sssd
+    - name: disable socket-activated pac responder
+      systemd:
+        name: sssd-pac.socket
+        state: stopped
+        enabled: false
+    - name: ensure socket-activated pac responder is not running
+      systemd:
+        name: sssd-pac.service
+        state: stopped
 
     - name: enable sssd kerberos credentials manager
       when:
