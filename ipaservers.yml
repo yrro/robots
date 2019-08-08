@@ -86,6 +86,7 @@
         - {'dn': 'cn=encryption,cn=config', 'name': 'sslVersionMin', 'value': 'TLS1.2'}
         - {'dn': 'cn=config', 'name': 'nsslapd-minssf', 'value': '56'}
         - {'dn': 'cn=config', 'name': 'nsslapd-allow-anonymous-access', 'value': 'rootdse'}
+        #- {'dn': 'cn=config', 'name': 'nsslapd-require-secure-binds', 'value', 'on'}
       notify: restart slapd
 
     - name: restrict tomcat to TLSv1.2
