@@ -45,9 +45,8 @@
     - vim-enhanced
     - ldapvi
     - tmux
+    - yum-cron
 
-- name: install yum-cron
-  yum: name=yum-cron state=present
 - name: configure yum-cron
   ini_file:
     path: /etc/yum/{{ item.file }}
