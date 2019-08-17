@@ -64,3 +64,6 @@
     - {'file': 'yum-cron-hourly.conf', 'section': 'commands', 'option': 'apply_updates', 'value': 'yes'}
 - name: start yum-cron
   systemd: name=yum-cron state=started enabled=yes
+
+- name: enable/start atop
+  systemd: name=atop state=started enabled=yes
