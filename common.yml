@@ -19,7 +19,7 @@
         path: /etc/sssd/sssd.conf
         section: '{{item}}'
         option: debug_level
-        value: 2
+        value: '2'
       notify: restart sssd
       loop:
         - domain/ipa.robots.org.uk
