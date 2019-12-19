@@ -54,7 +54,8 @@
         insertafter: \ballow-recursion\b
       notify: reload bind
 
-    - name: configure httpd security
+    - name: configure httpd mod_nss security
+      when: "'mod_nss' in ansible_facts.packages"
       lineinfile:
         path: /etc/httpd/conf.d/nss.conf
         line: '{{item.name}} {{item.value}}'
