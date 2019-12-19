@@ -83,6 +83,18 @@
           - +rsa_aes_256_sha
       notify: restart httpd
 
+    - name: configure httpd mod_ssl security
+      when: "'mod_ssl' in ansible_facts.packages"
+      lineinfile:
+        path: /etc/httpd/conf.d/ssl.conf
+        line: '{{item.name}} {{item.value}}'
+        regexp: \b{{item.name}}\b
+      loop:
+        - {'name': 'SSLProtocol', 'value': '{{protocol|join(" ")}}'}
+      vars:
+        protocol:
+          - +TLSv1.2
+
     - name: configure slapd security
       ldap_attr:
         server_uri: ldapi://%2fvar%2frun%2fslapd-IPA-ROBOTS-ORG-UK.socket
