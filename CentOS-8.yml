@@ -21,8 +21,10 @@
     - tmux
     - dnf-automatic
 
-- name: start dnf-automatic
-  systemd: name=dnf-automatic.timer state=started enabled=yes
+- name: stop dnf-automatic
+  systemd: name=dnf-automatic.timer state=stopped enabled=no
+- name: start dnf-automatic-install
+  systemd: name=dnf-automatic-install.timer state=started enabled=yes
 
 - name: enable/start atop
   systemd: name=atop state=started enabled=yes
