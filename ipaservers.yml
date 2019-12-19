@@ -3,6 +3,13 @@
   become: yes
   force_handlers: true
   tasks:
+    - name: disable password authentication for root via SSH
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        line: PermitRootLogin prohibit-password
+        regexp: ^\s*PermitRootLogin\b
+      notify: reload ssh
+
     - name: install firewalld
       yum: name=firewalld state=present
     - name: start firewalld
@@ -101,6 +108,8 @@
       notify: restart tomcat
 
   handlers:
+    - name: reload ssh
+      systemd: name=sshd state=reloaded
     - name: reload firewalld
       systemd: name=firewalld state=restarted
     - name: reload bind
