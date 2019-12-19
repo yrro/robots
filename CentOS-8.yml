@@ -26,3 +26,8 @@
 
 - name: enable/start atop
   systemd: name=atop state=started enabled=yes
+
+- name: enable SELinux
+  selinux:
+    policy: targeted
+    state: enforcing
