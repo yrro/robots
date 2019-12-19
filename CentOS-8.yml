@@ -1,0 +1,28 @@
+---
+- name: install etckeeper
+  yum: name=etckeeper state=present
+- name: recon etckeeper init
+  stat: path=/etc/.git
+  register: etckeeper_dotgit
+- name: etckeeper init
+  command: etckeeper init
+  when: not etckeeper_dotgit.stat.exists
+
+- name: enable epel repo
+  yum: name=epel-release state=present
+
+- name: install useful packages
+  yum: name={{item}} state=present
+  loop:
+    - atop
+    - etckeeper
+    - htop
+    - vim-enhanced
+    - tmux
+    - dnf-automatic
+
+- name: start dnf-automatic
+  systemd: name=dnf-automatic.timer state=started enabled=yes
+
+- name: enable/start atop
+  systemd: name=atop state=started enabled=yes
