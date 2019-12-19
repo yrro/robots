@@ -46,7 +46,7 @@
         - {service: 'freeipa-ldaps', state: 'enabled'}
         - {service: 'freeipa-replication', state: 'enabled'}
 
-    - name: set named to be authoratitive-only
+    - name: set named to be authoritative-only
       lineinfile:
         path: /etc/named.conf
         line: "\trecursion no;"
