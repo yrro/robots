@@ -2,6 +2,8 @@
 - hosts: ipaservers
   become: yes
   force_handlers: true
+  vars:
+    ldap_url: ldapi://%2fvar%2frun%2fslapd-IPA-ROBOTS-ORG-UK.socket
   tasks:
     - name: gather package_facts
       package_facts:
@@ -98,24 +100,64 @@
         protocol:
           - +TLSv1.2
 
+    - name: configure slapd TLS versions
+      ldap_attr:
+        server_uri: '{{ldap_url}}'
+        dn: cn=encryption,cn=config
+        name: sslVersionMin
+        values: TLS1.2
+        state: exact
+      notify: restart slapd
+    # This used to be done by FreeIPA itself
+    # <350954589774499d99bf87cb5631c664bb0707c4> but was later reverted
+    # <294aa3a33375dc246b2a733fce3cbd09a39071a0>.
+    #
+    # The meaning of the value 56 is obscure. Try with 256.
+    # <https://fy.blackhats.net.au/blog/html/2016/11/23/the_minssf_trap.html>
+    - name: configure slapd minimum security strength factor
+      ldap_attr:
+        server_uri: '{{ldap_url}}'
+        dn: cn=config
+        name: nsslapd-minssf
+        values: 56
+        state: exact
+      notify: restart slapd
+    - name: require authentication for slapd (except for Root DSE)
+      ldap_attr:
+        server_uri: '{{ldap_url}}'
+        dn: cn=config
+        name: nsslapd-allow-anonymous-access
+        values: rootdse
+        state: exact
+      notify: restart slapd
+    - name: require confidentiality for slapd binds
+      ldap_attr:
+        server_uri: '{{ldap_url}}'
+        dn: cn=config
+        name: nsslapd-require-secure-binds
+        values: 'on'
+        state: exact
+      notify: restart slapd
+    - name: enable rootdn_access plugin
+      ldap_attr:
+        server_uri: '{{ldap_url}}'
+        dn: cn=RootDN Access Control,cn=plugins,cn=config
+        name: nsslapd-pluginEnabled
+        values: 'on'
+        state: exact
+      notify: restart slapd
     # Even though rootdn-allow-ip is documented as allowing wildcards, trying
     # to use them causes slapd to fail to start
-    # <https://pagure.io/389-ds-base/issue/50800>. Looking more closely at the
-    # code, I don't believe wildcard matching is even implemented.
-    - name: configure slapd security
+    # <https://pagure.io/389-ds-base/issue/50800>.
+    - name: restrict rootdn access to localhost
       ldap_attr:
-        server_uri: ldapi://%2fvar%2frun%2fslapd-IPA-ROBOTS-ORG-UK.socket
-        dn: '{{item.dn}}'
-        name: '{{item.name}}'
-        values: '{{item.value}}'
+        server_uri: '{{ldap_url}}'
+        dn: cn=RootDN Access Control,cn=plugins,cn=config
+        name: rootdn-allow-ip
+        values:
+          - ::1
+          - 127.0.0.1
         state: exact
-      loop:
-        - {'dn': 'cn=encryption,cn=config', 'name': 'sslVersionMin', 'value': 'TLS1.2'}
-        - {'dn': 'cn=config', 'name': 'nsslapd-minssf', 'value': '56'}
-        - {'dn': 'cn=config', 'name': 'nsslapd-allow-anonymous-access', 'value': 'rootdse'}
-        - {'dn': 'cn=config', 'name': 'nsslapd-require-secure-binds', 'value': 'on'}
-        - {'dn': 'cn=RootDN Access Control,cn=plugins,cn=config', 'name': 'nsslapd-pluginEnabled', 'value': 'on'}
-        - {'dn': 'cn=RootDN Access Control,cn=plugins,cn=config', 'name': 'rootdn-allow-ip', 'value': ['::1', '127.0.0.1']}
       notify: restart slapd
 
     - name: restrict tomcat to TLSv1.2
