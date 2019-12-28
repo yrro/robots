@@ -3,6 +3,9 @@
   become: yes
   force_handlers: true
   tasks:
+    - name: gather package_facts
+      package_facts:
+
     - name: disable password authentication for root via SSH
       lineinfile:
         path: /etc/ssh/sshd_config

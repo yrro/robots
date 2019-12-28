@@ -3,6 +3,8 @@
   become: yes
   force_handlers: true
   tasks:
+    - name: gather package_facts
+      package_facts:
     - name: configure log access
       user:
         name: sam
