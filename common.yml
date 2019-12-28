@@ -3,6 +3,13 @@
   become: yes
   force_handlers: true
   tasks:
+    - name: enable gssapi-keyex
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        line: GSSAPIKeyExchange yes
+        regexp: (?i)^\s*GSSAPIKeyExchange\b
+      notify: reload ssh
+
     - name: enable fstrim
       systemd:
         name: fstrim.timer
@@ -29,7 +36,16 @@
         - sudo
 
   handlers:
-    - name: restart sssd
+    - name: restart ssst
       systemd:
         name: sssd
         state: restarted
+    - name: reload ssh
+      systemd:
+        name: '{{s[ansible_facts.os_family]}}'
+        state: reloaded
+      when: ansible_facts.os_family == 'Debian'
+      vars:
+        s:
+          Debian: ssh
+          RedHat: sshd
