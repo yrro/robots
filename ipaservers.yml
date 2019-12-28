@@ -7,7 +7,7 @@
       lineinfile:
         path: /etc/ssh/sshd_config
         line: PermitRootLogin prohibit-password
-        regexp: ^\s*PermitRootLogin\b
+        regexp: (?i)^\s*PermitRootLogin\b
       notify: reload ssh
 
     - name: install firewalld
@@ -50,7 +50,7 @@
       lineinfile:
         path: /etc/named.conf
         line: "\trecursion no;"
-        regexp: ^\s*recursion\b
+        regexp: (?i)^\s*recursion\b
         insertafter: \ballow-recursion\b
       notify: reload bind
 
@@ -59,7 +59,7 @@
       lineinfile:
         path: /etc/httpd/conf.d/nss.conf
         line: '{{item.name}} {{item.value}}'
-        regexp: \b{{item.name}}\b
+        regexp: (?i)^\s*{{item.name}}\b
       loop:
         - {'name': 'NSSProtocol', 'value': '{{protocol|join(",")}}'}
         - {'name': 'NSSCipherSuite', 'value': '{{ciphersuite|join(",")}}'}
@@ -88,7 +88,7 @@
       lineinfile:
         path: /etc/httpd/conf.d/ssl.conf
         line: '{{item.name}} {{item.value}}'
-        regexp: \b{{item.name}}\b
+        regexp: (?i)^\s*{{item.name}}\b
       loop:
         - {'name': 'SSLProtocol', 'value': '{{protocol|join(" ")}}'}
       vars:
