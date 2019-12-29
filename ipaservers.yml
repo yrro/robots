@@ -49,7 +49,7 @@
         - {service: 'dns', state: 'enabled'}
         - {service: 'freeipa-ldap', state: 'enabled'}
         - {service: 'freeipa-ldaps', state: 'enabled'}
-        - {service: 'freeipa-replication', state: 'enabled'}
+        - {service: 'freeipa-replication', state: 'disabled'} # for older FreeIPA only
 
     - name: set named to be authoritative-only
       lineinfile:
@@ -138,6 +138,8 @@
         values: 'on'
         state: exact
       notify: restart slapd
+    # Has the side-effect of disbling simple binds via ldapi. SASL EXTERNAL
+    # authentication still works though.
     - name: enable rootdn_access plugin
       ldap_attr:
         server_uri: '{{ldap_url}}'
