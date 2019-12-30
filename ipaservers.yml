@@ -38,6 +38,7 @@
       command: firewall-cmd --set-default-zone=public
       when: firewalld_default_zone.stdout != 'public'
 
+    # TODO use freeipa-4 service once available in firewalld
     - name: firewall service configuration
       firewalld:
         zone: public
