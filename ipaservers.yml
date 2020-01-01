@@ -8,6 +8,10 @@
     - name: gather package_facts
       package_facts:
 
+    - name: set timezone
+      timezone:
+        name: UTC
+
     - name: create /var/log/journal
       file:
         path: /var/log/journal
