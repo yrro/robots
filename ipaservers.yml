@@ -24,10 +24,12 @@
     - name: set /var/log/journal permissions
       command: systemd-tmpfiles --create --prefix=/var/log/journal
       when: journal_acl.acl|length == 3
+      register: journal_permissions
     - name: flush logs to persistent storage
       command:
         cmd: journalctl --flush
         creates: /var/log/journald/{{ansible_facts.machine_id}}
+      when: not journal_permissions.skipped
 
     - name: disable password authentication for root via SSH
       lineinfile:
