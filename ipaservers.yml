@@ -61,7 +61,29 @@
       command: firewall-cmd --set-default-zone=public
       when: firewalld_default_zone.stdout != 'public'
 
-    # TODO use freeipa-4 service once available in firewalld
+    - name: recon firewalld freeipa-4 service definition
+      stat:
+        path: /usr/lib/firewalld/services/freeipa-4.xml
+      register: firewalld_svc_freeipa4
+    - name: provide firewalld freeipa-4 service definition
+      copy:
+        src: files/firewalld/freeipa-4.xml
+        dest: /etc/firewalld/services/freeipa-4.xml
+        seuser: _default
+        serole: _default
+        setype: _default
+        selevel: _default
+      when: not firewalld_svc_freeipa4.stat.exists
+      notify: reload firewalld
+    - name: remove firewalld freeipa-4 service definition
+      file:
+        path: /etc/firewalld/services/freeipa-4.xml
+        state: absent
+      when: firewalld_svc_freeipa4.stat.exists
+      notify: reload firewalld
+    - name: apply firewalld service changes
+      meta: flush_handlers
+
     - name: firewall service configuration
       firewalld:
         zone: public
@@ -71,9 +93,11 @@
         immediate: yes
       loop:
         - {service: 'dns', state: 'enabled'}
-        - {service: 'freeipa-ldap', state: 'enabled'}
-        - {service: 'freeipa-ldaps', state: 'enabled'}
-        - {service: 'freeipa-replication', state: 'disabled'} # for older FreeIPA only
+        - {service: 'freeipa-ldap', state: 'disabled'}
+        - {service: 'freeipa-ldaps', state: 'disabled'}
+        - {service: 'freeipa-replication', state: 'disabled'}
+        - {service: 'freeipa-adtrust', state: 'disabled'}
+        - {service: 'freeipa-4', state: 'enabled'}
 
     - name: set named to be authoritative-only
       lineinfile:
@@ -201,7 +225,7 @@
     - name: reload ssh
       systemd: name=sshd state=reloaded
     - name: reload firewalld
-      systemd: name=firewalld state=restarted
+      command: firewall-cmd --reload
     - name: reload bind
       systemd: name=named-pkcs11 state=reloaded
     - name: restart httpd
