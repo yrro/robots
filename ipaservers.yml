@@ -8,6 +8,27 @@
     - name: gather package_facts
       package_facts:
 
+    - name: create /var/log/journal
+      file:
+        path: /var/log/journal
+        state: directory
+        mode: '2755'
+        owner: root
+        group: systemd-journal
+    - name: recon /var/log/journal permissions
+      acl:
+        path: /var/log/journal
+      register: journal_acl
+      check_mode: false
+      changed_when: false
+    - name: set /var/log/journal permissions
+      command: systemd-tmpfiles --create --prefix=/var/log/journal
+      when: journal_acl.acl|length == 3
+    - name: flush logs to persistent storage
+      command:
+        cmd: journalctl --flush
+        creates: /var/log/journald/{{ansible_facts.machine_id}}
+
     - name: disable password authentication for root via SSH
       lineinfile:
         path: /etc/ssh/sshd_config
