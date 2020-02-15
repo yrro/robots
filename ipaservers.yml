@@ -147,6 +147,7 @@
         path: /etc/httpd/conf.d/ssl.conf
         state: absent
         regexp: (?i)^\s*{{item.name}}\b
+      notify: restart httpd
 
     - name: configure slapd TLS versions
       ldap_attr:
