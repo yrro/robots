@@ -140,17 +140,13 @@
           - +rsa_aes_256_sha
       notify: restart httpd
 
+    # crypto-policies(7) takes care of this
     - name: configure httpd mod_ssl security
       when: "'mod_ssl' in ansible_facts.packages"
       lineinfile:
         path: /etc/httpd/conf.d/ssl.conf
-        line: '{{item.name}} {{item.value}}'
+        state: absent
         regexp: (?i)^\s*{{item.name}}\b
-      loop:
-        - {'name': 'SSLProtocol', 'value': '{{protocol|join(" ")}}'}
-      vars:
-        protocol:
-          - +TLSv1.2
 
     - name: configure slapd TLS versions
       ldap_attr:
