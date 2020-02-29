@@ -146,7 +146,9 @@
       lineinfile:
         path: /etc/httpd/conf.d/ssl.conf
         state: absent
-        regexp: (?i)^\s*{{item.name}}\b
+        regexp: (?i)^\s*{{item}}\b
+      loop:
+        - SSLProtocol
       notify: restart httpd
 
     - name: configure slapd TLS versions
