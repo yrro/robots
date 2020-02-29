@@ -151,6 +151,15 @@
         - SSLProtocol
       notify: restart httpd
 
+    - name: configure httpd OCSP stapling
+      when: "'mod_ssl' in ansible_facts.packages"
+      copy:
+        content: |
+          SSLUseStapling on
+          SSLStaplingCache shmcb:/var/cache/httpd/ssl/ocsp_cache(10485760)
+        dest: /etc/httpd/conf.d/~ocsp-stapling.conf
+      notify: restart httpd
+
     - name: configure slapd TLS versions
       ldap_attr:
         server_uri: '{{ldap_url}}'
