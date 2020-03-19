@@ -239,6 +239,9 @@
     - name: install ipa-healthcheck
       yum: name=ipa-healthcheck state=installed
       when: ipa_healthcheck_available.results
+    - name: start ipa-healthcheck
+      systemd: name=ipa-healthcheck.timer state=started enabled=yes
+      when: ipa_healthcheck_available.results
 
   handlers:
     - name: reload ssh
