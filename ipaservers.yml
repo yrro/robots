@@ -106,10 +106,19 @@
     - name: set named to be authoritative-only
       lineinfile:
         path: /etc/named.conf
-        line: "\trecursion no;"
-        regexp: (?i)^\s*recursion\b
-        insertafter: \ballow-recursion\b
+        regexp: (?i)^\s*recursion\s+no\s*;
+        state: absent
       notify: reload bind
+    - name: add local config file to BIND config
+      lineinfile:
+        path: /etc/named.conf
+        insertafter: ^\s*options\b
+        line: "\tinclude \"/etc/named/options.conf\";"
+      notify: reload bind
+    - name: provide named options
+      copy:
+        src: files/named.options.conf
+        dest: /etc/named/options.conf
 
     - name: configure httpd mod_nss security
       when: "'mod_nss' in ansible_facts.packages"
