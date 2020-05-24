@@ -36,7 +36,7 @@
         - sudo
 
   handlers:
-    - name: restart ssst
+    - name: restart sssd
       systemd:
         name: sssd
         state: restarted
