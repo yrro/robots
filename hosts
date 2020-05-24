@@ -2,6 +2,7 @@
 ipa0.ipa.robots.org.uk
 ipa1.ipa.robots.org.uk
 ipa2.ipa.robots.org.uk
+ipa4.ipa.robots.org.uk
 
 [samhosts]
 merodach.ipa.robots.org.uk ansible_python_interpreter=/usr/bin/python3
