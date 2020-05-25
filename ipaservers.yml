@@ -4,9 +4,31 @@
   force_handlers: true
   vars:
     ldap_url: ldapi://%2fvar%2frun%2fslapd-IPA-ROBOTS-ORG-UK.socket
+    crypto_policy:
+      Fedora-32: NEXT
+      CentOS-8: DEFAULT
+
   tasks:
     - name: gather package_facts
       package_facts:
+
+    - name: switch to Fedora Server
+      dnf: name=fedora-release-server state=installed
+      when: ansible_facts['distribution'] == 'Fedora'
+
+    - name: choose desired crypto policy
+      set_fact:
+        crypto_policy_desired: "{{ crypto_policy[ansible_facts['distribution'] + '-' + ansible_facts['distribution_major_version']] | default(None) }}"
+    - block:
+      - name: recon active crypto policy
+        command: update-crypto-policies --show
+        register: crypto_policy_active
+        check_mode: false
+        changed_when: false
+      - name: configure crypto policy
+        command: update-crypto-policies --set {{crypto_policy_desired}}
+        when: crypto_policy_active != crypto_policy_desired
+      when: ansible_facts['crypto_policy_desired'] is not none
 
     - name: set timezone
       timezone:
