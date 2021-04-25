@@ -7,6 +7,7 @@
     crypto_policy:
       Fedora-32: NEXT
       CentOS-8: DEFAULT
+      RedHat-8: DEFAULT
 
   tasks:
     - name: gather package_facts

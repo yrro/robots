@@ -1,5 +1,6 @@
 [ipaservers]
 ipa2.ipa.robots.org.uk
+ipa3.ipa.robots.org.uk
 ipa4.ipa.robots.org.uk
 
 [samhosts]
