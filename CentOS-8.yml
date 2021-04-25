@@ -20,6 +20,7 @@
     - vim-enhanced
     - tmux
     - dnf-automatic
+    - needrestart
 
 - name: stop dnf-automatic
   systemd: name=dnf-automatic.timer state=stopped enabled=no

@@ -46,6 +46,7 @@
     - ldapvi
     - tmux
     - yum-cron
+    - needrestart
 
 - name: configure yum-cron
   ini_file:
