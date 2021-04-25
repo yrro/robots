@@ -98,38 +98,8 @@
         - {service: 'freeipa-adtrust', state: 'disabled'}
         - {service: 'freeipa-4', state: 'enabled'}
 
-    - name: configure httpd mod_nss security
-      when: "'mod_nss' in ansible_facts.packages"
-      lineinfile:
-        path: /etc/httpd/conf.d/nss.conf
-        line: '{{item.name}} {{item.value}}'
-        regexp: (?i)^\s*{{item.name}}\b
-      loop:
-        - {'name': 'NSSProtocol', 'value': '{{protocol|join(",")}}'}
-        - {'name': 'NSSCipherSuite', 'value': '{{ciphersuite|join(",")}}'}
-      vars:
-        protocol:
-          - TLSv1.2
-        ciphersuite:
-          - +aes_128_sha_256
-          - +aes_256_sha_256
-          - +ecdhe_ecdsa_aes_128_gcm_sha_256
-          - +ecdhe_ecdsa_aes_128_sha
-          - +ecdhe_ecdsa_aes_256_gcm_sha_384
-          - +ecdhe_ecdsa_aes_256_sha
-          - +ecdhe_rsa_aes_128_gcm_sha_256
-          - +ecdhe_rsa_aes_128_sha
-          - +ecdhe_rsa_aes_256_gcm_sha_384
-          - +ecdhe_rsa_aes_256_sha
-          - +rsa_aes_128_gcm_sha_256
-          - +rsa_aes_128_sha
-          - +rsa_aes_256_gcm_sha_384
-          - +rsa_aes_256_sha
-      notify: restart httpd
-
     # crypto-policies(7) takes care of this
     - name: configure httpd mod_ssl security
-      when: "'mod_ssl' in ansible_facts.packages"
       lineinfile:
         path: /etc/httpd/conf.d/ssl.conf
         state: absent
@@ -139,7 +109,6 @@
       notify: restart httpd
 
     - name: configure httpd OCSP stapling
-      when: "'mod_ssl' in ansible_facts.packages"
       copy:
         content: |
           SSLUseStapling on
