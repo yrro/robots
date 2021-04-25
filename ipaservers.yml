@@ -83,29 +83,6 @@
       command: firewall-cmd --set-default-zone=public
       when: firewalld_default_zone.stdout != 'public'
 
-    - name: recon firewalld freeipa-4 service definition
-      stat:
-        path: /usr/lib/firewalld/services/freeipa-4.xml
-      register: firewalld_svc_freeipa4
-    - name: provide firewalld freeipa-4 service definition
-      copy:
-        src: files/firewalld/freeipa-4.xml
-        dest: /etc/firewalld/services/freeipa-4.xml
-        seuser: _default
-        serole: _default
-        setype: _default
-        selevel: _default
-      when: not firewalld_svc_freeipa4.stat.exists
-      notify: reload firewalld
-    - name: remove firewalld freeipa-4 service definition
-      file:
-        path: /etc/firewalld/services/freeipa-4.xml
-        state: absent
-      when: firewalld_svc_freeipa4.stat.exists
-      notify: reload firewalld
-    - name: apply firewalld service changes
-      meta: flush_handlers
-
     - name: firewall service configuration
       firewalld:
         zone: public
