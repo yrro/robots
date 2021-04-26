@@ -1,0 +1,58 @@
+---
+- name: import yum repo PGP keys
+  rpm_key:
+    state: present
+    key: https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+    fingerprint: '96C0 104F 6315 4731 1E0B  B1AE 309B C305 BAAD AE52'
+- name: import epel PGP key
+  rpm_key:
+    state: present
+    key: '{{ item.key }}'
+    fingerprint: '{{ item.fingerprint }}'
+  loop:
+  - key: https://www.mirrorservice.org/sites/dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8
+    fingerprint: '94E2 79EB 8D8F 25B2 1810  ADF1 21EA 45AB 2F86 D6A1'
+  - key: https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+    fingerprint: '96C0 104F 6315 4731 1E0B  B1AE 309B C305 BAAD AE52'
+
+- name: enable yum repos
+  dnf:
+    name: '{{ item }}'
+    state: present
+  loop:
+  - https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+  - https://www.elrepo.org/elrepo-release-8.el8.elrepo.noarch.rpm
+
+- name: enable codeready builder repository
+  rhsm_repository:
+    name: codeready-builder-for-rhel-8-x86_64-rpms
+    state: enabled
+
+- name: install etckeeper
+  yum: name=etckeeper state=present
+- name: recon etckeeper init
+  stat: path=/etc/.git
+  register: etckeeper_dotgit
+- name: etckeeper init
+  command: etckeeper init
+  when: not etckeeper_dotgit.stat.exists
+
+- name: install useful packages
+  yum: name={{item}} state=present
+  loop:
+    - atop
+    - etckeeper
+    - htop
+    - vim-enhanced
+    - tmux
+    - dnf-automatic
+    - needrestart
+
+- name: stop dnf-automatic
+  systemd: name=dnf-automatic.timer state=stopped enabled=no
+- name: start dnf-automatic-install
+  systemd: name=dnf-automatic-install.timer state=started enabled=yes
+# TODO: upgrade_type=security
+
+- name: enable/start atop
+  systemd: name=atop state=started enabled=yes
