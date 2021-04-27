@@ -55,4 +55,11 @@
 # TODO: upgrade_type=security
 
 - name: enable/start atop
-  systemd: name=atop state=started enabled=yes
+  systemd:
+    name: '{{ item }}'
+    state: started
+    enabled: yes
+  loop:
+  - atop.service
+  - atop-rotate.timer
+  - atopacct.service
