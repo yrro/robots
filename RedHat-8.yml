@@ -48,6 +48,12 @@
     - dnf-automatic
     - needrestart
 
+- name: configure dnf-automatic to install security updates only
+  ini_file:
+    path: /etc/dnf/automatic.conf
+    section: commands
+    option: upgrade_type
+    value: security
 - name: stop dnf-automatic
   systemd: name=dnf-automatic.timer state=stopped enabled=no
 - name: start dnf-automatic-install
