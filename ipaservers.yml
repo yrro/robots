@@ -28,7 +28,7 @@
         changed_when: false
       - name: configure crypto policy
         command: update-crypto-policies --set {{crypto_policy_desired}}
-        when: crypto_policy_active != crypto_policy_desired
+        when: crypto_policy_active.stdout != crypto_policy_desired
       when: ansible_facts['crypto_policy_desired'] is not none
 
     - name: set timezone
