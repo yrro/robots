@@ -60,6 +60,13 @@
   systemd: name=dnf-automatic-install.timer state=started enabled=yes
 # TODO: upgrade_type=security
 
+- name: recon insights-client schedule
+  systemd: name=insights-client.timer
+  register: insights_client_timer
+- name: enable insights-client schedule
+  command: insights-client --enable-schedule
+  when: insights_client_timer.status.UnitFileState != 'enabled'
+
 - name: enable/start atop
   systemd:
     name: '{{ item }}'
