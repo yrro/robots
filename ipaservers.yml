@@ -92,6 +92,24 @@
       command: firewall-cmd --set-default-zone=public
       when: firewalld_default_zone.stdout != 'public'
 
+    - name: recon firewalld public zone target
+      command: firewall-cmd --permanent --zone=public --get-target
+      check_mode: no
+      changed_when: False
+      register: firewalld_public_target
+    - name: set firewalld public zone target
+      command: firewall-cmd --permanent --zone=public --set-target=REJECT
+      when: firewalld_public_target.stdout != 'REJECT'
+      notify: reload firewalld
+
+    - name: firewalld - allow ping
+      firewalld:
+        zone: public
+        rich_rule: rule icmp-type name="echo-request" accept
+        state: enabled
+        permanent: yes
+        immediate: yes
+
     - name: firewall service configuration
       firewalld:
         zone: public
