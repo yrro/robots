@@ -65,6 +65,15 @@
     - name: start firewalld
       systemd: name=firewalld state=started enabled=yes
 
+    - name: disable firewalld zone drifting
+      ini_file:
+        path: /etc/firewalld/firewalld
+        state: present
+        section: null
+        option: AllowZoneDrifting
+        value: no
+      notify: reload firewalld
+
     - name: recon firewalld log-denied
       command: firewall-cmd --get-log-denied
       check_mode: no
