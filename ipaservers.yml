@@ -160,6 +160,13 @@
         dest: /etc/httpd/conf.d/~ocsp-stapling.conf
       notify: restart httpd
 
+    - name: configure ldap commands for root to use ldapi
+      copy:
+        content: |
+          URI ldapi://%2frun%2fslapd-IPA-ROBOTS-ORG-UK.socket
+          SASL_MECH EXTERNAL
+        dest: /root/.ldaprc
+
     - name: configure slapd TLS versions
       ldap_attr:
         server_uri: '{{ldap_url}}'
