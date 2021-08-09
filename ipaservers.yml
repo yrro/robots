@@ -110,6 +110,23 @@
         permanent: yes
         immediate: yes
 
+    # See <https://firewalld.org/2020/09/policy-objects-introduction>; the
+    # allow-host-ipv6 policy isn't available until firewalld 0.9.x so we need
+    # to allow the icmp packets listed explicitly until that version becomes
+    # available in RHEL.
+    - name: firewalld - allow ipv6
+      firewalld:
+        zone: public
+        rich_rule: rule icmp-type name="{{item}}" accept
+        state: enabled
+        permanent: yes
+        immediate: yes
+      loop:
+      - neighbour-advertisement
+      - neighbour-solicitation
+      - router-advertisement
+      - redirect
+
     - name: firewall service configuration
       firewalld:
         zone: public
