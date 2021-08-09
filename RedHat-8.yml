@@ -58,7 +58,6 @@
   systemd: name=dnf-automatic.timer state=stopped enabled=no
 - name: start dnf-automatic-install
   systemd: name=dnf-automatic-install.timer state=started enabled=yes
-# TODO: upgrade_type=security
 
 - name: recon insights-client schedule
   systemd: name=insights-client.timer
