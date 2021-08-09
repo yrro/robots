@@ -222,17 +222,6 @@
         state: exact
       notify: restart slapd
 
-    - name: restrict tomcat to TLSv1.2
-      xml:
-        path: /etc/pki/pki-tomcat/server.xml
-        xpath: /Server/Service[@name='Catalina']/Connector[@name='Secure']
-        attribute: '{{item}}'
-        value: 'tls1_2:tls1_2'
-      loop:
-        - sslVersionRangeDatagram
-        - sslVersionRangeStream
-      notify: restart tomcat
-
     - name: install ipa-healthcheck
       yum: name=ipa-healthcheck state=installed
     - name: start ipa-healthcheck
@@ -249,5 +238,3 @@
       systemd: name=httpd state=restarted
     - name: restart slapd
       systemd: name=dirsrv@IPA-ROBOTS-ORG-UK state=restarted
-    - name: restart tomcat
-      systemd: name=pki-tomcatd@pki-tomcat state=restarted
