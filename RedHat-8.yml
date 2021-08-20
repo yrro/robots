@@ -38,6 +38,8 @@
     - atop
     - etckeeper
     - htop
+    - lsof
+    - strace
     - vim-enhanced
     - tmux
     - dnf-automatic
