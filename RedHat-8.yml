@@ -40,6 +40,7 @@
     - htop
     - lsof
     - strace
+    - ldapvi
     - vim-enhanced
     - tmux
     - dnf-automatic
