@@ -67,7 +67,7 @@
 
     - name: disable firewalld zone drifting
       ini_file:
-        path: /etc/firewalld/firewalld
+        path: /etc/firewalld/firewalld.conf
         state: present
         section:
         option: AllowZoneDrifting
