@@ -16,12 +16,11 @@
     fingerprint: '96C0 104F 6315 4731 1E0B  B1AE 309B C305 BAAD AE52'
 
 - name: enable 3rd party yum repos
-  dnf:
-    name: '{{ item }}'
+  yum:
     state: present
-  loop:
-  - https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-  - https://www.elrepo.org/elrepo-release-8.el8.elrepo.noarch.rpm
+    name:
+    - https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+    - https://www.elrepo.org/elrepo-release-8.el8.elrepo.noarch.rpm
 
 - name: install etckeeper
   yum: name=etckeeper state=present
@@ -33,8 +32,9 @@
   when: not etckeeper_dotgit.stat.exists
 
 - name: install useful packages
-  yum: name={{item}} state=present
-  loop:
+  yum:
+    state: present
+    name:
     - atop
     - etckeeper
     - htop
