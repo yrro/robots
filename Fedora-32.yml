@@ -15,8 +15,9 @@
     force: no
 
 - name: install useful packages
-  yum: name={{item}} state=present
-  loop:
+  yum:
+    state: present
+    name:
     - atop
     - etckeeper
     - htop
