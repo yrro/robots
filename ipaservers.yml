@@ -69,7 +69,7 @@
       ini_file:
         path: /etc/firewalld/firewalld
         state: present
-        section: null
+        section:
         option: AllowZoneDrifting
         value: 'no'
       notify: reload firewalld
