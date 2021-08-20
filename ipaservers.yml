@@ -230,7 +230,12 @@
       notify: restart slapd
 
     - name: install ipa-healthcheck
-      yum: name=ipa-healthcheck state=installed
+      yum: name={{pkg[ansible_facts.distribution]}} state=installed
+      vars:
+        pkg:
+          RedHat: ipa-healthcheck
+          CentOS: ipa-healthcheck
+          Fedora: freeipa-healthcheck
     - name: start ipa-healthcheck
       systemd: name=ipa-healthcheck.timer state=started enabled=yes
 
