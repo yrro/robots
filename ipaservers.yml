@@ -71,7 +71,7 @@
         state: present
         section: null
         option: AllowZoneDrifting
-        value: no
+        value: 'no'
       notify: reload firewalld
 
     - name: recon firewalld log-denied
