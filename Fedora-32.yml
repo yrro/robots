@@ -27,6 +27,7 @@
     - vim-enhanced
     - tmux
     - dnf-automatic
+    - needrestart
     - crudini
   when: "'ipaservers' in group_names"
 
