@@ -45,6 +45,7 @@
     - tmux
     - dnf-automatic
     - needrestart
+    - crudini
 
 - name: configure dnf-automatic to install security updates only
   ini_file:

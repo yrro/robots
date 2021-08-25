@@ -27,6 +27,7 @@
     - vim-enhanced
     - tmux
     - dnf-automatic
+    - crudini
   when: "'ipaservers' in group_names"
 
 - name: stop dnf-automatic
