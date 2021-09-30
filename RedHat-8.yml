@@ -38,6 +38,7 @@
     - atop
     - etckeeper
     - htop
+    - jq
     - lsof
     - strace
     - ldapvi
