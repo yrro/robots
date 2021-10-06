@@ -1,0 +1,18 @@
+driftfile /var/lib/chrony/drift
+
+makestep 1.0 {{ -1 if ansible_facts['virtualization_role'] == 'guest' else 3 }}
+
+rtcsync
+
+minsources 2
+
+keyfile /etc/chrony.keys
+
+leapsectz right/UTC
+
+logdir /var/log/chrony
+
+pool pool.ntp.org iburst
+
+allow ::/128
+allow 127.0.0.1/8

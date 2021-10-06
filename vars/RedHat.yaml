@@ -1,0 +1,5 @@
+---
+chrony_conf: /etc/chrony.conf
+chrony_service: chronyd
+
+ssh_service: sshd

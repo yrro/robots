@@ -3,6 +3,9 @@
   become: yes
   force_handlers: true
   tasks:
+    - name: gather OS-specific variables
+      include_vars: '{{ ansible_facts.os_family }}.yaml'
+
     - name: enable gssapi-keyex
       lineinfile:
         path: /etc/ssh/sshd_config
@@ -35,6 +38,12 @@
         - pam
         - sudo
 
+    - name: configure chrony
+      template:
+        src: templates/chrony/chrony.{{ ansible_facts.os_family }}.conf.j2
+        dest: '{{ chrony_conf }}'
+      notify: restart chrony
+
   handlers:
     - name: restart sssd
       systemd:
@@ -42,10 +51,9 @@
         state: restarted
     - name: reload ssh
       systemd:
-        name: '{{s[ansible_facts.os_family]}}'
+        name: '{{ ssh_service }}'
         state: reloaded
-      when: ansible_facts.os_family == 'Debian'
-      vars:
-        s:
-          Debian: ssh
-          RedHat: sshd
+    - name: restart chrony
+      systemd:
+        name: '{{ chrony_service }}'
+        state: restarted
