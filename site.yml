@@ -1,7 +1,20 @@
 ---
 - hosts: all
+  gather_facts: no
+  tasks:
+
+  - name: assert limit
+    run_once: yes
+    assert:
+      that:
+      - 'ansible_limit is defined'
+      fail_msg: Playbook must be run with a limit
+      quiet: yes
+
+- hosts: all
   become: yes
   tasks:
+
     - include_tasks: "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
 
 - import_playbook: common.yml
