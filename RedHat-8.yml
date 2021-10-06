@@ -52,6 +52,7 @@
     - dnf-automatic
     - needrestart
     - crudini
+    - chrony
 
 - name: configure dnf-automatic to install security updates only
   ini_file:
@@ -80,3 +81,9 @@
   - atop.service
   - atop-rotate.timer
   - atopacct.service
+
+- name: enable/start chrony
+  systemd:
+    name: chronyd
+    state: started
+    enabled: yes
