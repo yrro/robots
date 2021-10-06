@@ -30,6 +30,11 @@
 - name: etckeeper init
   command: etckeeper init
   when: not etckeeper_dotgit.stat.exists
+- name: enable etckeeper daily autocommit
+  systemd:
+    name: etckeeper.timer
+    state: started
+    enabled: yes
 
 - name: install useful packages
   yum:
