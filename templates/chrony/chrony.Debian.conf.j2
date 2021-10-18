@@ -1,0 +1,24 @@
+confdir /etc/chrony/conf.d
+
+pool pool.ntp.org iburst
+
+sourcedir /run/chrony-dhcp
+
+keyfile /etc/chrony/chrony.keys
+
+driftfile /var/lib/chrony/chrony.drift
+
+ntsdumpdir /var/lib/chrony
+
+logdir /var/log/chrony
+
+maxupdateskew 100.0
+
+rtcsync
+
+makestep 1.0 {{ chrony_makestep_limit }}
+
+leapsectz right/UTC
+
+allow ::/128
+allow 127.0.0.0/8

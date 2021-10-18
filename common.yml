@@ -65,6 +65,10 @@
       notify: restart sssd
       when: pam_sss_gss_stat.stat.exists
 
+    - name: determine chrony makestep limit
+      set_fact:
+        chrony_makestep_limit: "{{ -1 if ansible_facts['virtualization_role'] == 'guest' else 3 }}"
+
     - name: configure chrony
       template:
         src: templates/chrony/chrony.{{ ansible_facts.os_family }}.conf.j2

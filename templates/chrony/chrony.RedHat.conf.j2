@@ -1,6 +1,6 @@
 driftfile /var/lib/chrony/drift
 
-makestep 1.0 {{ -1 if ansible_facts['virtualization_role'] == 'guest' else 3 }}
+makestep 1.0 {{ chrony_makestep_limit }}
 
 rtcsync
 
