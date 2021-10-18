@@ -2,4 +2,4 @@
 chrony_conf: /etc/chrony/chrony.conf
 chrony_service: chrony
 
-sshd_service: ssh
+ssh_service: ssh
