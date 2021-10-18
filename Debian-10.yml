@@ -1,3 +1,10 @@
 ---
 - name: install auditd
   apt: name=auditd state=present
+
+- name: enable pam_sss_gss
+  lineinfile:
+    path: /etc/pam.d/sudo
+    state: present
+    line: '-auth sufficient pam_sss_gss.so'
+    insertbefore: '^\s*@include\s+common-auth\b'

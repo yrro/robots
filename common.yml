@@ -43,6 +43,28 @@
         - pam
         - sudo
 
+    - name: recon pam_libdir
+      shell:
+        cmd: /sbin/ldconfig -p | awk '$1 == "libpam.so.0" { print $4 }' | sed 's/libpam\.so\.0$/security/'
+      register: pam_libdir
+      check_mode: False
+      changed_when: False
+      failed_when: pam_libdir.stdout == ""
+
+    - name: recon pam_sss_gss.so existence
+      stat:
+        path: '{{ pam_libdir.stdout }}/pam_sss_gss.so'
+      register: pam_sss_gss_stat
+
+    - name: configure allowed services for pam_sss_gss.so
+      ini_file:
+        path: /etc/sssd/sssd.conf
+        section: pam
+        option: pam_gssapi_services
+        value: sudo
+      notify: restart sssd
+      when: pam_sss_gss_stat.stat.exists
+
     - name: configure chrony
       template:
         src: templates/chrony/chrony.{{ ansible_facts.os_family }}.conf.j2

@@ -87,3 +87,14 @@
     name: chronyd
     state: started
     enabled: yes
+
+- name: enable pam_sss_gss
+  pamd:
+    name: sudo
+    state: before
+    type: auth
+    control: include
+    module_path: system-include
+    new_type: -auth
+    new_control: sufficient
+    new_module_path: pam_sss_gss.so
