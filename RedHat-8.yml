@@ -94,7 +94,7 @@
     state: before
     type: auth
     control: include
-    module_path: system-include
+    module_path: system-auth
     new_type: -auth
     new_control: sufficient
     new_module_path: pam_sss_gss.so
