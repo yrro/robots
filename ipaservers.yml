@@ -213,9 +213,9 @@
         values: 'on'
         state: exact
         # dirsrv restart not required!
-    # Has the side-effect of disbling simple binds via ldapi. SASL EXTERNAL
-    # authentication still works though.
     - name: enable rootdn_access plugin
+      # Has the side-effect of disbling simple binds via ldapi. SASL EXTERNAL
+      # authentication still works though.
       ldap_attr:
         server_uri: '{{ldap_url}}'
         dn: cn=RootDN Access Control,cn=plugins,cn=config
@@ -223,10 +223,10 @@
         values: 'on'
         state: exact
       notify: restart slapd
-    # Even though rootdn-allow-ip is documented as allowing wildcards, trying
-    # to use them causes slapd to fail to start
-    # <https://pagure.io/389-ds-base/issue/50800>.
     - name: restrict rootdn access to localhost
+      # Even though rootdn-allow-ip is documented as allowing wildcards, trying
+      # to use them causes slapd to fail to start
+      # <https://pagure.io/389-ds-base/issue/50800>.
       ldap_attr:
         server_uri: '{{ldap_url}}'
         dn: cn=RootDN Access Control,cn=plugins,cn=config
