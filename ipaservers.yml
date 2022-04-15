@@ -205,6 +205,14 @@
         values: 'on'
         state: exact
       notify: restart slapd
+    - name: enable directory server audit logging
+      ldap_attr:
+        server_uri: '{{ldap_url}}'
+        dn: cn=config
+        name: nsslapd-auditlog-logging-enabled
+        values: 'on'
+        state: exact
+        # dirsrv restart not required!
     # Has the side-effect of disbling simple binds via ldapi. SASL EXTERNAL
     # authentication still works though.
     - name: enable rootdn_access plugin
