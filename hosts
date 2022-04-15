@@ -7,3 +7,5 @@ ipa5.ipa.robots.org.uk
 merodach.ipa.robots.org.uk ansible_python_interpreter=/usr/bin/python3
 wintermute.ipa.robots.org.uk
 xoanon.ipa.robots.org.uk
+
+# vim: ft=dosini
