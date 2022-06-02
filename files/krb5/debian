@@ -1,11 +1,12 @@
 [libdefaults]
+# TODO test if persistent keyring is supported, in the same way freeipa-client does: run keyctl get_persistent @s $UID
 # Debian kernels don't have CONFIG_PERSISTENT_KEYRINGS. In the absence
 # of this option, libkrb5 is supposed to fall back to the user keyring.
-#default_ccache_name=KEYRING:PERSISTENT:%{uid}
+default_ccache_name=KEYRING:PERSISTENT:%{uid}
 #
 # But that didn't appear to happen on at least one host. So we can set
 # it explicitly:
-default_ccache_name=KEYRING:user:%{uid}
+#default_ccache_name=KEYRING:user:%{uid}
 #
 # It turns out that Fedora 30 uses sssd's KCM service instead. Let's try
 # this another time.
