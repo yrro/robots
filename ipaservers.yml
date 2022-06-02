@@ -258,3 +258,8 @@
       systemd: name=httpd state=restarted
     - name: restart slapd
       systemd: name=dirsrv@IPA-ROBOTS-ORG-UK state=restarted
+
+# TODO: authselect enable-feature with-mkhomedir
+# TODO: module.sig_enforce
+# TODO: audit log?
+# TODO: nsslapd-plugin-binddn-tracking=on?
