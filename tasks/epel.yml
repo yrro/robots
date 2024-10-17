@@ -1,0 +1,11 @@
+- name: import epel PGP key
+  rpm_key:
+    state: present
+    key: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ ansible_facts.distribution_major_version }}
+    fingerprint: FF8A D134 4597 106E CE81  3B91 8A38 72BF 3228 467C
+
+- name: enable epel repository
+  dnf:
+    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+    state: present
+...

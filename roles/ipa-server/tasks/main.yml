@@ -1,0 +1,10 @@
+- import_tasks: packages.yml
+- import_tasks: firewalld.yml
+- import_tasks: replica-install.yml
+- import_tasks: config-recon.yml
+- import_tasks: root-ldaprc.yml
+- import_tasks: dirsrv.yml
+- import_tasks: pki.yml
+- import_tasks: replica-status.yml
+- import_tasks: healthcheck-prometheus.yml
+...

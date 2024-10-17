@@ -1,0 +1,10 @@
+- name: configure ldap commands for root to use ldapi
+  copy:
+    content: |
+      URI {{ ipa_server_ldapi_uri }}
+      SASL_MECH EXTERNAL
+    dest: /root/.ldaprc
+    mode: 0644
+    owner: root
+    group: root
+...

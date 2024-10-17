@@ -1,0 +1,20 @@
+- name: install etckeeper
+  package:
+    name: etckeeper
+    state: present
+  tags: slow
+
+- name: recon etckeeper init
+  stat: path=/etc/.git
+  register: etckeeper_dotgit
+
+- name: etckeeper init
+  command: etckeeper init && etckeeper commit -m "Initial commit"
+  when: not etckeeper_dotgit.stat.exists
+
+- name: enable etckeeper daily autocommit
+  systemd:
+    name: etckeeper.timer
+    state: started
+    enabled: yes
+...

@@ -1,0 +1,13 @@
+- name: restart dirsrv
+  systemd:
+    name: dirsrv@{{ ipa_server_dirsrv_instance }}
+    state: restarted
+
+- name: restart pki-tomcatd
+  systemd:
+    name: pki-tomcatd@pki-tomcat
+    state: restarted
+
+- name: systemd daemon-reload
+  systemd:
+    daemon_reload: true

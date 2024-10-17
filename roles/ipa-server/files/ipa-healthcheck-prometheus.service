@@ -1,0 +1,8 @@
+[Unit]
+Description=IPA Healthcheck for node exporter
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/ipa-healthcheck-prometheus
+TimeoutStartSec=5m
+Environment=IPA_HEALTHCHECK_PROMETHEUS_OUTPUT_DIR=/srv/node-exporter

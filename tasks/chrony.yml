@@ -1,0 +1,66 @@
+- name: install chrony
+  package:
+    name: chrony
+    state: present
+  tags: slow
+
+- name: load ptp-kvm module
+  modprobe:
+    name: ptp-kvm
+    persistent: '{{ ("kvm" in ansible_facts.virtualization_tech_guest) | ternary("present", "absent") }}'
+    state: '{{ ("kvm" in ansible_facts.virtualization_tech_guest) | ternary("present", "absent") }}'
+
+- name: recon /dev/ptp_kvm
+  stat:
+    path: /dev/ptp_kvm
+  register: chrony_stat_ptp_kvm
+
+- name: recon chronyd seccomp support
+  command: chronyd --version
+  check_mode: false
+  changed_when: false
+  register: chronyd_version
+
+- name: configure chrony
+  template:
+    src: templates/chrony.conf.j2
+    dest: /etc/chrony.conf
+    mode: 0644
+    owner: root
+    group: root
+  register: chrony_configure
+
+- name: verify chrony configuration
+  command: chronyd -p
+  check_mode: false
+  changed_when: false
+
+- name: configure chrony options
+  template:
+    src: templates/chronyd.sysconfig.j2
+    dest: /etc/sysconfig/chronyd
+    mode: 0644
+    owner: root
+    group: root
+  register: chrony_options
+
+# A simple handler to restart chronyd won't cut it, because if the config file
+# is invalid then the playbook will fail when the handler fails, but a
+# subsequent run won't trigger the handler and so an invalid config file will
+# not be noticed.
+#
+# If we stop chronyd after reconfiguration, and the config file is invalid, then
+# the following task will fail to start it, detecting the error every time.
+
+- name: stop chrony after reconfiguration
+  systemd:
+    name: chronyd
+    state: stopped
+  when: chrony_configure.changed or chrony_options.changed
+
+- name: enable & start chronyd
+  systemd:
+    name: chronyd
+    enabled: true
+    state: started
+...

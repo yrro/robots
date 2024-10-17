@@ -1,0 +1,6 @@
+- name: enable codeready builder repository
+  rhsm_repository:
+    name: codeready-builder-for-rhel-{{ ansible_facts.distribution_major_version }}-{{ ansible_facts.architecture }}-rpms
+    state: enabled
+  tags: slow
+...

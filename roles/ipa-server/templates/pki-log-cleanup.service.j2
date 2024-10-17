@@ -1,0 +1,65 @@
+[Unit]
+Description=pki log file cleanup
+
+[Service]
+CapabilityBoundingSet=
+Environment=DEBUG_RETAIN_DAYS=10 RLF_RETAIN_DAYS=45 DRY_RUN=0
+ExecStart=/usr/local/sbin/pki-log-cleanup
+IPAddressDeny=any
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+NoNewPrivileges=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+PrivateTmp=yes
+PrivateUsers=yes
+{% if ansible_facts.distribution_major_version|int >= 9 %}
+ProcSubset=pid
+ProtectClock=yes
+{% endif %}
+ProtectControlGroups=yes
+ProtectHome=yes
+{% if ansible_facts.distribution_major_version|int >= 9 %}
+ProtectHostname=yes
+ProtectKernelLogs=yes
+{% endif %}
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+{% if ansible_facts.distribution_major_version|int >= 9 %}
+ProtectProc=invisible
+{% endif %}
+ProtectSystem=strict
+ReadWritePaths=/var/log/pki/pki-tomcat/acme /var/log/pki/pki-tomcat/ca /var/log/pki/pki-tomcat/kra /var/log/pki/pki-tomcat/pki
+RemoveIPC=yes
+{% if ansible_facts.distribution_major_version|int >= 9 %}
+RestrictAddressFamilies=none
+{% else %}
+RestrictAddressFamilies=~AF_INET
+RestrictAddressFamilies=~AF_INET6
+RestrictAddressFamilies=~AF_NETLINK
+RestrictAddressFamilies=~AF_PACKET
+RestrictAddressFamilies=~AF_UNIX
+{% endif %}
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+#SELinuxContext=system_u:system_r:tomcat_t:s0  # init_t may not transition to tomcat_t
+# setting pki-log-cleanup's context to system_u:object_r:tomcat_exec_t:s0 results in 'avc:  denied  { nnp_transition } for  pid=235980 comm=(-cleanup) scontext=system_u:system_r:init_t:s0 tcontext=system_u:system_r:tomcat_t:s0 tclass=process permissive=0
+SystemCallArchitectures=native
+# These appear to be set (according to 'systemctl show') but 'systemd-analyze security' doesn't see them
+SystemCallFilter=~@clock      
+SystemCallFilter=~@cpu-emulation    
+SystemCallFilter=~@debug      
+SystemCallFilter=~@module     
+SystemCallFilter=~@mount      
+SystemCallFilter=~@obsolete         
+SystemCallFilter=~@privileged 
+SystemCallFilter=~@raw-io     
+SystemCallFilter=~@reboot     
+SystemCallFilter=~@resources  
+SystemCallFilter=~@swap       
+Type=oneshot
+UMask=077
+User=pkiuser
+
+# vim: ft=systemd ts=4 sts=2 sw=2 et

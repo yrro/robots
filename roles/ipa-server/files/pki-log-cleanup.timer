@@ -1,0 +1,10 @@
+[Unit]
+Description=pki log file cleanup
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=14400
+
+[Install]
+WantedBy=timers.target

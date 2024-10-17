@@ -1,0 +1,59 @@
+- name: install ipa-client
+  package:
+    name: ipa-client
+    state: present
+  tags: slow
+
+- name: install ipa-client scripts
+  copy:
+    src: files/ipa-client/akinit.sh
+    dest: /usr/local/bin/akinit
+    mode: 0755
+    owner: root
+    group: root
+
+- name: recon IPA client configured
+  command:
+    argv:
+    - python3
+    - -c
+    - |
+      from ipalib.facts import is_ipa_client_configured
+      print(int(is_ipa_client_configured()))
+  check_mode: false
+  changed_when: false
+  register: ipa_client_configured
+
+- name: join host to domain
+  when: not (ipa_client_configured.stdout | bool)
+  block:
+  - pause:
+      prompt: "One Time Password for host {{ inventory_hostname }}"
+      echo: false
+    register: ipa_client_otp
+    no_log: true
+
+  - tempfile:
+      state: file
+      suffix: .crt
+    register: ipa_ca_crt
+
+  - copy:
+      src: /etc/ipa/ca.crt
+      dest: '{{ ipa_ca_crt.path }}'
+
+  - name: ipa-client-install
+    command:
+      argv:
+      - ipa-client-install
+      - --unattended
+      - --ca-cert-file={{ ipa_ca_crt.path }}
+      - --domain=ipa.robots.org.uk
+      - --hostname={{ inventory_hostname }}
+      - --password={{ ipa_client_otp.user_input }}
+      - --no-ntp
+
+  - meta: end_host
+
+# TODO: mkhomedir subid chrony dyndns pam_gssapi pwhistory faillock !nullok tlog
+...

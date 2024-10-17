@@ -1,0 +1,11 @@
+- name: add freeipa services to firewall zone
+  firewalld:
+    permanent: true
+    immediate: true
+    service: '{{ item }}'
+    zone: public
+    state: enabled
+  loop:
+  - dns
+  - freeipa-4
+...

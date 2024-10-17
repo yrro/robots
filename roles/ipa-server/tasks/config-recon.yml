@@ -1,0 +1,23 @@
+- name: recon ipa configuration
+  set_fact:
+    ipa_server_realm: '{{ query("ini", "realm", section="global", file="/etc/ipa/default.conf") | first }}'
+    ipa_server_domain: '{{ query("ini", "realm", section="global", file="/etc/ipa/default.conf") | first }}'
+
+- name: figure ipa server dirsrv instance name
+  set_fact:
+    ipa_server_dirsrv_instance: '{{ ipa_server_realm | replace(".", "-") }}'
+
+- name: figure ipa server ldapi URI
+  command:
+    argv:
+    - python3
+    - -c
+    - |
+      from ipapython.ipaldap import realm_to_ldapi_uri
+      print(realm_to_ldapi_uri("{{ ipa_server_realm }}"))
+  check_mode: false
+  changed_when: false
+  register: _ipa_server_ldapi_uri
+
+- set_fact:
+    ipa_server_ldapi_uri: '{{ _ipa_server_ldapi_uri.stdout }}'

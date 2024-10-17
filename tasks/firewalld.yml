@@ -1,0 +1,12 @@
+- name: install firewalld
+  package:
+    name: firewalld
+    state: present
+  tags: slow
+
+- name: enable & start firewalld
+  systemd_service:
+    name: firewalld
+    enabled: true
+    state: started
+...

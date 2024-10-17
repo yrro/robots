@@ -1,0 +1,9 @@
+- name: install ipa-server packages
+  package:
+    name:
+    - python3-prometheus_client
+    - ipa-healthcheck
+    - ipa-server
+    state: present
+  tags: slow
+...

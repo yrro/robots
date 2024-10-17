@@ -1,0 +1,33 @@
+- name: configure dirsrv
+  ldap_attrs:
+    dn: cn=config
+    attributes:
+      nsslapd-minssf-exclude-rootdse: "on"
+      nsslapd-minssf: 56
+      nsslapd-require-secure-binds: "on"
+      nsslapd-allow-anonymous-access: rootdse
+      #nsslapd-auditlog-logging-enabled: on
+    server_uri: '{{ ipa_server_ldapi_uri }}'
+    state: exact
+
+- name: configure dirsrv security
+  ldap_attrs:
+    dn: cn=encryption,cn=config
+    attributes:
+      nsTLSAllowClientRenegotiation: "off"
+    server_uri: '{{ ipa_server_ldapi_uri }}'
+    state: exact
+  notify: restart dirsrv
+
+- name: configure dirsrv RootDN Access Control
+  ldap_attrs:
+    dn: cn=RootDN Access Control,cn=plugins,cn=config
+    attributes:
+      nsslapd-pluginEnabled: "on"
+      rootdn-allow-ip:
+      - ::1
+      - 127.*
+    server_uri: '{{ ipa_server_ldapi_uri }}'
+    state: exact
+  notify: restart dirsrv
+...

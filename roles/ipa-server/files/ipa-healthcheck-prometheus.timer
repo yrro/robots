@@ -1,0 +1,10 @@
+[Unit]
+Description=IPA Healthcheck for node exporter
+
+[Timer]
+OnActiveSec=10m
+OnUnitActiveSec=15m
+RandomizedDelaySec=5m
+
+[Install]
+WantedBy=timers.target

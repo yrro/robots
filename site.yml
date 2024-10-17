@@ -1,0 +1,50 @@
+- name: assert limit is specified
+  hosts: all
+  gather_facts: no
+  run_once: yes
+  tasks:
+
+  - name: assert limit
+    run_once: yes
+    assert:
+      that:
+      - 'ansible_limit is defined'
+      fail_msg: Playbook must be run with a limit
+      quiet: yes
+
+- name: configure hosts
+  hosts: all
+  tasks:
+
+  - import_tasks: tasks/crb.yml
+    tags: crb
+
+  - import_tasks: tasks/epel.yml
+    tags: epel
+
+  - import_tasks: tasks/etckeeper.yml
+    tags: etckeeper
+
+  - import_tasks: tasks/packages.yml
+    tags: packages
+
+  - import_tasks: tasks/chrony.yml
+    tags: chrony
+
+  - import_tasks: tasks/firewalld.yml
+    tags: firewalld
+
+  - import_tasks: tasks/ipa-client.yml
+    tags: ipa-client
+
+- name: configure ipa servers
+  hosts: ipaservers
+  tasks:
+
+  - import_role:
+      name: ipa-server
+    tags: ipa-server
+
+
+# TODO: firewalld-public-reject firewalld-public-icmp-echo firewalld-log-unicast insights-client node-exporter certmonger-exporter(+firewalld) journal
+...

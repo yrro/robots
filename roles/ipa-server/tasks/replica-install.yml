@@ -1,0 +1,23 @@
+- name: recon IPA server configured
+  command:
+    argv:
+      - python3
+      - -c
+      - |
+        from ipalib.facts import is_ipa_configured
+        print(int(is_ipa_configured()))
+  check_mode: false
+  changed_when: false
+  register: ipa_server_configured
+
+- name: ipa-replica-install
+  command:
+    argv:
+    - ipa-replica-install
+    - --unattended
+    - --setup-dns
+    - --auto-forwarder
+    - --setup-ca
+    - --setup-kra
+  when: not (ipa_server_configured.stdout | bool)
+...

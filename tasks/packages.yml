@@ -1,0 +1,16 @@
+- name: install useful packages
+  package:
+    name:
+    - crudini
+    - htop
+    - jq
+    - ldapvi
+    - lsof
+    - ranger
+    - strace
+    - tcpdump
+    - tmux
+    - vim-enhanced
+    state: present
+  tags: slow
+...

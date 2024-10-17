@@ -1,0 +1,8 @@
+- name: install ipa-replica-status script
+  copy:
+    src: ipa-replica-status.sh
+    dest: /usr/local/sbin/ipa-replica-status
+    mode: 0755
+    owner: root
+    group: root
+...

@@ -1,0 +1,28 @@
+- name: install ipa-healthcheck-prometheus script
+  copy:
+    src: ipa-healthcheck-prometheus.py
+    dest: /usr/local/sbin/ipa-healthcheck-prometheus
+    mode: 0755
+    owner: root
+    group: root
+
+- name: install ipa-healthcheck-prometheus systemd units
+  copy:
+    src: '{{ item }}'
+    dest: /etc/systemd/system/
+    mode: 0644
+    owner: root
+    group: root
+  loop:
+  - ipa-healthcheck-prometheus.service
+  - ipa-healthcheck-prometheus.timer
+  notify: systemd daemon-reload
+
+- meta: flush_handlers
+
+- name: enable & start ipa-healthcheck-prometheus timer
+  systemd:
+    name: ipa-healthcheck-prometheus.timer
+    enabled: true
+    state: started
+...
