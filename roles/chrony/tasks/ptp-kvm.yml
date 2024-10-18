@@ -1,0 +1,11 @@
+- name: load ptp-kvm module
+  modprobe:
+    name: ptp-kvm
+    persistent: '{{ ("kvm" in ansible_facts.virtualization_tech_guest) | ternary("present", "absent") }}'
+    state: '{{ ("kvm" in ansible_facts.virtualization_tech_guest) | ternary("present", "absent") }}'
+
+- name: recon /dev/ptp_kvm
+  stat:
+    path: /dev/ptp_kvm
+  register: chrony_stat_ptp_kvm
+...

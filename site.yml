@@ -28,7 +28,8 @@
   - import_tasks: tasks/packages.yml
     tags: packages
 
-  - import_tasks: tasks/chrony.yml
+  - import_role:
+      name: chrony
     tags: chrony
 
   - import_tasks: tasks/firewalld.yml
@@ -44,7 +45,6 @@
   - import_role:
       name: ipa-server
     tags: ipa-server
-
 
 # TODO: firewalld-public-reject firewalld-public-icmp-echo firewalld-log-unicast insights-client node-exporter certmonger-exporter(+firewalld) journal
 ...

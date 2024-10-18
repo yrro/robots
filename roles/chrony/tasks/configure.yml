@@ -1,20 +1,3 @@
-- name: install chrony
-  package:
-    name: chrony
-    state: present
-  tags: slow
-
-- name: load ptp-kvm module
-  modprobe:
-    name: ptp-kvm
-    persistent: '{{ ("kvm" in ansible_facts.virtualization_tech_guest) | ternary("present", "absent") }}'
-    state: '{{ ("kvm" in ansible_facts.virtualization_tech_guest) | ternary("present", "absent") }}'
-
-- name: recon /dev/ptp_kvm
-  stat:
-    path: /dev/ptp_kvm
-  register: chrony_stat_ptp_kvm
-
 - name: recon chronyd seccomp support
   command: chronyd --version
   check_mode: false
@@ -23,7 +6,7 @@
 
 - name: configure chrony
   template:
-    src: templates/chrony.conf.j2
+    src: chrony.conf.j2
     dest: /etc/chrony.conf
     mode: 0644
     owner: root
@@ -37,7 +20,7 @@
 
 - name: configure chrony options
   template:
-    src: templates/chronyd.sysconfig.j2
+    src: chronyd.sysconfig.j2
     dest: /etc/sysconfig/chronyd
     mode: 0644
     owner: root

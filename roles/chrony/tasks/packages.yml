@@ -1,0 +1,8 @@
+- name: install chrony packages
+  package:
+    name:
+    - chrony
+    - podman
+    state: present
+  tags: slow
+...

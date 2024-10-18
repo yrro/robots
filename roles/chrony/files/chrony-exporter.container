@@ -1,0 +1,20 @@
+[Unit]
+Description=chrony Prometheus exporter
+
+[Container]
+Image=quay.io/superq/chrony-exporter
+User=65534
+Group=65534
+Network=host
+NoNewPrivileges=yes
+ReadOnly=yes
+Exec=--chrony.address=localhost:323
+PodmanArgs=--cpus=1
+PodmanArgs=--memory=64m
+Label=io.containers.autoupdate=registry
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

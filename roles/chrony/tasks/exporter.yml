@@ -1,0 +1,27 @@
+- name: install chrony-exporter container unit
+  copy:
+    src: chrony-exporter.container
+    dest: /etc/containers/systemd/
+    mode: 0644
+    owner: root
+    group: root
+  register: chrony_exporter_container_unit
+
+- name: systemd daemon-reload
+  systemd_service:
+    daemon_reload: true
+  when: chrony_exporter_container_unit.changed
+
+- name: start chrony-exporter
+  systemd_service:
+    name: chrony-exporter.service
+    state: started
+
+- name: add chrony-exporter port to firewalld
+  firewalld:
+    zone: public
+    port: 9123/tcp
+    permanent: true
+    immediate: true
+    state: enabled
+...
