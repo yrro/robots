@@ -1,11 +1,10 @@
 - name: assert limit is specified
   hosts: all
   gather_facts: no
-  run_once: yes
   tasks:
 
   - name: assert limit
-    run_once: yes
+    run_once: true
     assert:
       that:
       - 'ansible_limit is defined'
