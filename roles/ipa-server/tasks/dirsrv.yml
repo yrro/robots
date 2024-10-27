@@ -5,8 +5,8 @@
       nsslapd-minssf-exclude-rootdse: "on"
       nsslapd-minssf: 56
       nsslapd-require-secure-binds: "on"
-      nsslapd-allow-anonymous-access: rootdse
-      #nsslapd-auditlog-logging-enabled: on
+      nsslapd-allow-anonymous-access: "off"
+      #nsslapd-auditlog-logging-enabled: "on"
     server_uri: '{{ ipa_server_ldapi_uri }}'
     state: exact
 
