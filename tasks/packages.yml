@@ -1,12 +1,14 @@
 - name: install useful packages
   package:
     name:
+    - bash-color-prompt
     - crudini
     - htop
     - jq
     - ldapvi
     - lsof
     - ranger
+    - socat
     - strace
     - tcpdump
     - tmux
