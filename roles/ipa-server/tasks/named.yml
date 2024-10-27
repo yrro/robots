@@ -1,0 +1,20 @@
+- name: create named unit override directory
+  file:
+    path: /etc/systemd/system/named.service.d
+    mode: 0755
+    owner: root
+    group: root
+    state: directory
+
+- name: configure named to restart automatically
+  copy:
+    content: |
+      # <https://issues.redhat.com/browse/RHEL-6453?focusedId=23089892&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-23089892>
+      [Service]
+      Restart=on-abnormal
+    dest: /etc/systemd/system/named.service.d/auto-restart.conf
+    mode: 0644
+    owner: root
+    group: root
+    directory_mode: 0755
+  notify: systemd daemon-reload
