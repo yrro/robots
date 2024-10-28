@@ -1,6 +1,14 @@
+- name: determine named service
+  set_fact:
+    ipa_server_named_service: '{{ named_services[ansible_facts.distribution ~ "-" ~ ansible_facts.distribution_major_version] }}'
+  vars:
+    named_services:
+      RedHat-8: named-pkcs11
+      RedHat-9: named
+
 - name: create named unit override directory
   file:
-    path: /etc/systemd/system/named.service.d
+    path: /etc/systemd/system/{{ ipa_server_named_service }}.service.d
     mode: 0755
     owner: root
     group: root
@@ -12,7 +20,7 @@
       # <https://issues.redhat.com/browse/RHEL-6453?focusedId=23089892&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-23089892>
       [Service]
       Restart=on-abnormal
-    dest: /etc/systemd/system/named.service.d/auto-restart.conf
+    dest: /etc/systemd/system/{{ ipa_server_named_service }}.service.d/auto-restart.conf
     mode: 0644
     owner: root
     group: root
