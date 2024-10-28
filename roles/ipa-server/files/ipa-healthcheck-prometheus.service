@@ -1,5 +1,6 @@
 [Unit]
 Description=IPA Healthcheck for node exporter
+ConditionPathExists=/srv/node-exporter
 
 [Service]
 Type=oneshot

@@ -21,7 +21,7 @@
 - meta: flush_handlers
 
 - name: enable & start ipa-healthcheck-prometheus timer
-  systemd:
+  systemd_service:
     name: ipa-healthcheck-prometheus.timer
     enabled: true
     state: started
