@@ -32,7 +32,6 @@
     mode: 0644
     owner: root
     group: root
-    validate: systemd-analyze verify %s:pki-log-cleanup.service
   notify: systemd daemon-reload
 
 - meta: flush_handlers

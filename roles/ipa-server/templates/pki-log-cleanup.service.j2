@@ -5,7 +5,9 @@ Description=pki log file cleanup
 CapabilityBoundingSet=
 Environment=DEBUG_RETAIN_DAYS=10 RLF_RETAIN_DAYS=45 DRY_RUN=0
 ExecStart=/usr/local/sbin/pki-log-cleanup
+{% if ansible_facts.distribution_major_version|int >= 9 %}
 IPAddressDeny=any
+{% endif %}
 LockPersonality=yes
 MemoryDenyWriteExecute=yes
 NoNewPrivileges=yes
