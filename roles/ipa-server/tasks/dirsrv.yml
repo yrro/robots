@@ -30,4 +30,58 @@
     server_uri: '{{ ipa_server_ldapi_uri }}'
     state: exact
   notify: restart dirsrv
+
+- name: configure dirsrv monitoring system account
+  ldap_entry:
+    dn: uid=dirsrv-mon,cn=sysaccounts,cn=etc,dc=ipa,dc=robots,dc=org,dc=uk
+    objectClass:
+    - account
+    - simpleSecurityObject
+    attributes:
+      description: for 389-ds-exporter
+      userPassword: '{{ lookup("password", "/dev/null", chars="printable", length=20) }}'
+    server_uri: '{{ ipa_server_ldapi_uri }}'
+    state: present
+  when: inventory_hostname == groups.ipaservers|first
+
+- name: configure dirsrv monitoring system account password
+  ldap_passwd:
+    dn: uid=dirsrv-mon,cn=sysaccounts,cn=etc,dc=ipa,dc=robots,dc=org,dc=uk
+    passwd: '{{ ipa_server_dirsrv_mon_password }}'
+    server_uri: '{{ ipa_server_ldapi_uri }}'
+  when: inventory_hostname == groups.ipaservers|first
+
+- name: allow dirsrv-mon to monitor ldbm statistics
+  ldap_attrs:
+    dn: cn=ldbm database,cn=plugins,cn=config
+    attributes:
+      aci:
+      - (targetfilter = "(|(cn=monitor)(cn=database))")
+        (targetattr = "*")
+        (
+          version 3.0;
+          acl "dirsrv monitoring of ldbm statistics";
+          allow (search, read)
+          (userdn = "ldap:///uid=dirsrv-mon,cn=sysaccounts,cn=etc,dc=ipa,dc=robots,dc=org,dc=uk")
+          ;
+        )
+    state: present
+    server_uri: '{{ ipa_server_ldapi_uri }}'
+
+- name: allow dirsrv-mon to monitor replication
+  ldap_attrs:
+    dn: cn=mapping tree,cn=config
+    attributes:
+      aci:
+      - (targetfilter = "(|(objectclass=nsds5replica)(objectclass=nsds5replicationagreement))")
+        (targetattr = "*")
+        (
+          version 3.0;
+          acl "dirsrv monitoring of replication";
+          allow (search, read)
+          (userdn = "ldap:///uid=dirsrv-mon,cn=sysaccounts,cn=etc,dc=ipa,dc=robots,dc=org,dc=uk")
+          ;
+        )
+    state: present
+    server_uri: '{{ ipa_server_ldapi_uri }}'
 ...
