@@ -1,0 +1,10 @@
+- import_tasks: packages.yml
+- import_tasks: crypto-policy.yml
+- import_tasks: hostkey.yml
+- name: configure connections
+  include_tasks: connection.yml
+  loop: '{{ ipsec | dict2items }}'
+  loop_control:
+    loop_var: connection
+  when: ipsec is defined
+...

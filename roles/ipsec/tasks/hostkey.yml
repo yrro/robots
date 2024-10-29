@@ -1,0 +1,32 @@
+- name: determine ipsec nss database location
+  set_fact:
+    ipsec_nssdb_path: '{{ ipsec_nssdb_paths[ansible_facts.distribution ~ "-" ~ ansible_facts.distribution_major_version] }}'
+  vars:
+    ipsec_nssdb_paths:
+      RedHat-8: /etc/ipsec.d
+      RedHat-9: /var/lib/ipsec/nss
+
+- name: init ipsec nss database
+  command:
+    cmd: ipsec initnss
+    creates: '{{ ipsec_nssdb_path }}/*.db'
+
+- name: recon ipsec host keys
+  command: ipsec showhostkey --list
+  check_mode: false
+  changed_when: false
+  register: ipsec_hostkeys
+
+- name: create ipsec host key
+  command: ipsec newhostkey
+  when: ipsec_hostkeys.stdout_lines == []
+
+- name: recon ipsec host keys
+  command: ipsec showhostkey --list
+  check_mode: false
+  changed_when: false
+  register: ipsec_hostkeys
+
+- name: recon ipsec host pubkey ckaid
+  set_fact:
+    ipsec_host_pubkey_ckaid: '{{ (ipsec_hostkeys.stdout_lines[0] | split)[6] }}'

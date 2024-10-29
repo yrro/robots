@@ -1,0 +1,17 @@
+- name: create IPSEC-SHA1 crypto-policies subpolicy
+  copy:
+    src: IPSEC-SHA1.pmod
+    dest: /etc/crypto-policies/policies/modules
+    owner: root
+    group: root
+    mode: 0644
+
+- name: recon crypto policy
+  command: update-crypto-policies --show
+  check_mode: false
+  changed_when: false
+  register: crypto_policy
+
+- name: configure crypto policy
+  command: update-crypto-policies --set DEFAULT:IPSEC-SHA1
+  when: crypto_policy.stdout != "DEFAULT:IPSEC-SHA1"

@@ -1,0 +1,8 @@
+---
+sites:
+  stn:
+    wan_ipv4: 154.61.56.219
+    ipsec_pubkey: 0sAwEAAe9hv7xp5bKLq5gm++DfCqCVvX+tCThC7nk5P0Twlv844joI8EsHQeYPx+oiJWN+kmzXfWEcPs6bViqxq40tekYAxyviP1f4OhGS1P9WehgxN87tzSJdGTiOZViWqg8wq4pNSsupCaJttP8UQBL4LuzE1bH5cKwPdSd35jApIzuot+LvwyljwbDlI/mQ0sAYDzV2tH9rTyK9rFqlXN4lUU4/Hm9yNdHWAvtKQbGysco4nfdOH4/iolPAzOSOcpIG6D2IvUza1cqOv4U/Hc/myucN8K9CC866QQwF5gDu+uJ1O4PnrQoECB1fCKj8jFHTQqii95wB+NsFNnMhj1PFMd84Wy+b3yEJelsa9vMkxMcP8lFbJYX6I10SMUt+P6/GVj4/9UGO2qnp7nVR6Qr/88Q370hLZ1BnmBnbQvOTQrLhHmf3m/rJDCetv93RdlZJ8sOL2UDsyo7SFBnDeGZQUnDx8OLkuWHrI3pivB3M+7DuE6BeqSGLZ55Xo36Z3lKBEw==
+    ipsec_subnet: 192.168.88.0/23
+...
+# vim: ts=8 sts=2 sw=2 et ft=yaml

@@ -1,0 +1,6 @@
+conn {{ connection.key }}
+{% for k, v in connection.value.items() %}
+  {{ k }} = {{ v }}
+{% endfor %}
+
+# vim: ts=8 sts=2 sw=2 et

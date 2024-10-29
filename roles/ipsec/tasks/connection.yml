@@ -1,0 +1,12 @@
+- name: create {{ connection.key }} connection file
+  template:
+    src: connection.j2
+    dest: /etc/ipsec.d/{{ connection.key }}.conf
+    owner: root
+    group: root
+    mode: 0644
+  register: ipsec_connection_file
+
+- name: reload {{ connection.key }}
+  command: ipsec auto --replace {{ connection.key }}
+  when: ipsec_connection_file.changed

@@ -1,0 +1,13 @@
+- name: install ipsec packages
+  package:
+    name:
+    - libreswan
+    state: present
+  tags: slow
+
+- name: enable & start libreswan
+  systemd_service:
+    name: ipsec
+    enabled: true
+    state: started
+...
