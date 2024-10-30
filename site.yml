@@ -35,6 +35,10 @@
     tags: firewalld
 
   - import_role:
+      name: node-exporter
+    tags: node-exporter
+
+  - import_role:
       name: chrony
     tags: chrony
 

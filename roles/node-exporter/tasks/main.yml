@@ -1,0 +1,37 @@
+---
+- name: create textfile collector directory
+  file:
+    path: /srv/node-exporter
+    state: directory
+    mode: 0750
+    owner: root
+    group: nobody
+
+- name: install node-exporter container unit
+  copy:
+    src: node-exporter.container
+    dest: /etc/containers/systemd/
+    mode: 0644
+    owner: root
+    group: root
+  register: node_exporter_container_unit
+
+- name: systemd daemon-reload
+  systemd_service:
+    daemon_reload: true
+  when: node_exporter_container_unit.changed
+
+- name: start node-exporter
+  systemd_service:
+    name: node-exporter.service
+    state: started
+
+- name: add node-exporter port to firewalld
+  firewalld:
+    zone: public
+    port: 9100/tcp
+    permanent: true
+    immediate: true
+    offline: true
+    state: '{{ ("ipaservers_public" in group_names) | ternary("disabled", "enabled") }}'
+...

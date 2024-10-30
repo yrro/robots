@@ -1,0 +1,22 @@
+[Unit]
+Description=node Prometheus exporter
+
+[Container]
+Image=quay.io/prometheus/node-exporter:latest
+User=65534
+Group=65534
+Network=host
+NoNewPrivileges=yes
+ReadOnly=yes
+Volume=/:/host:ro,rslave
+PodmanArgs=--pid=host
+PodmanArgs=--cpus=1
+PodmanArgs=--memory=128m
+Label=io.containers.autoupdate=registry
+Exec=--path.rootfs=/host --collector.ntp --collector.textfile.directory=/host/srv/node-exporter
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
