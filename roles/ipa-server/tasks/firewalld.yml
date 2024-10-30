@@ -2,6 +2,7 @@
   firewalld:
     permanent: true
     immediate: true
+    offline: true
     service: '{{ item }}'
     zone: public
     state: enabled

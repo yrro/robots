@@ -1,4 +1,5 @@
 ---
+firewalld: true
 sites:
   stn:
     wan_ipv4: 154.61.56.219

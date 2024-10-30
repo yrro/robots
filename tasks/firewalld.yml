@@ -7,6 +7,6 @@
 - name: enable & start firewalld
   systemd_service:
     name: firewalld
-    enabled: true
-    state: started
+    enabled: '{{ firewalld | ternary(true, false) }}'
+    state: '{{ firewalld | ternary("started", "stopped") }}'
 ...
