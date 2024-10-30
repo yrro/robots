@@ -8,6 +8,14 @@
     follow: no
   notify: restart pki-tomcatd
 
+- name: configure PKI server access log
+  xml:
+    path: /etc/pki/pki-tomcat/server.xml
+    xpath: /Server/Service[@name="Catalina"]/Engine[@name="Catalina"]/Host[@name="localhost"]/Valve[@className="org.apache.catalina.valves.AccessLogValve"]
+    attribute: maxDays
+    value: '7'
+  notify: restart pki-tomcatd
+
 - name: install pki-log-cleanup script
   copy:
     src: pki-log-cleanup.sh
