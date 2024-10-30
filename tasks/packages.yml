@@ -7,6 +7,7 @@
     - jq
     - ldapvi
     - lsof
+    - mlocate
     - ranger
     - socat
     - strace
