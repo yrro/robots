@@ -9,7 +9,7 @@ $ ansible-galaxy collection install -r requirements.yml
 Should be as simple as:
 
 ```
-$ ansible-playbook -b -l ipaservers site.yml
+$ ansible-playbook -l ipaservers site.yml
 ```
 
 In subsequent runs, certain slow tasks, such as enabling repositories via RHSM,
