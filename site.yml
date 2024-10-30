@@ -1,3 +1,4 @@
+---
 - name: assert limit is specified
   hosts: all
   gather_facts: no
@@ -24,18 +25,18 @@
   - import_tasks: tasks/etckeeper.yml
     tags: etckeeper
 
+  - import_tasks: tasks/ipa-client.yml
+    tags: ipa-client
+
   - import_tasks: tasks/packages.yml
     tags: packages
-
-  - import_role:
-      name: chrony
-    tags: chrony
 
   - import_tasks: tasks/firewalld.yml
     tags: firewalld
 
-  - import_tasks: tasks/ipa-client.yml
-    tags: ipa-client
+  - import_role:
+      name: chrony
+    tags: chrony
 
 - name: configure ipa servers
   hosts: ipaservers
