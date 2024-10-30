@@ -1,9 +1,16 @@
+# Weak dependencies are disabled because java-17-openjdk-devel recommends gtk3
+# which pulls in a lot of stuff. To clean up manually, 'dnf remove gtk3 && dnf
+# autoremove'.  java-17-openjdk-devel is required by idm-pki-server
+# <https://gitlab.com/redhat/centos-stream/rpms/pki-core/-/blob/c340f9e97d55be47dd952644ec2af038197764e6/pki-core.spec#L494>
+# because some pki-server commands require the 'jar' command
+# <https://issues.redhat.com/browse/RHEL-4572>.
 - name: install ipa-server packages
-  package:
+  dnf:
     name:
     - python3-prometheus_client
     - ipa-healthcheck
     - ipa-server
     state: present
+    install_weak_deps: false
   tags: slow
 ...
