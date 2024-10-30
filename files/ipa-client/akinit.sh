@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu -o pipefail
+set -eEu -o pipefail
 
 armor_cc=$(mktemp --tmpdir="${XDG_RUNTIME_DIR}" krbcc_anon.XXXXXXXXXX)
 trap "rm -f ${armor_cc}" EXIT

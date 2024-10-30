@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu -o pipefail
+set -eEu -o pipefail
 
 domain=$(crudini --get /etc/ipa/default.conf global domain)
 ds_instance=$(<<< "${domain//./-}" tr a-z A-Z)
