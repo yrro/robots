@@ -8,6 +8,7 @@
     - ldapvi
     - lsof
     - mlocate
+    - podman
     - ranger
     - socat
     - strace
