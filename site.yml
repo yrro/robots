@@ -53,6 +53,5 @@
   - import_role:
       name: ipsec
     tags: ipsec
-
-# TODO: firewalld-stn-ipsec firewall-stn-sources firewalld-public-reject firewalld-public-icmp-echo firewalld-log-unicast insights-client node-exporter certmonger-exporter(+firewalld) journal
 ...
+# TODO: firewalld-stn-ipsec firewall-stn-sources firewalld-public-reject firewalld-public-icmp-echo firewalld-log-unicast insights-client node-exporter certmonger-exporter(+firewalld) journal dnf-automatic
