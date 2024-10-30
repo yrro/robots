@@ -1,5 +1,6 @@
 - import_tasks: packages.yml
 - import_tasks: crypto-policy.yml
+  when: ansible_facts.distribution_major_version|int >= 9
 - import_tasks: hostkey.yml
 - name: configure connections
   include_tasks: connection.yml
