@@ -27,12 +27,6 @@
 - name: join host to domain
   when: not (ipa_client_configured.stdout | bool)
   block:
-  - pause:
-      prompt: "One Time Password for host {{ inventory_hostname }}"
-      echo: false
-    register: ipa_client_otp
-    no_log: true
-
   - tempfile:
       state: file
       suffix: .crt

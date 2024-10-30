@@ -22,30 +22,10 @@ only the chrony related tasks.
 
 ## Host Enrolment
 
-Before a host has been joined to the domain, specify credentials via command
-line options.
+Before a host has been joined to the domain, use host variables to specify
+connection credentials (`ansible_user` and `ansible_password`) and the host's
+OTP (`ipa_client_otp`).
 
-For example:
-
-```
-$ ipa host-add host.example.com --random
------------------------------------
-Added host "host.example.com"
------------------------------------
-  Host name: host.example.com
-  Random password: 2secret2beTru
-  Password: True
-  Keytab: False
-  Managed by: host.example.com
-```
-
-Assuming that `root`'s password is available via the `SSHPASS` environment
-variable:
-
-```
-$ ansible-playbook site.yml -l host.example.com -u root -e ansible_password='{{ lookup("env", "SSHPASS" }}'
-```
-
-The playbook will prompt for the host's One Time Password as needed. The play
-will end immediately after the host is joined to the domain, so that you can
-re-run the playbook without specifying authentication options.
+The play will end immediately after the host is joined to the domain. At this
+point, remove `ansible_user` and `ansible_password` and re-run the
+`ansible-playbook` command.
