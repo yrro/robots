@@ -24,5 +24,5 @@
     permanent: true
     immediate: true
     offline: true
-    state: enabled
+    state: '{{ ("ipaservers_public" in group_names) | ternary("disabled", "enabled") }}'
 ...
