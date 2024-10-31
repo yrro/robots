@@ -48,20 +48,17 @@ def get_rlf_paths(log_dir, datum):
     there's no CS.cfg file for acma/pki subsystems so this property can't be
     set for them anyway.
     '''
-    rlf_retention = int(os.environ.get("RLF_RETAIN_DAYS", "14"))
+    rlf_retention = int(os.environ.get("RLF_RETAIN_DAYS", "90"))
     assert rlf_retention > 0
     cutoff = datum - timedelta(days=rlf_retention)
 
-    for glob in ["selftests.log.????-??-??.log", "system.????-??-??", "transactions.????-??-??"]:
+    # TODO: remove expiration of 'system' and 'transactions' logs, which were
+    # removed in v11.2.0-beta3-656-g043515bd9d
+    for glob in ["selftests.log.??????????????", "signedAudit/*.??????????????", "system.??????????????", "transactions.??????????????"]:
         for path in log_dir.glob(glob):
-            path_date = datetime.strptime(path.name[-14:-4], "%Y-%m-%d")
+            path_date = datetime.strptime(path.name[-14:-6], "%Y%m%d")
             if path_date.date() < cutoff:
                 yield path
-
-    for path in log_dir.glob("signedAudit/*.??????????????"):
-        path_date = datetime.strptime(path.name[-14:-6], "%Y%m%d")
-        if path_date.date() < cutoff:
-            yield path
 
 
 def get_debug_paths(log_dir, datum):
@@ -72,7 +69,7 @@ def get_debug_paths(log_dir, datum):
     </usr/share/pki/*/webapps/*/WEB-INF/classes/logging.properties>, they
     aren't being purged on RHEL 8 or 9.
     '''
-    debug_retention = int(os.environ.get("DEBUG_RETAIN_DAYS", "60"))
+    debug_retention = int(os.environ.get("DEBUG_RETAIN_DAYS", "21"))
     assert debug_retention > 0
     cutoff = datum - timedelta(days=debug_retention)
 
