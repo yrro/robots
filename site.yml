@@ -31,6 +31,9 @@
   - import_tasks: tasks/packages.yml
     tags: packages
 
+  - import_tasks: tasks/fstrim.yml
+    tags: fstrim
+
   - import_tasks: tasks/firewalld.yml
     tags: firewalld
 
