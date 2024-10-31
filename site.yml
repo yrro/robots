@@ -28,6 +28,9 @@
   - import_tasks: tasks/ipa-client.yml
     tags: ipa-client
 
+  - import_tasks: tasks/nfsv4.yml
+    tags: nfsv4
+
   - import_tasks: tasks/packages.yml
     tags: packages
 
