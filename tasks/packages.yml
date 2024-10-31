@@ -14,6 +14,7 @@
     - strace
     - tcpdump
     - tmux
+    - tree
     - vim-enhanced
     state: present
   tags: slow
