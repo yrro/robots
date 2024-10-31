@@ -18,7 +18,7 @@
 
 - name: install pki-log-cleanup script
   copy:
-    src: pki-log-cleanup.sh
+    src: pki-log-cleanup.py
     dest: /usr/local/sbin/pki-log-cleanup
     mode: 0755
     owner: root
