@@ -67,7 +67,8 @@ def get_debug_paths(log_dir, datum):
     <https://github.com/dogtagpki/pki/wiki/Configuring-Subsystem-Debug-Log>
     they are purged after 7 days, and even though maxDays is set to 7 in
     </usr/share/pki/*/webapps/*/WEB-INF/classes/logging.properties>, they
-    aren't being purged on RHEL 8 or 9.
+    aren't being purged on RHEL 8 or 9
+    <https://github.com/dogtagpki/pki/issues/3731>.
     '''
     debug_retention = int(os.environ.get("DEBUG_RETAIN_DAYS", "21"))
     assert debug_retention > 0
