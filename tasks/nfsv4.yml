@@ -1,6 +1,21 @@
+- name: populate package facts
+  package_facts:
+
+- name: check for nfs.conf.d support
+  set_fact:
+    nfs_utils_supports_conf_d: '{{ ansible_facts.packages["nfs-utils"][0].version is version("2.5.3", ">=") }}'
+
+- name: create /etc/nfs.conf.d
+  file:
+    path: /etc/nfs.conf.d
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+
 - name: disable nfsv3
   ini_file:
-    path: /etc/nfs.conf
+    path: '{{ nfs_utils_supports_conf_d | ternary("/etc/nfs.conf.d/v4only.conf", "/etc/nfs.conf") }}'
     section: nfsd
     option: vers3
     value: 'n'
@@ -8,7 +23,7 @@
 
 - name: cache mount requests by ip address
   ini_file:
-    path: /etc/nfs.conf
+    path: '{{ nfs_utils_supports_conf_d | ternary("/etc/nfs.conf.d/mountd-logging.conf", "/etc/nfs.conf") }}'
     section: mountd
     option: cache-use-ipaddr
     value: 'y'
@@ -16,7 +31,7 @@
 
 - name: enable mountd logging
   ini_file:
-    path: /etc/nfs.conf
+    path: '{{ nfs_utils_supports_conf_d | ternary("/etc/nfs.conf.d/mountd-logging.conf", "/etc/nfs.conf") }}'
     section: mountd
     option: debug
     value: auth
@@ -24,7 +39,7 @@
 
 - name: increase mound request ttl
   ini_file:
-    path: /etc/nfs.conf
+    path: '{{ nfs_utils_supports_conf_d | ternary("/etc/nfs.conf.d/mountd-logging.conf", "/etc/nfs.conf") }}'
     section: mountd
     option: ttl
     value: '3600'
@@ -55,18 +70,19 @@
 - name: populate service facts
   service_facts:
 
+- name: restart nfs-server
+  systemd_service:
+    name: nfs-server.service
+    state: restarted
+  when: ansible_facts.services["nfs-server"].state | default("stopped") == "running"
+    and nfs_conf_nfsd_vers3.changed
+
 - name: restart nfs-mountd
   systemd_service:
     name: nfs-mountd.service
     state: restarted
   when: ansible_facts.services["nfs-mountd.service"].state == "running"
-    and (
-      nfs_conf_nfsd_vers3.changed 
-      or nfs_conf_mountd_ipaddr.changed
-      or nfs_conf_mountd_debug.changed
-      or nfs_conf_mountd_ttl,changed
-      or mountd_v4only_conf.changed
-    )
+    and [nfs_conf_nfsd_vers3, nfs_conf_mountd_ipaddr, nfs_conf_mountd_debug, nfs_conf_mountd_ttl, mountd_v4only_conf.changed] | selectattr("changed")
 
 - name: disable nfsv3-specific services
   systemd_service:
