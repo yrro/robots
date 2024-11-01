@@ -1,0 +1,14 @@
+# https://pagure.io/freeipa/issue/9694
+- name: configure certmonger to renew certificates before ipa-healthcheck flags that they are about to expire
+  ini_file:
+    path: /etc/certmonger/certmonger.conf
+    section: defaults
+    option: enroll_ttls
+    value: 2764800, 2419200, 604800, 259200, 172800, 86400, 43200, 21600, 7200, 3600
+  register: ipa_server_certmonger_conf
+
+- name: restart certmonger
+  systemd_service:
+    name: certmonger.service
+    state: restarted
+  when: ipa_server_certmonger_conf.changed

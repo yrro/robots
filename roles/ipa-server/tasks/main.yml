@@ -1,4 +1,5 @@
 - import_tasks: packages.yml
+- import_tasks: certmonger.yml
 - import_tasks: firewalld.yml
 - import_tasks: replica-install.yml
 - import_tasks: config-recon.yml
