@@ -84,4 +84,60 @@
         )
     state: present
     server_uri: '{{ ipa_server_ldapi_uri }}'
+
+- name: store dirsrv-mon password in a secret
+  containers.podman.podman_secret:
+    name: dirsrv-mon-password
+    data: '{{ ipa_server_dirsrv_mon_password }}'
+    state: present
+  register: ipa_server_dirsrv_exporter_secret_password
+
+- name: store dirsrv URL in a secret
+  containers.podman.podman_secret:
+    name: dirsrv-mon-url
+    data: '{{ ipa_server_ldapi_uri | replace("ldapi://", "ldapi://%2Fhost") }}'
+    state: present
+  register: ipa_server_dirsrv_exporter_secret_url
+
+- name: run dirsrv-exporter
+  containers.podman.podman_container:
+    name: dirsrv-exporter
+    image: ghcr.io/yrro/dirsrv-exporter
+    state: quadlet
+    network: host
+    env:
+      389_DS_EXPORTER_USER: uid=dirsrv-mon,cn=sysaccounts,cn=etc,dc=ipa,dc=robots,dc=org,dc=uk
+    secrets:
+    - dirsrv-mon-password,type=env,target=389_DS_EXPORTER_PASSWORD
+    - dirsrv-mon-url,type=env,target=389_DS_EXPORTER_URL
+    generate_systemd:
+      restart: always
+    read_only: true
+    volume:
+    - /run:/host/run
+    label:
+      io.containers.autoupdate=registry
+    cpus: 1
+    memory: 64m
+    security_opt:
+    - label=disable
+    quadlet_options:
+    - AutoUpdate=registry
+    - NoNewPrivileges=yes
+    - |
+      [Install]
+      WantedBy=multi-user.target
+    user: 65535:65535
+  register: ipa_server_dirsrv_exporter_container
+
+- name: reload systemd units
+  systemd:
+    daemon_reload: true
+  when: ipa_server_dirsrv_exporter_container.changed
+
+- name: restart dirsrv-exporter
+  systemd_service:
+    name: dirsrv-exporter
+    state: restarted
+  when: '[ipa_server_dirsrv_exporter_secret_password, ipa_server_dirsrv_exporter_secret_url] | selectattr("changed")'
 ...
