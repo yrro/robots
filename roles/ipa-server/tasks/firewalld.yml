@@ -9,4 +9,15 @@
   loop:
   - dns
   - freeipa-4
+
+- name: add freeipa ports to firewall zone
+  firewalld:
+    permanent: true
+    immediate: true
+    offline: true
+    port: '{{ item }}'
+    zone: public
+    state: enabled
+  loop:
+  - 9976/tcp  # dirsrv-exporter
 ...
