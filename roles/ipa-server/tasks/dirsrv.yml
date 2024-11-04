@@ -139,5 +139,5 @@
   systemd_service:
     name: dirsrv-exporter
     state: restarted
-  when: '[ipa_server_dirsrv_exporter_secret_password, ipa_server_dirsrv_exporter_secret_url] | selectattr("changed")'
+  when: '[ipa_server_dirsrv_exporter_container, ipa_server_dirsrv_exporter_secret_password, ipa_server_dirsrv_exporter_secret_url] | selectattr("changed")'
 ...
