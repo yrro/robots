@@ -127,7 +127,7 @@
     - |
       [Install]
       WantedBy=multi-user.target
-    user: 65535:65535
+    user: 65534:65534
   register: ipa_server_dirsrv_exporter_container
 
 - name: reload systemd units
