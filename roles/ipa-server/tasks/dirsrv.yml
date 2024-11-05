@@ -102,7 +102,7 @@
 - name: run dirsrv-exporter
   containers.podman.podman_container:
     name: dirsrv-exporter
-    image: ghcr.io/yrro/dirsrv-exporter
+    image: quay.io/yrro/dirsrv-exporter
     state: quadlet
     network: host
     env:
