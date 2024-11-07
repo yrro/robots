@@ -10,11 +10,13 @@
     - mlocate
     - podman
     - ranger
+    - rsync
     - socat
     - strace
     - tcpdump
     - tmux
     - tree
+    - unzip
     - vim-enhanced
     state: present
   tags: slow
