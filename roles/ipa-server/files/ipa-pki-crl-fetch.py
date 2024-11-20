@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+from datetime import timezone
 from pathlib import Path
 from subprocess import run
 import sys
@@ -37,8 +38,8 @@ def convert_crl():
 
     crl_file_tmp.rename(crl_file)
     crl = x509.load_pem_x509_crl(crl_file.read_bytes())
-    prom_crl_last_update.labels(crl_file, crl.issuer.rfc4514_string()).set(crl.last_update.timestamp())
-    prom_crl_next_update.labels(crl_file, crl.issuer.rfc4514_string()).set(crl.next_update.timestamp())
+    prom_crl_last_update.labels(crl_file, crl.issuer.rfc4514_string()).set(crl.last_update.replace(tzinfo=timezone.utc).timestamp())
+    prom_crl_next_update.labels(crl_file, crl.issuer.rfc4514_string()).set(crl.next_update.replace(tzinfo=timezone.utc).timestamp())
     prom_crl_number.labels(crl_file, crl.issuer.rfc4514_string()).set(crl.extensions.get_extension_for_oid(x509.CRLNumber.oid).value.crl_number)
 
 
