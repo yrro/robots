@@ -1,0 +1,6 @@
+[Unit]
+Description=IPA PKI CRL fetch
+
+[Service]
+Type=exec
+ExecStart=/usr/local/libexec/ipa-pki-crl-fetch

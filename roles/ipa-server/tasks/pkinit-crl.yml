@@ -1,0 +1,96 @@
+# Important notes!
+
+# 1. CRLs are read at kdc startup - they are not refreshed ongoing!
+#
+# 2. If there's a problem that prevents the CRL directory being accessed during startup, krb5kdc will log a message and PKINIT will be disabled:
+#   krb5kdc[335082](Error): preauth pkinit failed to initialize: PKINIT initialization failed: Cannot open file '/var/kerberos/krb5kdc/crls//524d180b.r0': (null)
+#
+# 3. Can't use 'openssl rehash' as recommended by krb5.conf(5) because:
+#   type=AVC msg=audit(11/19/24 15:33:10.181:2663) : avc:  denied  { read } for  pid=335082 comm=krb5kdc name=524d180b.r0 dev="vda4" ino=25266954 scontext=system_u:system_r:krb5kdc_t:s0 tcontext=unconfined_u:object_r:krb5kdc_conf_t:s0 tclass=lnk_file permissive=0 
+#
+# When attempting to use a revoked certificate, the client will see:
+#
+#   $ kinit -c MEMORY: -X X509_anchors=FILE:/etc/ipa/ca.crt -X X509_user_identity=FILE:/tmp/tls.crt,/tmp/tls.key host/myhost.example.com
+#   kinit: Revoked certificate while getting initial credentials
+#
+# and krb5kdc will log:
+#
+#   krb5kdc[335116](info): preauth (pkinit) verify failure: Failed to verify received certificate (depth 0): certificate revoked
+#   krb5kdc[335116](info): AS_REQ (6 etypes {aes256-cts-hmac-sha384-192(20), aes128-cts-hmac-sha256-128(19), aes256-cts-hmac-sha1-96(18), aes128-cts-hmac-sha1-96(17), camellia256-cts-cmac(26), camellia128-cts-cmac(25)}) 192.168.89.4: PREAUTH_FAILED: host/ukhsa-idtest.ipa.robots.org.uk@IPA.ROBOTS.ORG.UK for krbtgt/IPA.ROBOTS.ORG.UK@IPA.ROBOTS.ORG.UK, Failed to verify received certificate (depth 0): certificate revoked
+#
+---
+- name: create kdc crl directory
+  file:
+    path: /var/local/pki/crl
+    owner: root
+    group: root
+    mode: 0755
+    state: directory 
+
+# because 'read' is missing from:
+#
+#   # sesearch -A -s krb5kdc_t -t var_t -c dir
+#   allow domain base_file_type:dir { getattr open search };
+#
+# we can't use 'pkinit_revoke = DIR:/var/local/pki/crl:'
+#
+#   avc:  denied  { read } for  pid=488158 comm=krb5kdc name=crl dev="dm-0" ino=67241970 scontext=system_u:system_r:krb5kdc_t:s0 tcontext=unconfined_u:object_r:var_t:s0 tclass=dir permissive=0
+- name: configure krb5 CRL checking
+  template:
+    src: krb5-pkinit-revoke.j2
+    dest: /etc/krb5.conf.d/pkinit-revoke
+    owner: root
+    group: root
+    mode: 0644
+  register: ipa_server_pkinit_revoke
+
+- name: create crl fetch scripts
+  copy:
+    src: '{{ item }}.py'
+    dest: /usr/local/libexec/{{ item }}
+    owner: root
+    group: root
+    mode: 0755
+  loop:
+  - ipa-pki-crl-fetch
+  - ipa-pki-crl-updated
+
+- name: create crl fetch systemd units
+  copy:
+    src: '{{ item }}'
+    dest: /etc/systemd/system/
+    owner: root
+    group: root
+    mode: 0644
+  register: ipa_server_pkinit_crl_fetch
+  loop:
+  - ipa-pki-crl-fetch.service
+  - ipa-pki-crl-fetch.timer
+  - ipa-pki-crl-updated.path
+  - ipa-pki-crl-updated.service
+
+- name: reload systemd units
+  systemd:
+    daemon_reload: true
+  when: ipa_server_pkinit_crl_fetch.results | selectattr("changed")
+
+- name: start crl fetch units
+  systemd_service:
+    name: '{{ item }}'
+    state: started
+    enabled: true
+  loop:
+  - ipa-pki-crl-fetch.timer
+  - ipa-pki-crl-updated.path
+
+- name: recon CRL presence
+  stat:
+    path: /var/local/pki/crl/ipa-ca.crl
+  register: ipa_server_pkinit_crl
+
+- name: start crl fetch service
+  systemd_service:
+    name: ipa-pki-crl-fetch.service
+    state: started
+  when: not ipa_server_pkinit_crl.stat.exists
+...

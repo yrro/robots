@@ -1,0 +1,6 @@
+[Unit]
+Description=Restart krb5kdc after IPA PKI CRL is updated
+
+[Service]
+Type=exec
+ExecStart=/usr/local/libexec/ipa-pki-crl-updated

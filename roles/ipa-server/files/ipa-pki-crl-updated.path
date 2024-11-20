@@ -1,0 +1,8 @@
+[Unit]
+Description=Restart krb5kdc after IPA PKI CRL is updated
+
+[Path]
+PathChanged=/var/local/pki/crl
+
+[Install]
+WantedBy=paths.target

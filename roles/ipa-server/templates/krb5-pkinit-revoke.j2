@@ -1,0 +1,5 @@
+[realms]
+{{ ipa_server_domain }} = {
+  pkinit_revoke = FILE:/var/local/pki/crl/ipa-ca.crl
+  pkinit_require_crl_checking = false
+}
