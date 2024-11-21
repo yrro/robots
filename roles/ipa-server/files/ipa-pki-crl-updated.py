@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import sys
 import time
@@ -10,6 +10,10 @@ def main(argv):
     # sleeping here during the 1st activation should prevent additioal
     # activations for subsequent changes during the duration of the sleep.
     time.sleep(5)
+
+    # Docs say that all files in the directory will be read, so rehash failure
+    # is not fatal.
+    run(["openssl", "rehash", "/var/local/pki/crl/"], check=False)
 
     run(['systemctl', 'try-restart', 'krb5kdc.service'], check=True)
 

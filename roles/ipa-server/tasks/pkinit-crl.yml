@@ -44,53 +44,58 @@
     mode: 0644
   register: ipa_server_pkinit_revoke
 
-- name: create crl fetch scripts
+- name: create crl updated script
   copy:
-    src: '{{ item }}.py'
-    dest: /usr/local/libexec/{{ item }}
+    src: ipa-pki-crl-updated.py
+    dest: /usr/local/libexec/ipa-pki-crl-updated
     owner: root
     group: root
     mode: 0755
-  loop:
-  - ipa-pki-crl-fetch
-  - ipa-pki-crl-updated
 
-- name: create crl fetch systemd units
+- name: create crl updated systemd units
   copy:
     src: '{{ item }}'
     dest: /etc/systemd/system/
     owner: root
     group: root
     mode: 0644
-  register: ipa_server_pkinit_crl_fetch
+  register: ipa_server_pkinit_crl_updated
   loop:
-  - ipa-pki-crl-fetch.service
-  - ipa-pki-crl-fetch.timer
   - ipa-pki-crl-updated.path
   - ipa-pki-crl-updated.service
+
+- name: create crl fetch script
+  copy:
+    src: ipa-pki-crl-fetch.py
+    dest: /usr/local/libexec/ipa-pki-crl-fetch
+    owner: root
+    group: root
+    mode: 0755
+  register: ipa_server_pkinit_crl_fetch
+
+- name: create crl fetch systemd units
+  template:
+    src: ipa-pki-crl-fetch.service.j2
+    dest: /etc/systemd/system/ipa-pki-crl-fetch.service
+    owner: root
+    group: root
+    mode: 0644
+  register: ipa_server_pkinit_crl_fetch_service
 
 - name: reload systemd units
   systemd:
     daemon_reload: true
-  when: ipa_server_pkinit_crl_fetch.results | selectattr("changed")
+  when: (ipa_server_pkinit_crl_updated.results | selectattr("changed")) or ipa_server_pkinit_crl_fetch_service
 
-- name: start crl fetch units
+- name: enable & start crl updated path
   systemd_service:
-    name: '{{ item }}'
+    name: ipa-pki-crl-updated.path
     state: started
     enabled: true
-  loop:
-  - ipa-pki-crl-fetch.timer
-  - ipa-pki-crl-updated.path
 
-- name: recon CRL presence
-  stat:
-    path: /var/local/pki/crl/ipa-ca.crl
-  register: ipa_server_pkinit_crl
-
-- name: start crl fetch service
+- name: enable & (re)start crl fetch service
   systemd_service:
     name: ipa-pki-crl-fetch.service
-    state: started
-  when: not ipa_server_pkinit_crl.stat.exists
+    state: '{{ ipa_server_pkinit_crl_fetch.changed | ternary("restarted", "started") }}'
+    enabled: true
 ...

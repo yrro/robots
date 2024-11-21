@@ -8,6 +8,7 @@
   dnf:
     name:
     - python3-prometheus_client
+    - python3-ldap3
     - ipa-healthcheck
     - ipa-server
     state: present

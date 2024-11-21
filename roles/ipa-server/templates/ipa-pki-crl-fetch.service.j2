@@ -1,0 +1,14 @@
+[Unit]
+Description=IPA PKI CRL fetch
+
+[Service]
+Type=exec
+ExecStart=/usr/local/libexec/ipa-pki-crl-fetch
+Environment=IPA_PKI_CRL_FETCH_LDAP_URL={{ ipa_server_ldapi_uri | replace('%', '%%') }}
+Environment=IPA_PKI_CRL_FETCH_CRL_DIR=/var/local/pki/crl
+Environment=IPA_PKI_CRL_FETCH_PROM_DIR=/srv/node-exporter
+Restart=always
+RestartSec=30s
+
+[Install]
+WantedBy=multi-user.target
