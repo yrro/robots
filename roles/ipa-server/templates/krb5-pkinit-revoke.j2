@@ -1,5 +1,6 @@
 [realms]
 {{ ipa_server_domain }} = {
+  # Can't use DIR: until <https://issues.redhat.com/browse/RHEL-68379> is fixed
   pkinit_revoke = FILE:/var/local/pki/crl/ipa-ca.crl
   pkinit_require_crl_checking = false
 }
