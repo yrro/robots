@@ -33,14 +33,6 @@ def main(argv):
     basicConfig(level=os.environ.get("IPA_PKI_CRL_FETCH_LOG_LEVEL", "INFO").upper())
     ldap3.utils.log.set_library_log_detail_level(int(os.environ.get("IPA_PKI_CRL_FETCH_LDAP_LOG_LEVEL", "0")))
 
-    search_args = {
-        "search_base": "ou=crlIssuingPoints,ou=ca,o=ipaca",
-        "search_filter": "(objectClass=crlIssuingPointRecord)",
-        "search_base": "LEVEL",
-        "attributes": ["cn", "certificateRevocationList", "nextUpdate", "thisUpdate"],
-        "time_limit": 10,
-    }
-
     exit_ = threading.Event()
 
     def handle_signal(signum, frame):
@@ -108,18 +100,20 @@ def process_crl(crl):
 
     new_crl = x509.load_der_x509_crl(crl.certificateRevocationList.value)
     new_crl_number = new_crl.extensions.get_extension_for_oid(x509.CRLNumber.oid).value.crl_number
+
     if old_crl_number == new_crl_number:
         logger.info("CRL %r %d has no updates", crl.cn.value, old_crl_number)
-        return
+        metric_crl = old_crl
+    else:
+        logger.info("CRL %r updated %r → %r", crl.cn.value, old_crl_number, new_crl_number)
+        crl_file.write_bytes(new_crl.public_bytes(serialization.Encoding.PEM))
+        metric_crl = new_crl
 
-    logger.info("CRL %r updated %r → %r", crl.cn.value, old_crl_number, new_crl_number)
-
-    prom_crl_last_update.labels(crl_file, new_crl.issuer.rfc4514_string()).set(new_crl.last_update.replace(tzinfo=timezone.utc).timestamp())
-    prom_crl_next_update.labels(crl_file, new_crl.issuer.rfc4514_string()).set(new_crl.next_update.replace(tzinfo=timezone.utc).timestamp())
-    prom_crl_number.labels(crl_file, new_crl.issuer.rfc4514_string()).set(new_crl_number)
+    prom_crl_last_update.labels(crl_file, metric_crl.issuer.rfc4514_string()).set(metric_crl.last_update.replace(tzinfo=timezone.utc).timestamp())
+    prom_crl_next_update.labels(crl_file, metric_crl.issuer.rfc4514_string()).set(metric_crl.next_update.replace(tzinfo=timezone.utc).timestamp())
+    prom_crl_number.labels(crl_file, metric_crl.issuer.rfc4514_string()).set(metric_crl)
     prom_status.set_to_current_time()
 
-    crl_file.write_bytes(new_crl.public_bytes(serialization.Encoding.PEM))
 
 
 if __name__ == "__main__":
