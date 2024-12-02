@@ -61,7 +61,7 @@ def main(argv):
         except ldap3.core.exceptions.LDAPException:
             logger.exception("LDAP error")
             conn = None
-            sleep_duration = timedelta(seconds=45)
+            sleep_for = timedelta(seconds=45)
             continue
 
         now = datetime.now(timezone.utc)
