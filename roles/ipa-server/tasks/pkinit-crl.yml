@@ -44,6 +44,10 @@
     mode: 0644
   register: ipa_server_pkinit_revoke
 
+- name: restart krb5kdc
+  command: systemctl try-restart krb5kdc.service
+  when: ipa_server_pkinit_revoke.changed
+
 - name: create crl updated script
   copy:
     src: ipa-pki-crl-updated.py
