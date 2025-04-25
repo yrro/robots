@@ -39,6 +39,7 @@
     group: root
     mode: 0755
     state: directory 
+    setype: _default
 
 - name: configure KDC to check CRLs
   blockinfile:
