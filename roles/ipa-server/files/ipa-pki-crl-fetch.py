@@ -84,12 +84,8 @@ def main(argv):
 
 def process_crl(crl):
     crl_file = (crl_dir / crl.cn.value).with_suffix(".crl")
-    if hasattr(crl_file, "is_relative_to"):
-        # Skip the sanity check on RHEL 8 which only has Python 3.6. If a CRL
-        # with a name such as '../../../etc/shadow' exists then we probably
-        # have bigger problems.
-        if not crl_file.is_relative_to(crl_dir):
-            raise ValueError("Invalid CRL path", crl_file)
+    if not crl_file.is_relative_to(crl_dir):
+        raise ValueError("Invalid CRL path", crl_file)
 
     try:
         old_crl = x509.load_pem_x509_crl(crl_file.read_bytes())
