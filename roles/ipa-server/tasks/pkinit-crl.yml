@@ -26,11 +26,6 @@
 #    saves us from needing to define a custom type.
 #
 ---
-- name: remove obsolete kdc crl directory
-  file:
-    path: /var/local/pki
-    state: absent
-
 - name: configure default file system labelling for crl directory
   sefcontext:
     target: '/var/kerberos/krb5kdc/crl(/.*)?'
@@ -45,12 +40,6 @@
     mode: 0755
     state: directory 
 
-- name: remove obsolete libkrb5 configuration check CRLs
-  file:
-    path: /etc/krb5.conf.d/pkinit-revoke
-    state: absent
-  register: krb5_conf_pkinit_revoke
-
 - name: configure KDC to check CRLs
   blockinfile:
     path: /var/kerberos/krb5kdc/kdc.conf
@@ -64,7 +53,7 @@
 
 - name: restart krb5kdc
   command: systemctl try-restart krb5kdc.service
-  when: krb5_conf_pkinit_revoke.changed or kdc_conf_crl_checking.changed
+  when: kdc_conf_crl_checking.changed
 
 - name: create crl updated script
   copy:
