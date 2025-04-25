@@ -13,7 +13,7 @@ def main(argv):
 
     # Docs say that all files in the directory will be read, so rehash failure
     # is not fatal.
-    run(["openssl", "rehash", "/var/local/pki/crl/"], check=False)
+    run(["openssl", "rehash", "/var/kerberos/krb5kdc/crl"], check=False)
 
     run(['systemctl', 'try-restart', 'krb5kdc.service'], check=True)
 

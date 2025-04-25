@@ -1,58 +1,70 @@
 # Important notes!
-
-# 1. CRLs are read at kdc startup - they are not refreshed ongoing!
 #
-# 2. If there's a problem that prevents the CRL directory being accessed during startup, krb5kdc will log a message and PKINIT will be disabled:
-#   krb5kdc[335082](Error): preauth pkinit failed to initialize: PKINIT initialization failed: Cannot open file '/var/kerberos/krb5kdc/crls//524d180b.r0': (null)
+# 0. Only the KDC will perform CRL checking. The only known use of PKINIT by a
+#    client on an IPA server is when ipaapi runs kinit to log in a user who
+#    authenticates with a smart card. The client only ever talks to the local
+#    KDC, so CRL checking is not vital in this case.
 #
-# 3. Can't use 'openssl rehash' as recommended by krb5.conf(5) because:
-#   type=AVC msg=audit(11/19/24 15:33:10.181:2663) : avc:  denied  { read } for  pid=335082 comm=krb5kdc name=524d180b.r0 dev="vda4" ino=25266954 scontext=system_u:system_r:krb5kdc_t:s0 tcontext=unconfined_u:object_r:krb5kdc_conf_t:s0 tclass=lnk_file permissive=0 
+# 1. CRL data is read only once, when krb5kdc starts up.
 #
-# When attempting to use a revoked certificate, the client will see:
+# 2. If there's a problem that prevents CRL data being accessed, krb5kdc will
+#    start up, but PKINIT will not work. It will log a message:
 #
-#   $ kinit -c MEMORY: -X X509_anchors=FILE:/etc/ipa/ca.crt -X X509_user_identity=FILE:/tmp/tls.crt,/tmp/tls.key host/myhost.example.com
-#   kinit: Revoked certificate while getting initial credentials
+#    (Error): preauth pkinit failed to initialize: PKINIT initialization failed: Cannot open file '/var/kerberos/krb5kdc/crls//524d180b.r0': (null)
 #
-# and krb5kdc will log:
+# 3. When attempting to use a revoked certificate, the client will see:
 #
-#   krb5kdc[335116](info): preauth (pkinit) verify failure: Failed to verify received certificate (depth 0): certificate revoked
-#   krb5kdc[335116](info): AS_REQ (6 etypes {aes256-cts-hmac-sha384-192(20), aes128-cts-hmac-sha256-128(19), aes256-cts-hmac-sha1-96(18), aes128-cts-hmac-sha1-96(17), camellia256-cts-cmac(26), camellia128-cts-cmac(25)}) 192.168.89.4: PREAUTH_FAILED: host/ukhsa-idtest.ipa.robots.org.uk@IPA.ROBOTS.ORG.UK for krbtgt/IPA.ROBOTS.ORG.UK@IPA.ROBOTS.ORG.UK, Failed to verify received certificate (depth 0): certificate revoked
+#    $ kinit -c MEMORY: -X X509_anchors=FILE:/etc/ipa/ca.crt -X X509_user_identity=FILE:/tmp/tls.crt,/tmp/tls.key host/myhost.example.com
+#    kinit: Revoked certificate while getting initial credentials
+#
+#    and krb5kdc will log:
+#
+#    (info): preauth (pkinit) verify failure: Failed to verify received certificate (depth 0): certificate revoked
+#    (info): AS_REQ (6 etypes {aes256-cts-hmac-sha384-192(20), aes128-cts-hmac-sha256-128(19), aes256-cts-hmac-sha1-96(18), aes128-cts-hmac-sha1-96(17), camellia256-cts-cmac(26), camellia128-cts-cmac(25)}) 192.168.89.4: PREAUTH_FAILED: host/ukhsa-idtest.ipa.robots.org.uk@IPA.ROBOTS.ORG.UK for krbtgt/IPA.ROBOTS.ORG.UK@IPA.ROBOTS.ORG.UK, Failed to verify received certificate (depth 0): certificate revoked
+#
+# 4. CRL data must be labelled such that krb5kdc_t can read it. Using etc_t
+#    saves us from needing to define a custom type.
 #
 ---
+- name: remove obsolete kdc crl directory
+  file:
+    path: /var/local/pki
+    state: absent
+
+- name: configure default file system labelling for crl directory
+  sefcontext:
+    target: '/var/kerberos/krb5kdc/crl(/.*)?'
+    setype: etc_t
+    state: present
+
 - name: create kdc crl directory
   file:
-    path: /var/local/pki/crl
+    path: /var/kerberos/krb5kdc/crl
     owner: root
     group: root
     mode: 0755
     state: directory 
 
-# because 'read' is missing from:
-#
-#   # sesearch -A -s krb5kdc_t -t var_t -c dir
-#   allow domain base_file_type:dir { getattr open search };
-#
-# we can't use 'pkinit_revoke = DIR:/var/local/pki/crl:'
-#
-#   avc:  denied  { read } for  pid=488158 comm=krb5kdc name=crl dev="dm-0" ino=67241970 scontext=system_u:system_r:krb5kdc_t:s0 tcontext=unconfined_u:object_r:var_t:s0 tclass=dir permissive=0
-#
-# ... we need to change this anyway because it breaks the web UI:
-#
-#   avc:  denied  { read } for  pid=1513153 comm=kinit name=MasterCRL.crl dev="dm-0" ino=67616109 scontext=system_u:system_r:httpd_t:s0 tcontext=system_u:object_r:var_t:s0 tclass=file permissive=0
-#
-# ... so maybe we should use /etc/ipa/crl?
-- name: configure krb5 CRL checking
-  template:
-    src: krb5-pkinit-revoke.j2
-    dest: /etc/krb5.conf.d/pkinit-revoke
-    owner: root
-    group: root
-    mode: 0644
-  register: ipa_server_pkinit_revoke
+- name: remove obsolete libkrb5 configuration check CRLs
+  file:
+    path: /etc/krb5.conf.d/pkinit-revoke
+    state: absent
+  register: krb5_conf_pkinit_revoke
+
+- name: configure KDC to check CRLs
+  blockinfile:
+    path: /var/kerberos/krb5kdc/kdc.conf
+    marker: '# {mark} ANSIBLE MANAGED BLOCK (crl checking)'
+    insertafter: '^\s*{{ ipa_server_domain | regex_escape }}\s*=\s*{\s*$'
+    block: |
+      pkinit_revoke = DIR:/var/kerberos/krb5kdc/crl
+      pkinit_require_crl_checking = false
+    state: present
+  register: kdc_conf_crl_checking
 
 - name: restart krb5kdc
   command: systemctl try-restart krb5kdc.service
-  when: ipa_server_pkinit_revoke.changed
+  when: krb5_conf_pkinit_revoke.changed or kdc_conf_crl_checking.changed
 
 - name: create crl updated script
   copy:
