@@ -35,6 +35,12 @@
 # we can't use 'pkinit_revoke = DIR:/var/local/pki/crl:'
 #
 #   avc:  denied  { read } for  pid=488158 comm=krb5kdc name=crl dev="dm-0" ino=67241970 scontext=system_u:system_r:krb5kdc_t:s0 tcontext=unconfined_u:object_r:var_t:s0 tclass=dir permissive=0
+#
+# ... we need to change this anyway because it breaks the web UI:
+#
+#   avc:  denied  { read } for  pid=1513153 comm=kinit name=MasterCRL.crl dev="dm-0" ino=67616109 scontext=system_u:system_r:httpd_t:s0 tcontext=system_u:object_r:var_t:s0 tclass=file permissive=0
+#
+# ... so maybe we should use /etc/ipa/crl?
 - name: configure krb5 CRL checking
   template:
     src: krb5-pkinit-revoke.j2
