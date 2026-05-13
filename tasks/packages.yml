@@ -9,7 +9,7 @@
     - lsof
     - mlocate
     - podman
-    - ranger
+    #- ranger
     - rsync
     - socat
     - strace
