@@ -2,7 +2,11 @@
   rpm_key:
     state: present
     key: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ ansible_facts.distribution_major_version }}
-    fingerprint: FF8A D134 4597 106E CE81  3B91 8A38 72BF 3228 467C
+    fingerprint: '{{ fingerprints[ansible_facts.distribution_major_version] }}'
+  vars:
+    fingerprints:
+      '9': FF8A D134 4597 106E CE81  3B91 8A38 72BF 3228 467C
+      '10': 7D8D 15CB FC4E 6268 8591  FB26 33D9 8517 E37E D158
 
 - name: enable epel repository
   dnf:
