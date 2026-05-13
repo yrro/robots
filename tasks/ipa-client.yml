@@ -53,8 +53,46 @@
       - --password={{ _ipa_client_otp }}
       - --no-ntp
 
-  - name: end of play, subsequent runs should use domain authentication
-    meta: end_host
+  - name: etckeeper commit
+    command: etckeeper commit -m ipa-client-install
 
-# TODO: mkhomedir subid chrony dyndns pam_gssapi pwhistory faillock !nullok tlog
+- name: recon ansible user disposition
+  shell: getent passwd --service=files $(id -u)
+  become: false
+  check_mode: false
+  changed_when: false
+  failed_when: false
+  register: _ipa_client_ansible_user_disposition
+
+# Can't use 'meta: end_host' because it only affects the current play; we
+# want to stop subsequent plays as well, so we must deliberately fail the
+# whole run.
+- name: end of play, subsequent runs should use domain authentication
+  fail:
+    msg: ipa-client-install was run, you must re-run the playbook using domain authentication
+  when: _ipa_client_ansible_user_disposition.rc == 0
+
+- name: recon authselect state
+  command: authselect current
+  check_mode: false
+  changed_when: false
+  register: _authselect_current_raw
+
+- name: parse authselect state
+  set_fact:
+    authselect_current: '{{ _authselect_current_raw.stdout | from_yaml }}'
+
+- name: assure authselect profile
+  assert:
+    that: authselect_current["Profile ID"] == "sssd"
+
+- name: enable mkhomedir
+  command: authselect enable-feature with-mkhomedir
+  when: "'with-mkhomedir' not in authselect_current['Enabled features']"
+
+- name: enable subid
+  command: authselect enable-feature with-subid
+  when: "'with-subid' not in authselect_current['Enabled features']"
+
+# TODO: chrony dyndns pam_gssapi pwhistory faillock !nullok remote-access smartcard?
 ...
