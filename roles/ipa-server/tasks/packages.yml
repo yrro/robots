@@ -11,6 +11,7 @@
     - python3-ldap3
     - ipa-healthcheck
     - ipa-server
+    - ipa-server-dns
     state: present
     install_weak_deps: false
   tags: slow
