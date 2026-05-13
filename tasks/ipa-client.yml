@@ -47,7 +47,8 @@
       - --password={{ ipa_client_otp.user_input }}
       - --no-ntp
 
-  - meta: end_host
+  - name: end of play, subsequent runs should use domain authentication
+    meta: end_host
 
 # TODO: mkhomedir subid chrony dyndns pam_gssapi pwhistory faillock !nullok tlog
 ...
