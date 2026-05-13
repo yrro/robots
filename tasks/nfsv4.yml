@@ -3,7 +3,7 @@
 
 - name: check for nfs.conf.d support
   set_fact:
-    nfs_utils_supports_conf_d: '{{ ansible_facts.packages["nfs-utils"][0].version is version("2.5.3", ">=") }}'
+    nfs_utils_conf_file: '{{ ansible_facts.packages["nfs-utils"][0].version is version("2.5.3", ">=") | ternary("/etc/nfs.conf.d/v4only.conf", "/etc/nfs.conf") }}'
 
 - name: create /etc/nfs.conf.d
   file:
@@ -15,7 +15,7 @@
 
 - name: disable nfsv3
   ini_file:
-    path: '{{ nfs_utils_supports_conf_d | ternary("/etc/nfs.conf.d/v4only.conf", "/etc/nfs.conf") }}'
+    path: '{{ nfs_utils_conf_file }}'
     section: nfsd
     option: vers3
     value: 'n'
@@ -23,7 +23,7 @@
 
 - name: cache mount requests by ip address
   ini_file:
-    path: '{{ nfs_utils_supports_conf_d | ternary("/etc/nfs.conf.d/mountd-logging.conf", "/etc/nfs.conf") }}'
+    path: '{{ nfs_utils_conf_file }}'
     section: mountd
     option: cache-use-ipaddr
     value: 'y'
@@ -31,7 +31,7 @@
 
 - name: enable mountd logging
   ini_file:
-    path: '{{ nfs_utils_supports_conf_d | ternary("/etc/nfs.conf.d/mountd-logging.conf", "/etc/nfs.conf") }}'
+    path: '{{ nfs_utils_conf_file }}'
     section: mountd
     option: debug
     value: auth
@@ -39,7 +39,7 @@
 
 - name: increase mound request ttl
   ini_file:
-    path: '{{ nfs_utils_supports_conf_d | ternary("/etc/nfs.conf.d/mountd-logging.conf", "/etc/nfs.conf") }}'
+    path: '{{ nfs_utils_conf_file }}'
     section: mountd
     option: ttl
     value: '3600'
