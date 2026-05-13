@@ -37,7 +37,7 @@
     value: auth
   register: nfs_conf_mountd_debug
 
-- name: increase mound request ttl
+- name: increase mountd cached information ttl
   ini_file:
     path: '{{ nfs_utils_conf_file }}'
     section: mountd
