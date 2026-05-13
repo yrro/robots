@@ -27,14 +27,10 @@
 - name: join host to domain
   when: not (ipa_client_configured.stdout | bool)
   block:
-  - tempfile:
-      state: file
-      suffix: .crt
-    register: ipa_ca_crt
-
-  - copy:
+  - name: provide IPA CA certificate
+    copy:
       src: /etc/ipa/ca.crt
-      dest: '{{ ipa_ca_crt.path }}'
+      dest: /tmp/ipa-ca.crt
 
   - name: set host {{ inventory_hostname }} one-time password
     command: ipa host-mod {{ inventory_hostname }} --random --raw
@@ -51,7 +47,7 @@
       argv:
       - ipa-client-install
       - --unattended
-      - --ca-cert-file={{ ipa_ca_crt.path }}
+      - --ca-cert-file=/tmp/ipa-ca.crt
       - --domain=ipa.robots.org.uk
       - --hostname={{ inventory_hostname }}
       - --password={{ _ipa_client_otp }}
