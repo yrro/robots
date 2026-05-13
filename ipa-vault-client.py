@@ -5,7 +5,7 @@ import getpass
 import secrets
 import sys
 
-from ansible.config.manager import ConfigManager, get_ini_config_value
+from ansible.config.manager import ConfigManager
 from ansible.module_utils.parsing.convert_bool import boolean
 from ipalib import api
 import ipalib.errors
@@ -18,17 +18,17 @@ def main(argv):
     config = ConfigManager()
     vault_args = {}
     if config._config_file:
-        vault_args["username"] = get_ini_config_value(
-            config._parsers[config._config_file],
-            {"section": "ipa-vault", "key": "username"},
+        vault_args["username"] = config._get_ini_config_value(
+            config._config_file,
+            section="ipa-vault", option="username",
         )
-        vault_args["service"] = get_ini_config_value(
-            config._parsers[config._config_file],
-            {"section": "ipa-vault", "key": "service"},
+        vault_args["service"] = config._get_ini_config_value(
+            config._config_file,
+            section="ipa-vault", option="service",
         )
-        vault_args["shared"] = get_ini_config_value(
-            config._parsers[config._config_file],
-            {"section": "ipa-vault", "key": "shared"},
+        vault_args["shared"] = config._get_ini_config_value(
+            config._config_file,
+            section="ipa-vault", option="shared",
         )
         if vault_args["shared"]:
             vault_args["shared"] = boolean(vault_args["shared"])
