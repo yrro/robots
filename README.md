@@ -23,8 +23,7 @@ only the chrony related tasks.
 ## Host Enrolment
 
 Before a host has been joined to the domain, use host variables to specify
-connection credentials (`ansible_user` and `ansible_password`) and the host's
-OTP (`ipa_client_otp`).
+connection credentials (`ansible_user` and `ansible_password`).
 
 If using `root`, set `ansible_become` to `false` as well.
 

@@ -36,6 +36,16 @@
       src: /etc/ipa/ca.crt
       dest: '{{ ipa_ca_crt.path }}'
 
+  - name: set host {{ inventory_hostname }} one-time password
+    command: ipa host-mod {{ inventory_hostname }} --random --raw
+    register: _ipa_client_otp_raw
+    delegate_to: localhost
+    become: false
+
+  - name: extract host {{ inventory_hostname }} one-time password
+    set_fact:
+      _ipa_client_otp: "{{ (_ipa_client_otp_raw.stdout_lines | select('match', '^\\s*randompassword:') | first | split(':'))[1] | trim }}"
+
   - name: ipa-client-install
     command:
       argv:
@@ -44,7 +54,7 @@
       - --ca-cert-file={{ ipa_ca_crt.path }}
       - --domain=ipa.robots.org.uk
       - --hostname={{ inventory_hostname }}
-      - --password={{ ipa_client_otp.user_input }}
+      - --password={{ _ipa_client_otp }}
       - --no-ntp
 
   - name: end of play, subsequent runs should use domain authentication
