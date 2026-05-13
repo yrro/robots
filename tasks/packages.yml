@@ -7,7 +7,7 @@
     - jq
     - ldapvi
     - lsof
-    - mlocate
+    #- plocate
     - podman
     #- ranger
     - rsync
