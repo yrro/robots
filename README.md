@@ -26,6 +26,7 @@ Before a host has been joined to the domain, use host variables to specify
 connection credentials (`ansible_user` and `ansible_password`) and the host's
 OTP (`ipa_client_otp`).
 
+If using `root`, set `ansible_become` to `false` as well.
+
 The play will end immediately after the host is joined to the domain. At this
-point, remove `ansible_user` and `ansible_password` and re-run the
-`ansible-playbook` command.
+point, remove the host variables and re-run the `ansible-playbook` command.
