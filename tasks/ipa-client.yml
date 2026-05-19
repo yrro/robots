@@ -86,13 +86,13 @@
   assert:
     that: authselect_current["Profile ID"] == "sssd"
 
-- name: enable mkhomedir
-  command: authselect enable-feature with-mkhomedir
-  when: "'with-mkhomedir' not in authselect_current['Enabled features']"
+- name: enable authselect profile feature
+  command: authselect enable-feature {{ item }}
+  when: "'{{ item }}' not in authselect_current['Enabled features']"
+  loop:
+  - with-mkhomedir
+  - with-subid
 
-- name: enable subid
-  command: authselect enable-feature with-subid
-  when: "'with-subid' not in authselect_current['Enabled features']"
 
-# TODO: chrony dyndns pam_gssapi pwhistory faillock !nullok remote-access smartcard?
+# TODO: dyndns pam_gssapi pwhistory !nullok remote-access smartcard?
 ...
