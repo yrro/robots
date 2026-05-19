@@ -97,7 +97,7 @@
 - name: reload systemd units
   systemd:
     daemon_reload: true
-  when: (ipa_server_pkinit_crl_updated.results | selectattr("changed")) or ipa_server_pkinit_crl_fetch_service
+  when: (ipa_server_pkinit_crl_updated.results | map(attribute='changed') is any) or ipa_server_pkinit_crl_fetch_service.changed
 
 - name: enable & start crl updated path
   systemd_service:
