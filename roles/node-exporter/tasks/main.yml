@@ -28,10 +28,11 @@
 
 - name: add node-exporter port to firewalld
   firewalld:
-    zone: public
+    zone: '{{ node_exporter_firewalld_zone }}'
     service: prometheus-node-exporter
     permanent: true
     immediate: true
     offline: true
     state: '{{ ("ipaservers_public" in group_names) | ternary("disabled", "enabled") }}'
+  when: node_exporter_firewalld_zone is defined
 ...
