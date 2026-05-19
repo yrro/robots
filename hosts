@@ -1,6 +1,7 @@
 [ipaservers]
 ipa4.ipa.robots.org.uk
 ipa6.ipa.robots.org.uk
+ipa7.ipa.robots.org.uk
 
 [ipaservers_public]
 ipa4.ipa.robots.org.uk
