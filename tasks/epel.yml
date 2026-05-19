@@ -7,10 +7,12 @@
     fingerprints:
       '9': FF8A D134 4597 106E CE81  3B91 8A38 72BF 3228 467C
       '10': 7D8D 15CB FC4E 6268 8591  FB26 33D9 8517 E37E D158
+  when: ansible_facts.distribution == "RedHat"
 
 - name: enable epel repository
   dnf:
     name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_facts.distribution_major_version }}.noarch.rpm
     state: present
+  when: ansible_facts.distribution == "RedHat"
   tags: slow
 ...
