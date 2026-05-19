@@ -1,4 +1,4 @@
-- name: configure ldap commands for root to use ldapi
+- name: configure .ldaprc for root
   copy:
     content: |
       URI {{ ipa_server_ldapi_uri }}
