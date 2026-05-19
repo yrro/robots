@@ -29,7 +29,7 @@
 - name: add node-exporter port to firewalld
   firewalld:
     zone: public
-    port: 9100/tcp
+    service: prometheus-node-exporter
     permanent: true
     immediate: true
     offline: true
