@@ -1,8 +1,11 @@
-- name: install ipa-client
+- name: install ipa-client packages
   package:
-    name: ipa-client
+    name: '{{ item }}'
     state: present
   tags: slow
+  loop:
+  - ipa-client
+  - libuser
 
 - name: install ipa-client scripts
   copy:
@@ -104,5 +107,45 @@
   - local_users_only
   - deny = 6
 
-# TODO: dyndns pam_gssapi remote-access smartcard?
+- name: create allow-remote-access group
+  group:
+    local: true
+    name: remote-access
+    state: present
+
+- name: create remote-access PAM substack
+  copy:
+    content: |
+      account [perm_denied=1 success=ignore] pam_localuser.so
+      account required pam_succeed_if.so user ingroup remote-access
+    dest: /etc/pam.d/remote-access
+    mode: 0644
+    owner: root
+    group: root
+
+- name: recon PAM services granting remote access
+  stat:
+    path: /etc/pam.d/{{ item }}
+  register: _ipa_client_pam_remote_services_potential
+  loop:
+  - sshd
+  - cockpit
+
+- name: figure remote access services that exist
+  set_fact:
+    _ipa_client_pam_remote_services: '{{ _ipa_client_pam_remote_services_potential.results | selectattr("stat.exists", "true") | map(attribute="item") | list }}'
+
+- name: check remote-access PAM substack for services granting remote access
+  pamd:
+    name: '{{ item }}'
+    type: account
+    control: include
+    module_path: password-auth
+    state: before
+    new_type: account
+    new_control: substack
+    new_module_path: remote-access
+  loop: '{{ _ipa_client_pam_remote_services }}'
+
+# TODO: dyndns pam_gssapi smartcard?
 ...
