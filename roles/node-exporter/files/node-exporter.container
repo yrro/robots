@@ -12,8 +12,8 @@ Volume=/:/host:ro,rslave
 PodmanArgs=--pid=host
 PodmanArgs=--cpus=1
 PodmanArgs=--memory=128m
-Label=io.containers.autoupdate=registry
 Exec=--path.rootfs=/host --collector.ntp --collector.textfile.directory=/host/srv/node-exporter
+AutoUpdate=registry
 
 [Service]
 Restart=always

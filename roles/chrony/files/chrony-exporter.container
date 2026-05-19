@@ -11,7 +11,7 @@ ReadOnly=yes
 Exec=--chrony.address=localhost:323
 PodmanArgs=--cpus=1
 PodmanArgs=--memory=64m
-Label=io.containers.autoupdate=registry
+AutoUpdate=registry
 
 [Service]
 Restart=always
