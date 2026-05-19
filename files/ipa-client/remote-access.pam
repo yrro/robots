@@ -1,0 +1,4 @@
+account [perm_denied=1 success=ignore] pam_localuser.so
+account required pam_succeed_if.so user ingroup remote-access
+
+# vim: ft=pamconf

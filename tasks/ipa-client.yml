@@ -115,9 +115,7 @@
 
 - name: create remote-access PAM substack
   copy:
-    content: |
-      account [perm_denied=1 success=ignore] pam_localuser.so
-      account required pam_succeed_if.so user ingroup remote-access
+    src: files/ipa-client/remote-access.pam
     dest: /etc/pam.d/remote-access
     mode: 0644
     owner: root
