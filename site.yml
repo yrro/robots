@@ -45,16 +45,16 @@
   tasks:
 
   - import_role:
-      name: chrony
-    tags: chrony
-
-  - import_role:
       name: node-exporter
     tags: node-exporter
 
 - name: configure ipa servers
   hosts: ipaservers
   tasks:
+
+  - import_role:
+      name: chrony
+    tags: chrony
 
   - import_role:
       name: ipa-server
