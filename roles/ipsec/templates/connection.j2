@@ -1,5 +1,5 @@
-conn {{ connection.key }}
-{% for k, v in connection.value.items() %}
+conn {{ conn.key }}
+{% for k, v in conn.value.items() %}
   {{ k }} = {{ v }}
 {% endfor %}
 

@@ -6,6 +6,6 @@
   include_tasks: connection.yml
   loop: '{{ ipsec | dict2items }}'
   loop_control:
-    loop_var: connection
+    loop_var: conn
   when: ipsec is defined
 ...
