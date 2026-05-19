@@ -93,6 +93,8 @@
   - with-mkhomedir
   - with-subid
   - with-faillock
+  - with-pwhistory
+  - without-nullok
 
 - name: configure pam_faillock
   lineinfile:
@@ -102,5 +104,5 @@
   - local_users_only
   - deny = 6
 
-# TODO: dyndns pam_gssapi pwhistory !nullok remote-access smartcard?
+# TODO: dyndns pam_gssapi remote-access smartcard?
 ...
