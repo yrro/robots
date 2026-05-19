@@ -24,9 +24,13 @@
     dn: cn=RootDN Access Control,cn=plugins,cn=config
     attributes:
       nsslapd-pluginEnabled: "on"
-      rootdn-allow-ip:
-      - ::1
-      - 127.*
+      rootdn-allow-ip: >-
+        {{ [
+          '::1',
+          ansible_facts.default_ipv6.address | default(omit),
+          '127.*',
+          ansible_facts.default_ipv4.address | default(omit),
+        ] }}
     server_uri: '{{ ipa_server_ldapi_uri }}'
     state: exact
   notify: restart dirsrv
