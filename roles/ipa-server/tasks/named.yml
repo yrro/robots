@@ -5,6 +5,7 @@
     named_services:
       RedHat-8: named-pkcs11
       RedHat-9: named
+      RedHat-10: named
 
 - name: create named unit override directory
   file:
