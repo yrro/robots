@@ -9,5 +9,6 @@
 - import_tasks: pki.yml
 - import_tasks: pkinit-crl.yml
 - import_tasks: replica-status.yml
+- import_tasks: healthcheck.yml
 - import_tasks: healthcheck-prometheus.yml
 ...

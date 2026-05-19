@@ -1,0 +1,10 @@
+- name: configure ipa-healthcheck
+  copy:
+    content: |
+      [default]
+      # https://github.com/freeipa/freeipa-healthcheck/issues/380
+      timeout=12
+    dest: /etc/ipahealthcheck/ipahealthcheck.conf
+    mode: 0644
+    owner: root
+    group: root
