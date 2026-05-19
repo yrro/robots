@@ -107,7 +107,7 @@
   - local_users_only
   - deny = 6
 
-- name: create allow-remote-access group
+- name: create remote-access group
   group:
     local: true
     name: remote-access
