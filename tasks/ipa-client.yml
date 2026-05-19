@@ -91,7 +91,7 @@
 
 - name: enable authselect profile feature
   command: authselect enable-feature {{ item }}
-  when: "'{{ item }}' not in authselect_current['Enabled features']"
+  when: item not in authselect_current['Enabled features']
   loop:
   - with-mkhomedir
   - with-subid
