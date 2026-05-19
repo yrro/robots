@@ -6,7 +6,7 @@
 
 - name: install ipa-client scripts
   copy:
-    src: files/ipa-client/akinit.sh
+    src: files/ipa-client/akinit.py
     dest: /usr/local/bin/akinit
     mode: 0755
     owner: root
