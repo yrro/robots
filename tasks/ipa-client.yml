@@ -92,7 +92,15 @@
   loop:
   - with-mkhomedir
   - with-subid
+  - with-faillock
 
+- name: configure pam_faillock
+  lineinfile:
+    path: /etc/security/faillock.conf
+    line: '{{ item }}'
+  loop:
+  - local_users_only
+  - deny = 6
 
 # TODO: dyndns pam_gssapi pwhistory !nullok remote-access smartcard?
 ...
