@@ -26,6 +26,12 @@
     name: node-exporter.service
     state: started
 
+- name: restart node-exporter
+  systemd_service:
+    name: node-exporter:service
+    state: restarted
+  when: node_exporter_container_unit.changed
+
 - name: add node-exporter port to firewalld
   firewalld:
     zone: '{{ node_exporter_firewalld_zone }}'
