@@ -6,6 +6,11 @@ ipa7.ipa.robots.org.uk
 [ipaservers_public]
 ipa4.ipa.robots.org.uk
 
+[servers:children]
+ipaservers
+
+[servers]
+
 [samhosts]
 #merodach.ipa.robots.org.uk ansible_python_interpreter=/usr/bin/python3
 #wintermute.ipa.robots.org.uk

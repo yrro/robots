@@ -40,13 +40,17 @@
   - import_tasks: tasks/firewalld.yml
     tags: firewalld
 
-  - import_role:
-      name: node-exporter
-    tags: node-exporter
+- name: configure servers
+  hosts: servers
+  tasks:
 
   - import_role:
       name: chrony
     tags: chrony
+
+  - import_role:
+      name: node-exporter
+    tags: node-exporter
 
 - name: configure ipa servers
   hosts: ipaservers
