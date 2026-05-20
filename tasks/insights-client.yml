@@ -1,0 +1,29 @@
+- name: create insights-client override directory
+  file:
+    path: /etc/systemd/system/insights-client.timer.d
+    state: directory 
+    mode: 0755
+    owner: root
+    group: root
+  when: ansible_facts.distribution == "RedHat"
+
+- name: delay insights-client.timer
+  copy:
+    content: |
+      # dnf-automatic-install.timer starts between 0600-0700.
+      # By default, insights-client.timer starts between 0000-0400.
+      # Move it after the daily dnf run.
+      OnCalendar=
+      OnCalendar=07:30:00
+      RandomizedDelaySec=0
+    dest: /etc/systemd/system/insights-client.timer.d/delay.conf
+    mode: 0644
+    owner: root
+    group: root
+  register: _insights_client_delay
+  when: ansible_facts.distribution == "RedHat"
+
+- name: reload systemd units
+  systemd:
+    daemon_reload: true
+  when: _insights_client_delay.changed

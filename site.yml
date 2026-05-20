@@ -48,6 +48,9 @@
       name: node-exporter
     tags: node-exporter
 
+  - import_tasks: tasks/insights-client.yml
+    tags: insights-client
+
 - name: configure ipa servers
   hosts: ipaservers
   tasks:
