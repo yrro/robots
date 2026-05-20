@@ -1,6 +1,6 @@
 - name: configure PKI server logging
   copy:
-    src: logging.properties
+    src: pki-server-logging-{{ ansible_facts.distribution_major_version }}.properties
     dest: /etc/pki/pki-tomcat/logging.properties
     mode: 0644
     owner: pkiuser
