@@ -2,9 +2,11 @@
 ipa4.ipa.robots.org.uk
 ipa6.ipa.robots.org.uk
 ipa7.ipa.robots.org.uk
+ipa8.ipa.robots.org.uk
 
 [ipaservers_public]
 ipa4.ipa.robots.org.uk
+ipa8.ipa.robots.org.uk
 
 [servers:children]
 ipaservers
