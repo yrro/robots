@@ -28,7 +28,7 @@
 
 - name: restart node-exporter
   systemd_service:
-    name: node-exporter:service
+    name: node-exporter.service
     state: restarted
   when: node_exporter_container_unit.changed
 
