@@ -5,6 +5,7 @@
     ipsec_nssdb_paths:
       RedHat-8: /etc/ipsec.d
       RedHat-9: /var/lib/ipsec/nss
+      RedHat-10: /var/lib/ipsec/nss
 
 - name: init ipsec nss database
   command:
