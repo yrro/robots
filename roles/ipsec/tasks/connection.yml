@@ -8,5 +8,9 @@
   register: _ipsec_connection_file
 
 - name: start {{ conn.key }} connection
+  command: ipsec auto --replace {{ conn.key }}
+  when: _ipsec_connection_file.changed and (ansible_facts.distribution ~ "-" ~ ansible_facts.distribution_major_version) == "RedHat-9"
+
+- name: start {{ conn.key }} connection
   command: ipsec start {{ conn.key }}
-  when: _ipsec_connection_file.changed
+  when: _ipsec_connection_file.changed and (ansible_facts.distribution ~ "-" ~ ansible_facts.distribution_major_version) == "RedHat-10"
