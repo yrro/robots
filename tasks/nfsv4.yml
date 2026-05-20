@@ -1,97 +1,96 @@
 - name: populate package facts
   package_facts:
 
-- name: check for nfs.conf.d support
-  set_fact:
-    nfs_utils_v4only_conf_file: '{{ ansible_facts.packages["nfs-utils"][0].version is version("2.5.3", ">=") | ternary("/etc/nfs.conf.d/v4only.conf", "/etc/nfs.conf") }}'
-    nfs_utils_mountd_logging_conf_file: '{{ ansible_facts.packages["nfs-utils"][0].version is version("2.5.3", ">=") | ternary("/etc/nfs.conf.d/mountd-logging.conf", "/etc/nfs.conf") }}'
+- name: configure NFSv4-only server
+  when: '"nfs-utils" in ansible_facts.packages'
+  block:
+  - name: create /etc/nfs.conf.d
+    file:
+      path: /etc/nfs.conf.d
+      state: directory
+      mode: 0755
+      owner: root
+      group: root
 
-- name: create /etc/nfs.conf.d
-  file:
-    path: /etc/nfs.conf.d
-    state: directory
-    mode: 0755
-    owner: root
-    group: root
+  - name: disable nfsv3
+    ini_file:
+      path: /etc/nfs.conf.d/v4only.conf
+      section: nfsd
+      option: vers3
+      value: 'n'
+    register: nfs_conf_nfsd_vers3
 
-- name: disable nfsv3
-  ini_file:
-    path: '{{ nfs_utils_v4only_conf_file }}'
-    section: nfsd
-    option: vers3
-    value: 'n'
-  register: nfs_conf_nfsd_vers3
+  - name: cache mount requests by ip address
+    ini_file:
+      path: /etc/nfs.conf.d/mountd-logging.conf
+      section: mountd
+      option: cache-use-ipaddr
+      value: 'y'
+    register: nfs_conf_mountd_ipaddr
 
-- name: cache mount requests by ip address
-  ini_file:
-    path: '{{ nfs_utils_mountd_logging_conf_file }}'
-    section: mountd
-    option: cache-use-ipaddr
-    value: 'y'
-  register: nfs_conf_mountd_ipaddr
+  - name: enable mountd logging
+    ini_file:
+      path: /etc/nfs.conf.d/mountd-logging.conf
+      section: mountd
+      option: debug
+      value: auth
+    register: nfs_conf_mountd_debug
 
-- name: enable mountd logging
-  ini_file:
-    path: '{{ nfs_utils_mountd_logging_conf_file }}'
-    section: mountd
-    option: debug
-    value: auth
-  register: nfs_conf_mountd_debug
+  - name: increase mountd cached information ttl
+    ini_file:
+      path: /etc/nfs.conf.d/mountd-logging.conf
+      section: mountd
+      option: ttl
+      value: '3600'
+    register: nfs_conf_mountd_ttl
 
-- name: increase mountd cached information ttl
-  ini_file:
-    path: '{{ nfs_utils_mountd_logging_conf_file }}'
-    section: mountd
-    option: ttl
-    value: '3600'
-  register: nfs_conf_mountd_ttl
+  - name: create nfs-mountd override directory
+    file:
+      path: /etc/systemd/system/nfs-mountd.service.d
+      state: directory 
+      mode: 0755
+      owner: root
+      group: root
 
-- name: create nfs-mountd override directory
-  file:
-    path: /etc/systemd/system/nfs-mountd.service.d
-    state: directory 
-    mode: 0755
-    owner: root
-    group: root
+  - name: prevent mountd from listening on the network
+    copy:
+      src: files/mountd-v4only.conf
+      dest: /etc/systemd/system/nfs-mountd.service.d/v4only.conf
+      mode: 0644
+      owner: root
+      group: root
+    register: mountd_v4only_conf
 
-- name: prevent mountd from listening on the network
-  copy:
-    src: files/mountd-v4only.conf
-    dest: /etc/systemd/system/nfs-mountd.service.d/v4only.conf
-    mode: 0644
-    owner: root
-    group: root
-  register: mountd_v4only_conf
+  - name: reload systemd units
+    systemd:
+      daemon_reload: true
+    when: mountd_v4only_conf.changed
 
-- name: reload systemd units
-  systemd:
-    daemon_reload: true
-  when: mountd_v4only_conf.changed
+  - name: populate service facts
+    service_facts:
 
-- name: populate service facts
-  service_facts:
+  - name: restart nfs-server
+    systemd_service:
+      name: nfs-server.service
+      state: restarted
+    when: |
+      nfs_conf_nfsd_vers3.changed
+      and ansible_facts.services["nfs-server"].state | default("stopped") == "running"
 
-- name: restart nfs-server
-  systemd_service:
-    name: nfs-server.service
-    state: restarted
-  when: ansible_facts.services["nfs-server"].state | default("stopped") == "running"
-    and nfs_conf_nfsd_vers3.changed
+  - name: restart nfs-mountd
+    systemd_service:
+      name: nfs-mountd.service
+      state: restarted
+    when: |
+      [nfs_conf_nfsd_vers3, nfs_conf_mountd_ipaddr, nfs_conf_mountd_debug, nfs_conf_mountd_ttl, mountd_v4only_conf] | selectattr("changed") is any
+      and ansible_facts.services["nfs-mountd.service"].state == "running"
 
-- name: restart nfs-mountd
-  systemd_service:
-    name: nfs-mountd.service
-    state: restarted
-  when: |
-    ansible_facts.services["nfs-mountd.service"].state == "running"
-    and [nfs_conf_nfsd_vers3, nfs_conf_mountd_ipaddr, nfs_conf_mountd_debug, nfs_conf_mountd_ttl, mountd_v4only_conf] | selectattr("changed") is any
-
-- name: disable nfsv3-specific services
-  systemd_service:
-    name: '{{ item }}'
-    state: stopped
-    masked: true
-  loop:
-  - rpc-statd.service
-  - rpcbind.socket
-  - rpcbind.service
+  - name: disable nfsv3-specific services
+    systemd_service:
+      name: '{{ item }}'
+      state: stopped
+      masked: true
+    loop:
+    - rpc-statd.service
+    - rpcbind.socket
+    - rpcbind.service
