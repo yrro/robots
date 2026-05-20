@@ -5,8 +5,8 @@
     owner: root
     group: root
     mode: 0644
-  register: ipsec_connection_file
+  register: _ipsec_connection_file
 
-- name: reload {{ conn.key }}
-  command: ipsec auto --replace {{ conn.key }}
-  when: ipsec_connection_file.changed
+- name: start {{ conn.key }} connection
+  command: ipsec start {{ conn.key }}
+  when: _ipsec_connection_file.changed

@@ -8,10 +8,3 @@
   loop_control:
     loop_var: conn
   when: ipsec is defined
-  register: _ipsec_connections
-- name: restart ipsec
-  systemd_service:
-    name: ipsec
-    state: restarted
-  when: _ipsec_connections.results | map(attribute='changed') is any
-...
