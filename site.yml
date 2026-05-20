@@ -71,4 +71,4 @@
       name: ipa-server
     tags: ipa-server
 ...
-# TODO: firewalld-stn-ipsec firewall-stn-sources firewalld-public-reject firewalld-public-icmp-echo firewalld-log-unicast insights-client certmonger-exporter(+firewalld) journal dnf-automatic no-login-pipup.conf ipa-server-smartcard
+# TODO: firewalld-stn-ipsec firewall-stn-sources firewalld-log-unicast insights-client certmonger-exporter(+firewalld) journal dnf-automatic no-login-pipup.conf ipa-server-smartcard
