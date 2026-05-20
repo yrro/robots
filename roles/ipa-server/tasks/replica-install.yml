@@ -10,14 +10,35 @@
   changed_when: false
   register: ipa_server_configured
 
-- name: ipa-replica-install
-  command:
-    argv:
-    - ipa-replica-install
-    - --unattended
-    - --setup-dns
-    - --auto-forwarder
-    - --setup-ca
-    - --setup-kra
+- name: install IPA server
   when: not (ipa_server_configured.stdout | bool)
+  block:
+
+  - name: create dirsrv config override file
+    copy:
+      content: |
+        dn: cn=config
+        changetype: modify
+        replace: nsslapd-maxsasliosize
+        nsslapd-maxsasliosize: 8000000
+        replace: nsslapd-sasl-max-buffer-size
+        nsslapd-sasl-max-buffer-size: 8000000
+      dest: /tmp/dirsrv-custom.ldif
+      mode: 0644
+      owner: root
+      group: root
+
+  - name: ipa-replica-install
+    command:
+      argv:
+      - ipa-replica-install
+      - --unattended
+      - --setup-dns
+      - --auto-forwarder
+      - --setup-ca
+      - --setup-kra
+      - --dirsrv-config-file=/tmp/dirsrv-custom.ldif
+
+  - name: etckeeper commit
+    command: etckeeper commit -m ipa-replica-install
 ...
