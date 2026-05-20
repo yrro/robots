@@ -51,6 +51,14 @@
   - import_tasks: tasks/insights-client.yml
     tags: insights-client
 
+- name: configure internet-facing ipa servers
+  hosts: ipaservers_public
+  tasks:
+
+  - import_role:
+      name: ipsec
+    tags: ipsec
+
 - name: configure ipa servers
   hosts: ipaservers
   tasks:
@@ -62,13 +70,5 @@
   - import_role:
       name: ipa-server
     tags: ipa-server
-
-- name: configure internet-facing ipa servers
-  hosts: ipaservers_public
-  tasks:
-
-  - import_role:
-      name: ipsec
-    tags: ipsec
 ...
 # TODO: firewalld-stn-ipsec firewall-stn-sources firewalld-public-reject firewalld-public-icmp-echo firewalld-log-unicast insights-client node-exporter certmonger-exporter(+firewalld) journal dnf-automatic no-login-pipup.conf ipa-server-smartcard
