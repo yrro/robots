@@ -1,8 +1,15 @@
----
 ipsec:
-  stn-to-ipa4:
+  stn-ipa-to-ipa4:
     left: "{{ sites.stn.wan_ipv4 }}"
     leftsubnet: "{{ sites.stn.ipa_subnet }}"
+    leftrsasigkey: "{{ sites.stn.ipsec_pubkey }}"
+    right: "{{ ansible_facts.default_ipv4.address }}"
+    rightckaid: "{{ ipsec_host_pubkey_ckaid }}"
+    auto: ondemand
+
+  stn-mon-to-ipa4:
+    left: "{{ sites.stn.wan_ipv4 }}"
+    leftsubnet: "{{ sites.stn.monitoring_subnet }}"
     leftrsasigkey: "{{ sites.stn.ipsec_pubkey }}"
     right: "{{ ansible_facts.default_ipv4.address }}"
     rightckaid: "{{ ipsec_host_pubkey_ckaid }}"
