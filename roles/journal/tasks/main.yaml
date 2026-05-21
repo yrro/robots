@@ -1,0 +1,13 @@
+- name: create journal persistent storage
+  file:
+    path: /var/log/journal
+    state: directory
+  register: _journal_storage
+
+- name: set journal persistent storage permissions
+  command: systemd-tmpfiles --create --prefix /var/log/journal
+  when: _journal_storage.changed
+
+- name: flush journal entries to persistent storage
+  command: journalctl --flush
+  when: _journal_storage.changed

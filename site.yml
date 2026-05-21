@@ -45,6 +45,10 @@
   tasks:
 
   - import_role:
+      name: journal
+    tags: journal
+
+  - import_role:
       name: node-exporter
     tags: node-exporter
 
@@ -71,4 +75,4 @@
       name: ipa-server
     tags: ipa-server
 ...
-# TODO: firewalld-stn-ipsec firewall-stn-sources firewalld-log-unicast insights-client certmonger-exporter(+firewalld) journal dnf-automatic no-login-pipup.conf ipa-server-smartcard
+# TODO: firewalld-stn-ipsec firewall-stn-sources firewalld-log-unicast insights-client certmonger-exporter(+firewalld) dnf-automatic no-login-pipup.conf ipa-server-smartcard
