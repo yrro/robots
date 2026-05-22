@@ -10,9 +10,13 @@ ipa8.ipa.robots.org.uk
 
 [servers:children]
 ipaservers
+mailservers
 
 [servers]
 evenlode.ipa.robots.org.uk
+
+[mailservers]
+mail0.ipa.robots.org.uk
 
 [samhosts]
 #merodach.ipa.robots.org.uk ansible_python_interpreter=/usr/bin/python3

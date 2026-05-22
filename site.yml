@@ -74,5 +74,13 @@
   - import_role:
       name: ipa-server
     tags: ipa-server
+
+- name: configure mail servers
+  hosts: mailservers
+  tasks:
+
+  - import_role:
+      name: chrony
+    tags: chrony
 ...
 # TODO: firewalld-stn-ipsec firewall-stn-sources firewalld-log-unicast insights-client certmonger-exporter(+firewalld) dnf-automatic no-login-pipup.conf ipa-server-smartcard ptrace_scope disable_ptrace lockdown[integrity] kpatch
