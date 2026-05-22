@@ -89,6 +89,12 @@
   assert:
     that: authselect_current["Profile ID"] == "sssd"
 
+- name: start oddjobd
+  systemd_service:
+    name: oddjobd.service
+    state: started
+    enabled: true
+
 - name: enable authselect profile feature
   command: authselect enable-feature {{ item }}
   when: item not in authselect_current['Enabled features']
