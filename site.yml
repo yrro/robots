@@ -75,4 +75,4 @@
       name: ipa-server
     tags: ipa-server
 ...
-# TODO: firewalld-stn-ipsec firewall-stn-sources firewalld-log-unicast insights-client certmonger-exporter(+firewalld) dnf-automatic no-login-pipup.conf ipa-server-smartcard
+# TODO: firewalld-stn-ipsec firewall-stn-sources firewalld-log-unicast insights-client certmonger-exporter(+firewalld) dnf-automatic no-login-pipup.conf ipa-server-smartcard ptrace_scope disable_ptrace lockdown[integrity] kpatch
