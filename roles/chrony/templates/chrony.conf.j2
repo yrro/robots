@@ -1,7 +1,7 @@
-# Default RHEL 9 config file is based on
-# <https://gitlab.com/chrony/chrony/-/blob/4.6.1/examples/chrony.conf.example2>
+# Default RHEL 10 config file is based on
+# <https://gitlab.com/chrony/chrony/-/blob/4.8/examples/chrony.conf.example2>
 # with a minor patch applied by
-# <https://gitlab.com/redhat/centos-stream/rpms/chrony/-/blob/c9s/chrony.spec>
+# <https://gitlab.com/redhat/centos-stream/rpms/chrony/-/blob/c10s/chrony.spec>
 
 {% if chrony_stat_ptp_kvm.stat.exists %}
 refclock PHC /dev/ptp_kvm poll 2
@@ -32,10 +32,10 @@ dumpdir /var/lib/chrony
 
 ntsdumpdir /var/lib/chrony
 
-leapsectz right/UTC
+leapseclist /usr/share/zoneinfo/leap-seconds.list
 
 logdir /var/log/chrony
-!log measurements statistics tracking
+#log measurements statistics tracking
 
 allow ::/128
 allow 127.0.0.0/8
