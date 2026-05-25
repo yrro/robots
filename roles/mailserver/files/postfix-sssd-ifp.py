@@ -3,6 +3,7 @@
 from contextlib import closing
 import logging
 import os
+import pwd
 import socket
 import sys
 
@@ -151,6 +152,24 @@ def dispatch_ifp_request(state):
         respond(state, "NOTFOUND", "")
         close_connection(state)
         return
+
+    if local_part == "root":
+        logger.info("mapname=%r key=%r NOTFOUND (root user)", state["mapname"], state["key"])
+        respond(state, "NOTFOUND", "")
+        close_connection(state)
+        return
+
+    if state["mapname"] == "mail":
+        try:
+            pwent = pwd.getpwnam(local_part)
+        except KeyError:
+            pass
+        else:
+            if pwent.pw_uid <= 999:  # SYS_UID_MAX
+                logger.info("mapname=%r key=%r OK root (system user)", state["mapname"], state["key"])
+                respond(state, "OK", "root")
+                close_connection(state)
+                return
 
     ifp_users = bus.get_object(
         "org.freedesktop.sssd.infopipe", "/org/freedesktop/sssd/infopipe/Users"
