@@ -215,10 +215,7 @@ def handle_reply_get_attributes(state, attrs):
 def respond(state, code, value):
     msg = f"{code} {value}".encode("us-ascii")
     msg_len = str(len(msg)).encode("us-ascii")
-    state["cs"].sendall(msg_len)
-    state["cs"].sendall(b":")
-    state["cs"].sendall(msg)
-    state["cs"].sendall(b",")
+    state["cs"].sendall(msg_len + b":" + msg + b",")
 
 
 if __name__ == "__main__":
