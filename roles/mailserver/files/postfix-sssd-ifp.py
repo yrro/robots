@@ -1,14 +1,13 @@
 #!/usr/bin/python -I
 
-from concurrent.futures import ThreadPoolExecutor
 from contextlib import closing
 import logging
 import os
 import socket
 import sys
 
-from dbus.mainloop.glib import DBusGMainLoop
 import dbus
+from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import GLib
 from systemd import daemon
 
