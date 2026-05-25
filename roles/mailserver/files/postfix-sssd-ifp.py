@@ -28,7 +28,7 @@ def main():
     global bus
     bus = dbus.SystemBus()
 
-    ls = socket.fromfd(fds[0], socket.AF_UNIX, socket.SOCK_STREAM)
+    ls = socket.socket(fileno=fds[0])
     with closing(ls):
         ls.setblocking(False)
         ls.listen()
