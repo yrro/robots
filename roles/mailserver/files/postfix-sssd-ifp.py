@@ -49,7 +49,8 @@ def cb_accept(ls, condition):
         GLib.io_add_watch(state["cs"], GLib.IO_IN, cb_read, state)
     except Exception as e:
         logger.exception("Failed to accept connection")
-        close_connection(state)
+        if "cs" in state:
+            close_connection(state)
     return True
 
 
@@ -137,11 +138,10 @@ def process_buffer(state):
 
 def close_connection(state):
     logger.debug("goodbye %r", state)
-    if cs := state.get("cs"):
-        try:
-            cs.close()
-        except Exception:
-            logger.exception("Closing %r", state["cs"])
+    try:
+        state["cs"].close()
+    except Exception:
+        logger.exception("Closing %r", state["cs"])
 
 
 def dispatch_ifp_request(state):
