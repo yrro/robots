@@ -145,13 +145,10 @@ def close_connection(state):
 
 
 def dispatch_ifp_request(state):
-    key = state["key"]
-    mapname = state["mapname"]
-
-    local_part, _, domain = key.partition("@")
+    local_part, _, domain = state["key"].partition("@")
     if domain not in ("", socket.gethostname()):
-        logger.info("mapname=%r key=%r NOTFOUND (external domain)", mapname, key)
-        respond(state, f"NOTFOUND", "")
+        logger.info("mapname=%r key=%r NOTFOUND (external domain)", state["mapname"], state["key"])
+        respond(state, "NOTFOUND", "")
         close_connection(state)
         return
 
