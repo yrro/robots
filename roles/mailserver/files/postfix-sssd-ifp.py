@@ -21,7 +21,8 @@ def main():
 
     fds = daemon.listen_fds()
     if len(fds) != 1:
-        sys.exit(f"Expected exactly 1 socket, received {len(fds)}")
+        logger.error("Expected 1 socket, received %s", len(fds))
+        sys.exit(1)
 
     global bus
     bus = dbus.SystemBus()
