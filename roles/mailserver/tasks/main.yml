@@ -1,0 +1,14 @@
+- import_tasks: packages.yml
+- import_tasks: sssd-ifp.yml
+  tags: sssd-ifp
+- import_tasks: postfix.yml
+  tags: postfix
+
+# TODO: redirect mail for system users to root
+# TODO: deliver mail to dovecot
+# TODO: sign outgoing mail with DKIM
+# TODO: PLAIN authentication by querying dovecot
+# TODO: GSSAPI authentication by looking up authorized principals for mailbox (where?)
+# TODO: DMARC verification of incoming mail (SPF/DKIM?)
+# TODO: avoid verifying mail to DKIM/SMTP-STS report address
+# TODO: spam filtering

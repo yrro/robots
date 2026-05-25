@@ -1,0 +1,8 @@
+- include_tasks: postfix-postconf.yml
+  loop: "{{ postfix_config | dict2items }}"
+
+- name: start postfix
+  systemd_service:
+    name: postfix.service
+    state: started
+    enabled: true

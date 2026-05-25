@@ -1,0 +1,25 @@
+- name: restart sssd
+  systemd_service:
+    name: sssd.service
+    state: restarted
+
+- name: reload postfix
+  systemd_service:
+    name: postfix.service
+    state: reloaded
+
+- name: systemctl daemon-reload
+  systemd:
+    daemon_reload: true
+
+- name: stop postfix-sssd-ifp
+  systemd_service:
+    name: postfix-sssd-ifp.service
+    state: stopped
+
+- name: restart postfix-sssd-ifp.socket
+  systemd_service:
+    name: postfix-sssd-ifp.socket
+    state: restarted
+    enabled: true
+

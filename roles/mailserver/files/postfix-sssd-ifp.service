@@ -1,0 +1,10 @@
+[Unit]
+Description=Postfix SSSD user attribute service
+Requires=postfix-sssd-ifp.socket
+
+[Service]
+Type=exec
+ExecStart=/usr/local/libexec/postfix-sssd-ifp
+User=postfix
+Group=postfix
+Restart=always

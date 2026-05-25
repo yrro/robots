@@ -1,0 +1,10 @@
+[Unit]
+Description=Postfix SSSD user attribute socket
+
+[Socket]
+ListenStream=/run/postfix-sssd-ifp.sock
+SocketUser=postfix
+SocketMode=0600
+
+[Install]
+WantedBy=sockets.target

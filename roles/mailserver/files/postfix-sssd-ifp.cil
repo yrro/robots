@@ -1,0 +1,6 @@
+; cleanup and trivial-rewrite both need to query the service. They run as
+; postfix_cleanup_t and postfix_master_t respectively.  If we query the map via
+; proxymap(8) then only it (running as postfix_cleanup_t) needs to query the
+; service.
+(allow postfix_master_t unconfined_service_t (unix_stream_socket (connectto)))
+(allow postfix_master_t var_run_t (sock_file (write)))

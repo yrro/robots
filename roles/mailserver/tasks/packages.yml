@@ -1,0 +1,10 @@
+- name: install mailserver packages
+  package:
+    name:
+    - mutt
+    - postfix
+    - dovecot
+    - dovecot-pigeonhole
+    state: present
+  tags: slow
+...

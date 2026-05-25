@@ -1,0 +1,85 @@
+- name: configure sssd infopipe service for postfix
+  copy:
+    src: sssd-ifp-postfix.conf
+    dest: /etc/sssd/conf.d/ifp-postfix.conf
+    mode: 0640
+    owner: root
+    group: sssd
+  notify: 'mailserver : restart sssd'
+
+#- name: configure file context of sssd ifp lookup script
+  #sefcontext:
+    #target: /usr/local/libexec/postfix-sssd-ifp
+    #setype: sssd_exec_t
+    #state: present
+  #notify: 'mailserver : stop postfix-sssd-ifp'
+
+- name: deploy sssd ifp lookup script
+  copy:
+    src: postfix-sssd-ifp.py
+    dest: /usr/local/libexec/postfix-sssd-ifp
+    mode: 0755
+    owner: root
+    group: root
+  register: _postfix_sssd_ifp_script
+  notify: 'mailserver : stop postfix-sssd-ifp'
+
+- name: deploy sssd ifp lookup service
+  copy:
+    src: postfix-sssd-ifp.service
+    dest: /etc/systemd/system/postfix-sssd-ifp.service
+    mode: 0644
+    owner: root
+    group: root
+  notify:
+  - 'mailserver : systemctl daemon-reload'
+  - 'mailserver : stop postfix-sssd-ifp'
+
+- name: deploy sssd ifp lookup socket
+  copy:
+    src: postfix-sssd-ifp.socket
+    dest: /etc/systemd/system/postfix-sssd-ifp.socket
+    mode: 0644
+    owner: root
+    group: root
+  notify:
+  - 'mailserver : systemctl daemon-reload'
+  - 'mailserver : restart postfix-sssd-ifp.socket'
+
+- name: flush handlers
+  meta: flush_handlers
+
+- name: start sssd ifp lookup socket
+  systemd_service:
+    name: postfix-sssd-ifp.socket
+    state: started
+    enabled: true
+
+- name: create SELinux local policy directory
+  file:
+    path: /etc/selinux/local
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+
+- name: copy sssd ifp selinux module source
+  copy:
+    src: postfix-sssd-ifp.cil
+    dest: /etc/selinux/local/postfix-sssd-ifp.cil
+    mode: 0644
+    owner: root
+    group: root
+  register: _postfix_sssd_ifp_selinux_policy_source
+
+- name: recon SELinux modules
+  command: semodule -l
+  check_mode: false
+  changed_when: false
+  register: _postfix_semodule_list
+  
+- name: install sssd ifp selinux module
+  command: semodule -i /etc/selinux/local/postfix-sssd-ifp.cil
+  when: |
+    _postfix_sssd_ifp_selinux_policy_source.changed
+    or ("postfix-sssd-ifp" not in _postfix_semodule_list.stdout_lines)
