@@ -44,6 +44,7 @@
   - name: extract host {{ inventory_hostname }} one-time password
     set_fact:
       _ipa_client_otp: "{{ (_ipa_client_otp_raw.stdout_lines | select('match', '^\\s*randompassword:') | first | split(':'))[1] | trim }}"
+    when: _ipa_client_otp_raw.changed
 
   - name: ipa-client-install
     command:
@@ -55,6 +56,7 @@
       - --hostname={{ inventory_hostname }}
       - --password={{ _ipa_client_otp }}
       - --no-ntp
+    when: _ipa_client_otp is defined
 
   - name: etckeeper commit
     command: etckeeper commit -m ipa-client-install
