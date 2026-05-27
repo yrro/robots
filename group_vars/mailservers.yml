@@ -1,3 +1,4 @@
 postfix_config:
   virtual_alias_domains: ''
   virtual_alias_maps: proxy:socketmap:unix:/run/postfix-sssd-ifp.sock:mail
+  recipient_delimiter: +-
