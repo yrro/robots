@@ -7,13 +7,6 @@
     group: sssd
   notify: 'mailserver : restart sssd'
 
-#- name: configure file context of sssd ifp lookup script
-  #sefcontext:
-    #target: /usr/local/libexec/postfix-sssd-ifp
-    #setype: sssd_exec_t
-    #state: present
-  #notify: 'mailserver : stop postfix-sssd-ifp'
-
 - name: deploy sssd ifp lookup script
   copy:
     src: postfix-sssd-ifp.py
