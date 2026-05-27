@@ -5,6 +5,7 @@
     - postfix
     - dovecot
     - dovecot-pigeonhole
+    - valkey
     state: present
   tags: slow
 ...

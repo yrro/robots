@@ -3,6 +3,10 @@
   tags: sssd-ifp
 - import_tasks: postfix.yml
   tags: postfix
+- import_tasks: valkey.yml
+  tags: valkey
+- import_tasks: rspamd.yml
+  tags: rspamd
 
 # TODO: redirect mail for system users to root
 # TODO: deliver mail to dovecot

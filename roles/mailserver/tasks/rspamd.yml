@@ -1,0 +1,63 @@
+- name: import rspamd PGP key
+  rpm_key:
+    state: present
+    key: https://rspamd.com/apt-stable/gpg.key
+    fingerprint: 3FA3 47D5 E599 BE45 95CA  2576 FFA2 32ED BF21 E25E
+
+- name: enable rspamd repository
+  get_url:
+    url: https://rspamd.com/rpm-stable/centos-{{ ansible_facts.distribution_major_version }}/rspamd.repo
+    dest: /etc/yum.repos.d/rspamd.repo
+    mode: 0644
+    owner: root
+    group: root
+
+- name: install rspamd
+  package:
+    name: rspamd
+    state: present
+  tags: slow
+
+- name: configure rspamd
+  copy:
+    content: "{{ item.content }}"
+    dest: /etc/rspamd/local.d/{{ item.filename }}
+    mode: "{{ item.private|default(false) | ternary('0640', '0644') }}"
+    owner: root
+    group: "{{ item.private|default(false) | ternary('_rspamd', 'root') }}"
+  notify: 'mailserver : reload rspamd'
+  loop:
+  - filename: redis.conf
+    content: |
+      servers = "[::1]:6379";
+      timeout = 1s;
+      #db = "0";
+      #password = "?"
+    private: true
+  - filename: worker-proxy.inc
+    content: |
+      milter = yes;
+      timeout = 120s;
+      upstream "local" {
+        default = yes;
+        self_scan = yes;
+
+      }
+  - filename: worker-normal.inc
+    content: |
+      enabled = false;
+  - filename: greylist.conf
+    content:
+      timeout = 10min;
+      message = "Temporary local problem. Sorry.";
+      #servers = "[::1]:6379";
+      #password = "?"
+    private: true
+
+- name: start rspamd
+  systemd_service:
+    name: rspamd.service
+    state: started
+    enabled: true
+
+# TODO rspamadm pw

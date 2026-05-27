@@ -23,3 +23,7 @@
     state: restarted
     enabled: true
 
+- name: reload rspamd
+  systemd_service:
+    name: rspamd.service
+    state: reloaded

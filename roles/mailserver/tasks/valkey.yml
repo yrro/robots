@@ -1,0 +1,7 @@
+- name: start valkey
+  systemd_service:
+    name: valkey.service
+    state: started
+    enabled: true
+
+# TODO: auth
