@@ -1,0 +1,33 @@
+- name: create SELinux local policy directory
+  file:
+    path: /etc/selinux/local
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+
+- name: copy sssd ifp selinux module source
+  copy:
+    src: "{{ module_src }}"
+    dest: /etc/selinux/local/{{ module_src }}
+    mode: 0644
+    owner: root
+    group: root
+  register: _module_src
+
+- name: recon SELinux modules
+  command: semodule -l
+  check_mode: false
+  changed_when: false
+  register: _semodule_l
+
+- name: figure SELinux module name
+  set_fact:
+    _selinux_policy_module_name: "{{ module_src.rstrip('.cil') }}"
+  when: module_src.endswith(".cil")
+  
+- name: install sssd ifp selinux module
+  command: semodule -i /etc/selinux/local/{{ module_src }}
+  when: |
+    _module_src.changed
+    or _selinux_policy_module_name not in _semodule_l.stdout_lines

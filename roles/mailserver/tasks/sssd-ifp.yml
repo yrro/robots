@@ -55,31 +55,9 @@
     state: started
     enabled: true
 
-- name: create SELinux local policy directory
-  file:
-    path: /etc/selinux/local
-    state: directory
-    owner: root
-    group: root
-    mode: 0700
+- name: load sssd ifp selinux policy module
+  include_role:
+    name: selinux_policy
+  vars:
+    module_src: postfix-sssd-ifp.cil
 
-- name: copy sssd ifp selinux module source
-  copy:
-    src: postfix-sssd-ifp.cil
-    dest: /etc/selinux/local/postfix-sssd-ifp.cil
-    mode: 0644
-    owner: root
-    group: root
-  register: _postfix_sssd_ifp_selinux_policy_source
-
-- name: recon SELinux modules
-  command: semodule -l
-  check_mode: false
-  changed_when: false
-  register: _postfix_semodule_list
-  
-- name: install sssd ifp selinux module
-  command: semodule -i /etc/selinux/local/postfix-sssd-ifp.cil
-  when: |
-    _postfix_sssd_ifp_selinux_policy_source.changed
-    or ("postfix-sssd-ifp" not in _postfix_semodule_list.stdout_lines)
