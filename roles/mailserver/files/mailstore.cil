@@ -1,0 +1,2 @@
+(filecon "/srv/mail" dir (system_u object_r dovecot_spool_t ((s0) (s0))))
+(filecon "/srv/mail/.*" any (system_u object_r dovecot_spool_t ((s0) (s0))))

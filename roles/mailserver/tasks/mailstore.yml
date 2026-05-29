@@ -1,0 +1,14 @@
+- name: load mailstore selinux policy module
+  include_role:
+    name: selinux_policy
+  vars:
+    module_src: mailstore.cil
+
+- name: create mail storage directoruy
+  file:
+    path: /srv/mail
+    state: directory
+    mode: 0750
+    owner: root
+    group: dovecot
+    setype: _default
