@@ -28,3 +28,9 @@
   systemd:
     daemon_reload: true
   when: _insights_client_delay.changed
+
+- name: start insights-client timer
+  systemd_service:
+    name: insights-client.timer
+    state: started
+    enabled: true
