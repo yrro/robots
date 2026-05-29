@@ -1,2 +1,5 @@
-(filecon "/srv/mail" dir (system_u object_r dovecot_spool_t ((s0) (s0))))
-(filecon "/srv/mail/.*" any (system_u object_r dovecot_spool_t ((s0) (s0))))
+(optional mailstore_labelling
+    (context mailstore_context (system_u object_r dovecot_spool_t ((s0) (s0))))
+    (filecon "/srv/mail(/.*)?" any mailstore_context)
+)
+; vim: ts=8 sts=4 sw=4 et
