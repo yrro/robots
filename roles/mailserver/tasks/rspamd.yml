@@ -32,7 +32,7 @@
       servers = "[::1]:6379";
       timeout = 1s;
       #db = "0";
-      #password = "?"
+      #password = "?";
     private: true
   - filename: worker-proxy.inc
     content: |
@@ -41,17 +41,16 @@
       upstream "local" {
         default = yes;
         self_scan = yes;
-
       }
   - filename: worker-normal.inc
     content: |
       enabled = false;
   - filename: greylist.conf
-    content:
+    content: |
       timeout = 10min;
       message = "Temporary local problem. Sorry.";
       #servers = "[::1]:6379";
-      #password = "?"
+      #password = "?";
     private: true
 
 - name: start rspamd
