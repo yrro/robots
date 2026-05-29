@@ -1,0 +1,7 @@
+- name: start unbound
+  systemd_service:
+    name: unbound.service
+    state: started
+    enabled: true
+
+# TODO: configure a system resolver?

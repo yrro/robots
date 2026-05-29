@@ -52,6 +52,11 @@
       #servers = "[::1]:6379";
       #password = "?";
     private: true
+  - filename: options.inc
+    content: |
+      dns {
+        nameserver = ["[::1]:53"]
+      }
 
 - name: start rspamd
   systemd_service:

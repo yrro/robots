@@ -5,6 +5,8 @@
   tags: postfix
 - import_tasks: valkey.yml
   tags: valkey
+- import_tasks: unbound.yml
+  tags: unbound
 - import_tasks: rspamd.yml
   tags: rspamd
 
