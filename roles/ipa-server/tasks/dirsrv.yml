@@ -144,3 +144,21 @@
     name: dirsrv-exporter
     state: restarted
   when: "[ipa_server_dirsrv_exporter_container, ipa_server_dirsrv_exporter_secret_password, ipa_server_dirsrv_exporter_secret_url] | map(attribute='changed') is any"
+
+- name: allow dex to search for groups by entrydn
+  ldap_attrs:
+    dn: cn=groups,cn=accounts,dc=ipa,dc=robots,dc=org,dc=uk
+    attributes:
+      aci:
+      - (targetfilter = "(objectClass=groupOfNames)")
+        (targetattr = "entryDN")
+        (
+          version 3.0;
+          acl "Allow dex to search for groups by entrydn";
+          allow (read, search)
+          (userdn = "ldap:///uid=dex,cn=sysaccounts,cn=etc,dc=ipa,dc=robots,dc=org,dc=uk")
+          ;
+        )
+    state: present
+    server_uri: '{{ ipa_server_ldapi_uri }}'
+  run_once: true
