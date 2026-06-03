@@ -4,6 +4,7 @@
 - import_tasks: firewalld.yml
 - import_tasks: replica-install.yml
 - import_tasks: config-recon.yml
+  tags: always
 - import_tasks: root-ldaprc.yml
 - import_tasks: dirsrv.yml
 - import_tasks: named.yml
