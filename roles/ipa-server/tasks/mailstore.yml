@@ -1,0 +1,64 @@
+- name: install mail storage schema
+  copy:
+    src: 90mailstorage.ldif
+    dest: /etc/dirsrv/slapd-IPA-ROBOTS-ORG-UK/schema/90mailstorage.ldif
+    mode: 0644
+    owner: dirsrv
+    group: dirsrv
+  notify: 'ipa-server : restart dirsrv'
+
+- meta: flush_handlers
+
+- name: create mail storage indexes
+  include_tasks: mailstore-index.yml
+  loop:
+  - mailDomainName
+  - mailLocalPart
+  loop_control:
+    loop_var: attr
+
+- name: configure dovecot system account
+  ldap_entry:
+    dn: uid=dovecot,cn=sysaccounts,cn=etc,dc=ipa,dc=robots,dc=org,dc=uk
+    objectClass:
+    - account
+    - simpleSecurityObject
+    attributes:
+      description: for dovecot
+      userPassword: '{{ lookup("password", "/dev/null", chars="printable", length=20) }}'
+    server_uri: '{{ ipa_server_ldapi_uri }}'
+    state: present
+  run_once: true
+
+- name: configure dovecot system account password
+  ldap_passwd:
+    dn: uid=dovecot,cn=sysaccounts,cn=etc,dc=ipa,dc=robots,dc=org,dc=uk
+    passwd: '{{ ipa_server_dovecot_password }}'
+    server_uri: '{{ ipa_server_ldapi_uri }}'
+  run_once: true
+
+- name: configure mail container
+  ldap_entry:
+    dn: cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
+    objectClass:
+    - nsContainer
+    server_uri: '{{ ipa_server_ldapi_uri }}'
+    state: present
+  run_once: true
+
+- name: allow dovecot to read mail information
+  ldap_attrs:
+    dn: cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
+    attributes:
+      aci:
+      - (targetattr != "userPassword")
+        (
+          version 3.0;
+          acl "dovecot may read mail information";
+          allow (read, search, compare)
+          (userdn = "ldap:///uid=dovecot,cn=sysaccounts,cn=etc,dc=ipa,dc=robots,dc=org,dc=uk")
+          ;
+        )
+    state: present
+    server_uri: '{{ ipa_server_ldapi_uri }}'
+  run_once: true

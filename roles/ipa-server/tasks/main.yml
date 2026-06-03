@@ -12,4 +12,6 @@
 - import_tasks: pkinit-crl.yml
 - import_tasks: healthcheck.yml
 - import_tasks: healthcheck-prometheus.yml
+- import_tasks: mailstore.yml
+  tags: mailstore
 ...

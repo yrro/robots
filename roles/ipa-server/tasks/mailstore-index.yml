@@ -1,0 +1,25 @@
+- name: create index on {{ attr }}
+  ldap_entry:
+    dn: cn={{ attr }},cn=index,cn=userRoot,cn=ldbm database,cn=plugins,cn=config
+    objectClass:
+    - nsIndex
+    attributes:
+      nsSystemIndex: false
+      nsIndexType: eq
+    state: present
+    server_uri: '{{ ipa_server_ldapi_uri }}'
+  register: _ipa_server_mailstore_index1
+
+- name: configure index on {{ attr }}
+  ldap_attrs:
+    dn: cn={{ attr }},cn=index,cn=userRoot,cn=ldbm database,cn=plugins,cn=config
+    attributes:
+      nsIndexType:
+      - eq
+    state: present
+    server_uri: '{{ ipa_server_ldapi_uri }}'
+  register: _ipa_server_mailstore_index2
+
+- name: build index on {{ attr }}
+  command: dsconf {{ ipa_server_dirsrv_instance }} backend index reindex --attr {{ attr }} --wait userRoot
+  when: _ipa_server_mailstore_index1.changed or _ipa_server_mailstore_index2.changed
