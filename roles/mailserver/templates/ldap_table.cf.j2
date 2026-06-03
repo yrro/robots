@@ -1,0 +1,13 @@
+tls_require_cert = yes
+tls_ca_cert_file = /etc/ipa/ca.crt
+# tls_cipher_suite = ? presumably PROFILE=SYSTEM is not needed here ?
+server_host ={% for hostname in groups["ipaservers_public"] %} ldaps://{{ hostname }}{% endfor +%}
+search_base = {{ search_base }}
+query_filter = {{ query_filter }}
+scope = base
+result_attribute = {{ result_attribute }}
+bind = simple
+bind_dn = uid=dovecot,cn=sysaccounts,cn=etc,dc=ipa,dc=robots,dc=org,dc=uk
+bind_pw = {{ bind_pw }}
+version = 3
+#sasl_mechs = GSSAPI

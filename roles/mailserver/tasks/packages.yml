@@ -3,6 +3,7 @@
     name:
     - mutt
     - postfix
+    - postfix-ldap
     - dovecot
     - dovecot-pigeonhole
     - unbound
