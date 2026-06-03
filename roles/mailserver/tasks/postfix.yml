@@ -43,21 +43,6 @@
     query_filter: (objectClass=mailBox)
     result_attribute: mailLocalPart
 
-- name: configure ldap_table virtual catchall
-  template:
-    src: ldap_table.cf.j2
-    dest: /etc/postfix/ldap-catchall.cf
-    mode: 0640
-    owner: root
-    group: postfix
-  vars:
-    comment: |
-      Search for a catchall alias which looks like @domain; since this is not
-      a valid email address, %s must be used.
-    search_base: mailDomainName=%s,cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
-    query_filter: (&(objectClass=mailDomain)(mail=*))
-    result_attribute: mail
-
 - name: start postfix
   systemd_service:
     name: postfix.service
