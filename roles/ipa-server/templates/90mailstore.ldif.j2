@@ -1,0 +1,21 @@
+# {{ mailstore_oid }} - mail storage
+# {{ mailstore_oid }}.1 - attributes
+# {{ mailstore_oid }}.2 - classes
+#
+# 'mail' is defined in RFC 4524
+# 'mailQuota' is defined by Netscape Messaging Server
+# 'memberPrincipal' is defined by FreeIPA (we don't inherit from 'groupOfPrincipals' because it makes 'cn' mandatory)
+#
+# Postfix resolves virtual_alias_maps, including the per-domain 'wildcard'
+# alias, before it checks virtual_mailbox_domains/virtual_mailbox_maps. This
+# means that the entry whose 'mail' attribute represents the wildcard alias for
+# the domain _must_ be a second entry within the mail container with the
+# mailDomainName=@example.com as its RDN. See virtual(5) 'TABLE SEACH ORDER'
+# for details.
+#
+dn: cn=schema
+attributeTypes: ( {{ mailstore_oid }}.1.1 NAME 'mailLocalPart' DESC 'The local-part of an email address' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE X-ORIGIN 'robots mail schema' )
+attributeTypes: ( {{ mailstore_oid }}.1.2 NAME 'mailDomainName' DESC 'The fully qualified domain name for mail routing' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE X-ORIGIN 'robots mail schema' )
+objectClasses: ( {{ mailstore_oid }}.2.1 NAME 'mailDomain' DESC 'Mail domain configuration' SUP top STRUCTURAL MUST mailDomainName MAY ( mail $ mailQuota ) X-ORIGIN 'robots mail schema' )
+objectClasses: ( {{ mailstore_oid }}.2.2 NAME 'mailAlias' DESC 'Mail alias in a domain' SUP top STRUCTURAL MUST ( mailLocalPart $ mail )  X-ORIGIN 'robots mail schema' )
+objectClasses: ( {{ mailstore_oid }}.2.3 NAME 'mailBox' DESC 'Mailbox in a domain' SUP top STRUCTURAL MUST mailLocalPart MAY ( mailQuota $ memberPrincipal ) X-ORIGIN 'robots mail schema' )
