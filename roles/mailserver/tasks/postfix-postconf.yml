@@ -10,5 +10,5 @@
     - postconf
     - -ep 
     - "{{ item.key }}={{ item.value }}"
-  when: _mailserver_postfix_postconf.stdout != item.value
+  when: _mailserver_postfix_postconf.stdout != item.value|string
   notify: 'mailserver : reload postfix'
