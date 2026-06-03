@@ -55,6 +55,10 @@
     server_uri: '{{ ipa_server_ldapi_uri }}'
   run_once: true
 
+# We need to monitor the following DNs:
+# cn=monitor,cn=ldbm database,cn=plugins,cn=config
+# cn=database,cn=monitor,cn=ldbm database,cn=plugins,cn=config
+# cn=monitor,cn=*,cn=ldbm database,cn=plugins,cn=config
 - name: allow dirsrv-mon to monitor ldbm statistics
   ldap_attrs:
     dn: cn=ldbm database,cn=plugins,cn=config
@@ -72,6 +76,9 @@
     state: present
     server_uri: '{{ ipa_server_ldapi_uri }}'
 
+# We need to monitor the following DNs:
+# cn=replica,cn=*,cn=mapping tree,cn=config
+# cn=*,cn=replica,cn=*,cn=mapping tree,cn=config
 - name: allow dirsrv-mon to monitor replication
   ldap_attrs:
     dn: cn=mapping tree,cn=config
