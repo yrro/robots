@@ -1,10 +1,12 @@
 - name: install mail storage schema
-  copy:
-    src: 90mailstorage.ldif
+  template:
+    src: 90mailstorage.ldif.j2
     dest: /etc/dirsrv/slapd-IPA-ROBOTS-ORG-UK/schema/90mailstorage.ldif
     mode: 0644
     owner: dirsrv
     group: dirsrv
+  vars:
+    mailstorage_oid: 1.2.826.0.1.4287146.1
   notify: 'ipa-server : restart dirsrv'
 
 - meta: flush_handlers
