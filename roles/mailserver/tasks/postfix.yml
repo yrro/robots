@@ -1,6 +1,11 @@
 - include_tasks: postfix-postconf.yml
   loop: "{{ postfix_config | dict2items }}"
 
+- name: check postconf(5)
+  shell: postconf > /dev/null
+  check_mode: false
+  changed_when: false
+
 - name: configure ldap_table virtual domains
   template:
     src: ldap_table.cf.j2
