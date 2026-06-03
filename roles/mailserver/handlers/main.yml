@@ -8,6 +8,11 @@
     name: postfix.service
     state: reloaded
 
+- name: reload dovecot
+  systemd_service:
+    name: dovecot.service
+    state: reloaded
+
 - name: systemctl daemon-reload
   systemd:
     daemon_reload: true

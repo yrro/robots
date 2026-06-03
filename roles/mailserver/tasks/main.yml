@@ -11,6 +11,8 @@
   tags: rspamd
 - import_tasks: mailstore.yml
   tags: mailstore
+- import_tasks: dovecot.yml
+  tags: dovecot
 
 # TODO: redirect mail for system users to root
 # TODO: deliver mail to dovecot

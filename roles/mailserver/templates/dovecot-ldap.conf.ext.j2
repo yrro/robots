@@ -1,0 +1,25 @@
+uris = {% for hostname in groups["ipaservers_public"] %} ldaps://{{ hostname }}{% endfor +%}
+dn = uid=dovecot,cn=sysaccounts,cn=etc,dc=ipa,dc=robots,dc=org,dc=uk
+dnpass = {{ dovecot_password }}
+
+tls_ca_cert_file = /etc/ipa/ca.crt
+tls_require_cert = demand
+
+auth_bind = yes
+auth_bind_userdn = mailLocalPart=%n,mailDomainName=%d,cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
+
+ldap_version = 3
+
+base = mailLocalPart=%n,mailDomainName=%d,cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
+
+scope = base
+
+user_attrs = memberPrincipal=k5principals,mailQuota=quota_rule=*:storage=%$
+
+user_filter = (objectClass=mailBox)
+
+pass_attrs =
+
+pass_filter = (objectClass=mailBox)
+
+debug_level = 0

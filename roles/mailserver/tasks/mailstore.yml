@@ -4,11 +4,27 @@
   vars:
     module_src: mailstore.cil
 
+- name: create mail storage group
+  group:
+    name: mailstore
+    system: true
+    state: present
+
+- name: create mail storage user
+  user:
+    name: mailstore
+    group: mailstore
+    system: true
+    create_home: false
+    home: /srv/mail
+    password: '!*'
+    state: present
+
 - name: create mail storage directoruy
   file:
     path: /srv/mail
     state: directory
-    mode: 0750
+    mode: 0770
     owner: root
-    group: dovecot
+    group: mailstore
     setype: _default
