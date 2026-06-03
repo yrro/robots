@@ -57,6 +57,9 @@
       dns {
         nameserver = ["[::1]:53"]
       }
+  - filename: classifier-bayes.conf
+    content: |
+      per_user = true;
 
 - name: start rspamd
   systemd_service:
