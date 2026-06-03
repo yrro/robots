@@ -14,7 +14,6 @@
     scope: base
     query_filter: (objectClass=mailDomain)
     result_attribute: mailDomainName
-    bind_pw: '{{ hostvars[groups["ipaservers"][0]]["ipa_server_dovecot_password"] }}'
 
 - name: configure ldap_table virtual aliases
   template:
@@ -29,7 +28,6 @@
     scope: base
     query_filter: (&(objectClass=mailAlias)(mail=*))
     result_attribute: mail
-    bind_pw: '{{ hostvars[groups["ipaservers"][0]]["ipa_server_dovecot_password"] }}'
 
 - name: configure ldap_table virtual mailboxes
   template:
@@ -44,7 +42,6 @@
     scope: base
     query_filter: (objectClass=mailBox)
     result_attribute: mailLocalPart
-    bind_pw: '{{ hostvars[groups["ipaservers"][0]]["ipa_server_dovecot_password"] }}'
 
 - name: configure ldap_table virtual catchall
   template:
@@ -60,7 +57,6 @@
     search_base: mailDomainName=%s,cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
     query_filter: (&(objectClass=mailDomain)(mail=*))
     result_attribute: mail
-    bind_pw: '{{ hostvars[groups["ipaservers"][0]]["ipa_server_dovecot_password"] }}'
 
 - name: start postfix
   systemd_service:

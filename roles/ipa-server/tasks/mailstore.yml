@@ -33,7 +33,7 @@
 - name: configure dovecot system account password
   ldap_passwd:
     dn: uid=dovecot,cn=sysaccounts,cn=etc,dc=ipa,dc=robots,dc=org,dc=uk
-    passwd: '{{ ipa_server_dovecot_password }}'
+    passwd: '{{ dovecot_password }}'
     server_uri: '{{ ipa_server_ldapi_uri }}'
   run_once: true
 
