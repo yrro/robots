@@ -87,4 +87,4 @@
       name: mailserver
     tags: mailserver
 ...
-# TODO: firewalld-stn-ipsec firewall-stn-sources firewalld-log-unicast insights-client certmonger-exporter(+firewalld) dnf-automatic no-login-pipup.conf ipa-server-smartcard ptrace_scope disable_ptrace lockdown[integrity] kpatch
+# TODO: firewalld-stn-ipsec firewall-stn-sources firewalld-log-unicast insights-client certmonger-exporter(+firewalld) dnf-automatic no-login-pipup.conf ipa-server-smartcard ptrace_scope disable_ptrace lockdown[integrity] kpatch node-exporter/textfile/needs-restarting
