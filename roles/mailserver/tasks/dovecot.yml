@@ -42,7 +42,7 @@
   - spam.sieve
   loop_control:
     loop_var: script
-
+  
 - name: check dovecot config
   shell: doveadm config > /dev/null
   check_mode: false
