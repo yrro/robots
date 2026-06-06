@@ -59,7 +59,7 @@
       }
   - filename: classifier-bayes.conf
     content: |
-      per_user = true;
+      per_user = false;  # unclear how this works when rspamd is called as a milter
   - filename: milter_headers.conf
     content: |
       extended_spam_headers = true;  # x-spamd-result, x-rspamd-server, x-rspamd-queue-id
