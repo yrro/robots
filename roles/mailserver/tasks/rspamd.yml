@@ -57,6 +57,7 @@
       dns {
         nameserver = ["[::1]:53"]
       }
+      enable_test_patterns = false;
   - filename: classifier-bayes.conf
     content: |
       per_user = false;  # unclear how this works when rspamd is called as a milter
