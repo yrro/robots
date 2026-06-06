@@ -45,6 +45,7 @@ plugin {
 
 protocol imap {
   mail_plugins = $mail_plugins imap_quota imap_sieve
+  imap_metadata = yes
 }
 
 protocol lmtp {
@@ -106,5 +107,7 @@ namespace inbox {
     special_use = \Sent
   }
 }
+
+mail_attribute_dict = file:%h/Maildir/dovecot-attributes
 
 # vim: ts=8 sts=2 sw=2 et
