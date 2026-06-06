@@ -1,0 +1,20 @@
+- name: install dovecot sieve script {{ script }}
+  copy:
+    src: dovecot/{{ script }}
+    dest: /etc/dovecot/sieve
+    mode: 0644
+    owner: root
+    group: root
+  register: _mailserver_dovecot_sieve_script
+
+- name: stat compiled sieve script {{ script }}
+  stat:
+    path: /etc/dovecot/sieve/{{ (script | splitext)[0] }}.svbin
+  register: _mailserver_dovecot_sieve_binary
+
+- name: compile sieve script {{ script }}
+  command:
+    cmd: sievec /etc/dovecot/sieve/{{ script }}
+  when: |
+    _mailserver_dovecot_sieve_script.changed
+    or not _mailserver_dovecot_sieve_binary.stat.exists

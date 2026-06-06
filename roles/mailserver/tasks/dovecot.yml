@@ -27,10 +27,44 @@
     regexp: ^(!include auth-system.conf\.ext)
     replace: '#\1'
 
+- name: create dovecot sieve script directory
+  file:
+    path: /etc/dovecot/sieve
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+
+- name: configure dovecot sieve scripts
+  include_tasks: dovecot-sieve.yml
+  loop:
+  - on-move.sieve
+  - spam.sieve
+  loop_control:
+    loop_var: script
+
 - name: check dovecot config
   shell: doveadm config > /dev/null
   check_mode: false
   changed_when: false
+
+- name: create dovecot sieve pipe script directory
+  file:
+    path: /usr/local/libexec/dovecot/sieve
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+
+- name: install dovecot sieve pipe script
+  copy:
+    src: dovecot/{{ item }}
+    dest: /usr/local/libexec/dovecot/sieve/{{ (item | splitext)[0] }}
+    mode: 0755
+    owner: root
+    group: root
+  loop:
+  - rspamd-report.sh
 
 - name: start dovecot
   systemd_service:
