@@ -55,7 +55,7 @@ protocol lmtp {
 lmtp_save_to_detail_mailbox = yes
 
 plugin {
-  recipient_delimiter = +=
+  recipient_delimiter = +-
 
   sieve_global_extensions = +vnd.dovecot.pipe +vnd.dovecot.debug
   sieve_plugins = sieve_extprograms sieve_imapsieve
@@ -71,6 +71,8 @@ plugin {
   sieve_quota_max_scripts = 10
   sieve_quota_max_storage = 1M
 }
+
+lmtp_save_to_detail_mailbox = yes
 
 service auth {
   unix_listener postfix {
