@@ -2,6 +2,8 @@
   package:
     name:
     - mutt
+    - swaks
+    - perl-Sys-Hostname  # swaks needs it
     - postfix
     - postfix-ldap
     - dovecot
