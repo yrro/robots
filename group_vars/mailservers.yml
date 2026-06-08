@@ -5,7 +5,7 @@ postfix_config:
     ldap:/etc/postfix/ldap-aliases.cf
 
   virtual_mailbox_domains: ldap:/etc/postfix/ldap-domains.cf
-  virtual_mailbox_maps: ldap:/etc/postfix/ldap-mailboxes.cf
+  virtual_mailbox_maps: ''
   virtual_transport: lmtp:unix:/run/dovecot/lmtp
 
   smtpd_recipient_restrictions: >-
