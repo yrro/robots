@@ -66,6 +66,8 @@
       extended_spam_headers = true;  # x-spamd-result, x-rspamd-server, x-rspamd-queue-id
       # not clear if these are pre-defined or whether we have to add the definitions to the use section...
       use = ["x-spamd-bar", "x-spam-level", "x-spam-status", "authentication-results"];
+      #skip_local = false;
+      #skip_authenticated = true;
 
 - name: start rspamd
   systemd_service:
