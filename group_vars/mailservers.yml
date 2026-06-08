@@ -27,4 +27,6 @@ postfix_config:
 
   recipient_delimiter: +-
 
+  smtpd_tls_security_level: may
+
   #smtpd_recipient_limit = 1  # required for per-user statistics to work when rspamd is called as a milter?
