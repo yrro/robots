@@ -35,6 +35,8 @@ userdb {
 plugin {
   quota = maildir:User quota
   quota_rule = *:storage=100MB
+  #quota_rule2 = Trash:storage+=100M
+  #quota_rule3 = Spam:storage+=50M
 }
 
 protocol imap {
@@ -69,6 +71,7 @@ plugin {
 }
 
 lmtp_save_to_detail_mailbox = yes
+#lmtp_rcpt_check_quota = yes
 
 service auth {
   unix_listener postfix {
@@ -88,13 +91,16 @@ postmaster_address = postmaster@robots.org.uk
 
 mail_max_userip_connections = 10
 
+# Some alternatives to the mailboxes already defined
+# 15-mailboxes.conf
+#
 namespace inbox {
-  # Some alternatives to the mailboxes already defined
-  # 15-mailboxes.conf
-
   mailbox "Spam" {
     auto = subscribe
     special_use = \Junk
+    #autoexpunge = ?
+    #mailbox_list_index = yes  ... global setting?
+    #mailbox_always_cache_fields = date.save
   }
 
   mailbox "Deleted Items" {
@@ -108,4 +114,13 @@ namespace inbox {
 
 mail_attribute_dict = file:%h/Maildir/dovecot-attributes
 
-# vim: ts=8 sts=2 sw=2 et
+#;; Assign TCP port 9900 to the existing mail_port_t type
+#(portcon tcp 9900 (system_u object_r mail_port_t (s0 s0)))
+#service stats {
+#  inet_listener http {
+#    port = 9900
+#  }
+#}
+
+
+# vim: ft=conf ts=8 sts=2 sw=2 et
