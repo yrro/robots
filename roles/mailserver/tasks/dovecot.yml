@@ -14,8 +14,8 @@
 
 - name: configure dovecot ldap
   template:
-    src: dovecot-ldap.conf.ext.j2
-    dest: /etc/dovecot/dovecot-ldap.conf.ext
+    src: dovecot/ldap.conf.ext.j2
+    dest: /etc/dovecot/ldap.conf.ext
     mode: 0640
     owner: root
     group: dovecot
