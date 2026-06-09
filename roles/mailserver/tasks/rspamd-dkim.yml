@@ -1,0 +1,23 @@
+- name: generate DKIM key for {{domain}}
+  command:
+    cmd: rspamadm dkim_keygen -s mail -d {{domain}} -k /etc/rspamd/dkim/{{domain}}-mail.key
+    creates: /etc/rspamd/dkim/{{domain}}-mail.key
+  register: _mailserver_rspamd_dkim_domain
+
+- name: save DKIM public key for {{domain}}
+  copy:
+    content: "{{ _mailserver_rspamd_dkim_domain.stdout }}\n"
+    dest: /etc/rspamd/dkim/{{domain}}-mail.zone
+    mode: 0644
+    owner: root
+    group: root
+  when: _mailserver_rspamd_dkim_domain.changed
+
+- name: configure DKIM key file permissions for {{domain}}
+  file:
+    path: /etc/rspamd/dkim/{{domain}}-mail.key
+    state: file
+    owner: root
+    group: _rspamd
+    mode: 0640
+  

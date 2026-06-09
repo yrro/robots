@@ -69,6 +69,46 @@
       #skip_local = false;
       #skip_authenticated = true;
 
+- name: recon mailbox domains
+  community.general.ldap_search:
+    server_uri: '{{ groups["ipaservers_public"] | map("regex_replace", "^", "ldaps://") | join(",") }}'
+    dn: cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
+    scope: onelevel
+    filter: '(objectClass=mailDomain)'
+    attrs:
+    - mailDomainName
+    bind_dn: uid=dovecot,cn=sysaccounts,cn=etc,dc=ipa,dc=robots,dc=org,dc=uk
+    bind_pw: '{{ dovecot_password }}'
+  check_mode: false
+  register: _mailserver_rspamd_mailbox_domains
+
+- name: figure virtual_mailbox_domains
+  set_fact:
+    mailserver_rspamd_mailbox_domains: '{{ _mailserver_rspamd_mailbox_domains.results | map(attribute="mailDomainName") | map("basename") | list }}'
+
+- name: configure DKIM signing
+  template:
+    src: rspamd/dkim_signing.conf.j2
+    dest: /etc/rspamd/local.d/dkim_signing.conf
+    mode: 0644
+    owner: root
+    group: root
+  notify: 'mailserver : reload rspamd'
+
+- name: create DKIM key directory
+  file:
+    path: /etc/rspamd/dkim
+    state: directory
+    mode: 0750
+    owner: root
+    group: _rspamd
+
+- name: generate DKIM keys
+  include_tasks: rspamd-dkim.yml
+  loop: '{{ mailserver_rspamd_mailbox_domains }}'
+  loop_control:
+    loop_var: domain
+
 - name: start rspamd
   systemd_service:
     name: rspamd.service

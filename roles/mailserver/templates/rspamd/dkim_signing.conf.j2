@@ -1,0 +1,9 @@
+domain {
+{% for domain in mailserver_rspamd_mailbox_domains %}
+  {{ domain }} {
+    selector = "mail";
+    path = "/etc/rspamd/dkim/{{ domain }}-mail.key";
+  }
+{% endfor %}
+}
+{# vim: set ts=8 sts=2 sw=2 et : #}
