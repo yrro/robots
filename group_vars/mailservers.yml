@@ -7,6 +7,8 @@ postfix_config:
   virtual_mailbox_domains: ldap:/etc/postfix/ldap-domains.cf
   virtual_transport: lmtp:unix:/run/dovecot/lmtp
 
+  smtpd_authorized_xclient_hosts: 127.0.0.0/8 [::1]
+
   smtpd_recipient_restrictions: >-
     permit_sasl_authenticated
     reject_unauth_destination

@@ -5,7 +5,7 @@
 
 - name: configure dovecot
   template:
-    src: dovecot-local.conf.j2
+    src: dovecot/local.conf.j2
     dest: /etc/dovecot/local.conf
     mode: 0644
     owner: root
