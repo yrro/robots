@@ -6,20 +6,24 @@ tls_ca_cert_file = /etc/ipa/ca.crt
 tls_require_cert = demand
 
 auth_bind = yes
-auth_bind_userdn = mailLocalPart=%n,mailDomainName=%d,cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
+auth_bind_userdn = mail=%u,cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
 
 ldap_version = 3
 
-base = mailLocalPart=%n,mailDomainName=%d,cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
+base = cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
 
-scope = base
+scope = onelevel
 
 user_attrs = memberPrincipal=k5principals,mailQuota=quota_rule=*:storage=%$
 
-user_filter = (objectClass=mailBox)
+user_filter = (&(objectClass=mailBox)(mail=%u))
 
-pass_attrs =
+#pass_attrs = mail=user,memberPrincipal=userdb_k5principals,mailQuota=userdb_quota_rule=*:storage=%$
 
-pass_filter = (objectClass=mailBox)
+pass_filter = (&(objectClass=mailBox)(mail=%u))
+
+iterate_filter = (objectClass=mailBox)
+
+iterate_attrs = mail=user
 
 debug_level = 0

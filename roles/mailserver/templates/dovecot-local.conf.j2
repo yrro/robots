@@ -27,12 +27,6 @@ passdb {
   args = /etc/dovecot/dovecot-ldap.conf.ext
 }
 
-#userdb {
-#  driver = prefetch
-  #driver = static
-  #args = uid=? gid=? home=/srv/mail/domains/%d/users/%u
-#}
-
 userdb {
   driver = ldap
   args = /etc/dovecot/dovecot-ldap.conf.ext

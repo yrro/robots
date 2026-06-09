@@ -6,33 +6,29 @@
   check_mode: false
   changed_when: false
 
-- name: configure ldap_table virtual domains
+- name: configure ldap_table for virtual_mailbox_domains
   template:
-    src: ldap_table.cf.j2
+    src: postfix/ldap_table.cf.j2
     dest: /etc/postfix/ldap-domains.cf
     mode: 0640
     owner: root
     group: postfix
   vars:
-    comment: Postfix will search for _just_ the domain name, so %s will be the domain name
     search_base: mailDomainName=%s,cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
-    scope: base
-    query_filter: (objectClass=mailDomain)
+    query_filter: objectClass=mailDomain
     result_attribute: mailDomainName
 
-- name: configure ldap_table virtual aliases
+- name: configure ldap_table for virtual_alias_maps
   template:
-    src: ldap_table.cf.j2
+    src: postfix/ldap_table.cf.j2
     dest: /etc/postfix/ldap-aliases.cf
     mode: 0640
     owner: root
     group: postfix
   vars:
-    comment: Search for a matching alias with the full email address, so %u and %d will work
-    search_base: mailLocalPart=%u,mailDomainName=%d,cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
-    scope: base
-    query_filter: (&(objectClass=mailAlias)(mail=*))
-    result_attribute: mail
+    search_base: mail=%s,cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
+    query_filter: objectClass=mailAlias
+    result_attribute: mailRoutingAddress
 
 - name: start postfix
   systemd_service:
