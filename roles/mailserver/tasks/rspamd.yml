@@ -63,11 +63,12 @@
       per_user = false;  # unclear how this works when rspamd is called as a milter
   - filename: milter_headers.conf
     content: |
-      extended_spam_headers = true;  # x-spamd-result, x-rspamd-server, x-rspamd-queue-id
+      extended_spam_headers = true;  # x-spamd-result, x-rspamd-server, x-rspamd-queue-id, x-rspamd-action
       # not clear if these are pre-defined or whether we have to add the definitions to the use section...
       use = ["x-spamd-bar", "x-spam-level", "x-spam-status", "authentication-results"];
       #skip_local = false;
       #skip_authenticated = true;
+      # remove-spam-flag is activated by default, which only removes X-Spam; what about other headers?
 
 - name: recon mailbox domains
   community.general.ldap_search:
