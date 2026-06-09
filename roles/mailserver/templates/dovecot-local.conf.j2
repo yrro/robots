@@ -1,4 +1,4 @@
-protocols = imap lmtp
+protocols = imap lmtp sieve
 
 mail_debug = no  # for sieve debugging
 
@@ -55,6 +55,8 @@ plugin {
   sieve_plugins = sieve_extprograms sieve_imapsieve
 
   sieve_before = file:/etc/dovecot/sieve/spam.sieve
+
+  imapsieve_url = sieve://imap.robots.org.uk
 
   imapsieve_mailbox1_name = *
   imapsieve_mailbox1_causes = COPY
