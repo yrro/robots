@@ -110,6 +110,11 @@
   loop_control:
     loop_var: domain
 
+- name: check rspamd config
+  shell: rspamadm configdump > /dev/null
+  check_mode: false
+  changed_when: false
+
 - name: start rspamd
   systemd_service:
     name: rspamd.service
