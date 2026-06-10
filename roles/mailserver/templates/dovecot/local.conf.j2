@@ -143,5 +143,11 @@ mail_attribute_dict = file:%h/Maildir/dovecot-attributes
 #  }
 #}
 
+# Allow mailstore to make userdb lookups - remove once replication is complete
+service auth {
+  unix_listener auth-userdb {
+    group = mailstore
+  }
+}
 
 # vim: ft=conf ts=8 sts=2 sw=2 et

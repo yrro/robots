@@ -14,6 +14,7 @@
   user:
     name: mailstore
     group: mailstore
+    groups: remote-access  # temporary to allow replicator to SSH in
     system: true
     create_home: false
     home: /srv/mail
@@ -24,7 +25,24 @@
   file:
     path: /srv/mail
     state: directory
-    mode: 0770
-    owner: root
+    mode: 0700
+    owner: mailstore  # temporary to allow replicator to SSH in
     group: mailstore
     setype: _default
+
+- name: configure mail storage ssh config directory
+  file:
+    path: /srv/mail/.ssh
+    state: directory
+    mode: 0500
+    owner: mailstore
+    group: mailstore
+
+- name: configure mail storage authorized_keys
+  copy:
+    content: |
+      from="37.139.10.94,2a03:b0c0:0:1010::64:e001" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEVdJ2znTpljtMD4S0cVaEwY8rBJnPRkxSZ3jk6iur5+ root@traxus.ipa.robots.org.uk
+    dest: /srv/mail/.ssh/authorized_keys
+    mode: 0400
+    owner: mailstore
+    group: mailstore
