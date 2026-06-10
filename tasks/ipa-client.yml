@@ -105,6 +105,7 @@
   - with-subid
   - with-faillock
   - with-pwhistory
+  - with-pamaccess
   - without-nullok
 
 - name: configure pam_faillock
@@ -120,6 +121,23 @@
     local: true
     name: remote-access
     state: present
+
+- name: create pam_access config directory
+  file:
+    path: /etc/security/access.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: restrict remote-access group via pam_access
+  copy:
+    content: |
+      -:(remote-access):ALL EXCEPT LOCAL
+    dest: /etc/security/access.d/99_deny-remote-access.conf
+    owner: root
+    group: root
+    mode: 0644
 
 - name: create remote-access PAM substack
   copy:
