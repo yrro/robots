@@ -20,7 +20,7 @@
     password: '!*'
     state: present
 
-- name: create mail storage directoruy
+- name: create mail storage directory
   file:
     path: /srv/mail
     state: directory
