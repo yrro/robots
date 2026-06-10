@@ -48,6 +48,22 @@
   check_mode: false
   changed_when: false
 
+- name: create dovecot utility script directory
+  file:
+    path: /usr/local/libexec/dovecot
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+
+- name: create dovecot dsync-server wrapper
+  copy:
+    src: dovecot/wrap-dsync-server.sh
+    dest: /usr/local/libexec/dovecot/wrap-dsync-server
+    mode: 0755
+    owner: root
+    group: root
+
 - name: create dovecot sieve pipe script directory
   file:
     path: /usr/local/libexec/dovecot/sieve
