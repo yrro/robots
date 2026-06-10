@@ -134,7 +134,7 @@
   copy:
     content: |
       -:(remote-access):ALL EXCEPT LOCAL
-    dest: /etc/security/access.d/99_deny-remote-access.conf
+    dest: /etc/security/access.d/zz_deny-remote-access.conf
     owner: root
     group: root
     mode: 0644
