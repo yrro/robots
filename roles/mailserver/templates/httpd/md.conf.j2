@@ -1,0 +1,25 @@
+MDCAChallenges dns-01
+MDCertificateAgreement accepted
+MDCertificateAuthority https://acme-staging-v02.api.letsencrypt.org/directory
+MDChallengeDns01 /usr/local/libexec/httpd/md-challenge-dns
+MDChallengeDns01Version 2
+MDContactEmail sam@robots.org.uk
+#MDMessageCmd ?
+MDRequireHttps permanent
+MDStapling on
+MDStapleOthers off
+
+#LogLevel md:debug
+
+{% for domain in mod_md_extra_domains %}
+<MDomain {{ domain }}>
+    MDRenewMode always
+</MDomain>
+{% endfor %}
+
+<Location /md-status>
+    SetHandler md-status
+    Require local
+</Location>
+
+# vim: ts=8 sts=4 sw=4 et

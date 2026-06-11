@@ -1,3 +1,12 @@
+mod_md_extra_domains:
+- imap.robots.org.uk
+- smtp.robots.org.uk
+
+mta_sts_domains:
+- robots.org.uk
+- meights.co.uk
+- velse.co.uk
+
 postfix_config:
   virtual_alias_domains: ''
   virtual_alias_maps: >-

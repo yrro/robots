@@ -13,6 +13,8 @@
   tags: mailstore
 - import_tasks: dovecot.yml
   tags: dovecot
+- import_tasks: httpd.yml
+  tags: httpd
 
 # TODO: redirect mail for system users to root
 # TODO: deliver mail to dovecot

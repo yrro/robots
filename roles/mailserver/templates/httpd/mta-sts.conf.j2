@@ -1,0 +1,21 @@
+{% for domain in mta_sts_domains %}
+MDomain mta-sts.{{ domain }} manual
+
+<VirtualHost _default_:443>
+  ServerName mta-sts.{{ domain }}
+
+  ErrorLog logs/mta-sts.{{ domain }}/ssl_error_log
+  TransferLog logs/mta-sts.{{ domain }}/ssl_access_log
+  LogLevel warn
+
+  SSLEngine on
+  SSLHonorCipherOrder on
+  SSLCipherSuite PROFILE=SYSTEM
+  SSLProxyCipherSuite PROFILE=SYSTEM
+
+  CustomLog logs/mta-sts.{{ domain }}/ssl_request_log \
+    "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+</VirtualHost>
+
+{% endfor %}
+# vim: ts=8 sts=2 sw=2 et

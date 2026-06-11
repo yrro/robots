@@ -1,0 +1,116 @@
+- name: configure apache
+  template:
+    src: httpd/{{ item }}.j2
+    dest: /etc/httpd/conf.d/{{ item }}
+    mode: 0644
+    owner: root
+    group: root
+  notify: 'mailserver : reload apache'
+  loop:
+  - md.conf
+  - mta-sts.conf
+
+- name: configure gssproxy for apache
+  copy:
+    src: files/httpd/gssproxy.conf
+    dest: /etc/gssproxy/80-httpd.conf
+    mode: 0644
+    owner: root
+    group: root
+  notify: 'mailserver : reload gssproxy'
+
+- name: create keytab for md-challenge-dns script
+  shell:
+    cmd: |
+      export KRB5CCNAME=$(mktemp) && kinit -V -k host/{{ inventory_hostname }} && ipa-getkeytab -p host/mail0.acme-challenge.ipa.robots.org.uk -k /etc/gssproxy/acme-challenge.keytab && kdestroy
+    creates: /etc/gssproxy/acme-challenge.keytab
+
+- name: allow apache to make network connections
+  seboolean:
+    name: httpd_can_network_connect
+    state: true
+    persistent: true
+
+- name: create apache script directory
+  file:
+    path: /usr/local/libexec/httpd
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+
+- name: create md-challenge-dns script
+  copy:
+    src: httpd/md-challenge-dns.py
+    dest: /usr/local/libexec/httpd/md-challenge-dns
+    mode: 0755
+    owner: root
+    group: root
+
+- name: create md-challenge-dns log directory
+  file:
+    path: /var/log/md-challenge-dns
+    state: directory
+    mode: 0700
+    owner: apache
+    group: root
+
+- name: create mta-sts vhost log directories
+  file:
+    path: /var/log/httpd/mta-sts.{{ item }}
+    state: directory
+    mode: 0700
+    owner: root
+    group: root
+  loop: '{{ mta_sts_domains }}'
+
+- name: create mod_md certificate watcher
+  copy:
+    content: |
+      [Unit]
+      Description=mod_md staging area watcher
+
+      [Path]
+      PathExistsGlob=/var/lib/httpd/md/staging/*/pubcert.pem
+
+      [Install]
+      WantedBy=httpd.service
+    dest: /etc/systemd/system/httpd-md-reload.path
+    mode: 0644
+    owner: root
+    group: root
+  notify: 'mailserver : systemctl daemon-reload'
+
+- name: create mod_md certificate httpd reloader
+  copy:
+    content: |
+      [Unit]
+      Description=mod_md httpd reloader
+
+      [Service]
+      Type=exec
+      ExecStart=/usr/bin/systemctl try-reload-or-restart httpd.service
+    dest: /etc/systemd/system/httpd-md-reload.service
+    mode: 0644
+    owner: root
+    group: root
+  notify: 'mailserver : systemctl daemon-reload'
+
+- meta: flush_handlers
+
+- name: start/enable mod_md certificate watcher
+  systemd_service:
+    name: httpd-md-reload.path
+    state: started
+    enabled: yes
+
+- name: check apache config
+  command: apachectl configtest
+  check_mode: false
+  changed_when: false
+
+- name: start/enable httpd
+  systemd_service:
+    name: httpd.service
+    state: started
+    enabled: true

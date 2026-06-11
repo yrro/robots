@@ -10,6 +10,8 @@
     - dovecot-pigeonhole
     - unbound
     - valkey
+    - httpd
+    - mod_md
     state: present
   tags: slow
 ...

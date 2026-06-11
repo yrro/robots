@@ -32,3 +32,13 @@
   systemd_service:
     name: rspamd.service
     state: reloaded
+
+- name: reload apache
+  systemd_service:
+    name: httpd.service
+    state: reloaded
+
+- name: reload gssproxy
+  systemd_service:
+    name: gssproxy.service
+    state: reloaded
