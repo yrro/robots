@@ -114,3 +114,10 @@
     name: httpd.service
     state: started
     enabled: true
+
+- name: allow https through firewall
+  firewalld:
+    service: https
+    state: enabled
+    permanent: true
+    immediate: true
