@@ -9,7 +9,7 @@
 - name: copy sssd ifp selinux module source
   copy:
     src: "{{ module_src }}"
-    dest: /etc/selinux/local/{{ module_src }}
+    dest: /etc/selinux/local/{{ module_src | basename }}
     mode: 0644
     owner: root
     group: root
@@ -23,11 +23,11 @@
 
 - name: figure SELinux module name
   set_fact:
-    _selinux_policy_module_name: "{{ module_src.rstrip('.cil') }}"
+    _selinux_policy_module_name: "{{ module_src.rstrip('.cil') | basename }}"
   when: module_src.endswith(".cil")
   
 - name: install sssd ifp selinux module
-  command: semodule -i /etc/selinux/local/{{ module_src }}
+  command: semodule -i /etc/selinux/local/{{ module_src | basename }}
   when: |
     _module_src.changed
     or _selinux_policy_module_name not in _semodule_l.stdout_lines
