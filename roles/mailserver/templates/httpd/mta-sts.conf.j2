@@ -1,7 +1,13 @@
+<DirectoryMatch "^/srv/www/[^/]+/html/">
+    AllowOverride None
+    Require all granted
+</DirectoryMatch>
+
 {% for domain in mta_sts_domains %}
 MDomain mta-sts.{{ domain }} manual
 
 <VirtualHost _default_:443>
+  DocumentRoot /srv/www/mta-sts/html
   ServerName mta-sts.{{ domain }}
 
   ErrorLog logs/mta-sts.{{ domain }}/ssl_error_log

@@ -1,0 +1,4 @@
+version: STSv1
+max_age: 86400
+mode: testing
+mx: smtp.robots.org.uk

@@ -10,6 +10,28 @@
   - md.conf
   - mta-sts.conf
 
+- name: create mta-sts content directories
+  file:
+    path: /srv/www/{{ item }}
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+    setype: _default
+  loop:
+  - ''
+  - mta-sts
+  - mta-sts/html
+  - mta-sts/html/.well-known
+
+- name: create mta-sts policy file
+  copy:
+    src: httpd/mta-sts.txt
+    dest: /srv/www/mta-sts/html/.well-known/
+    mode: 0644
+    owner: root
+    group: root
+
 - name: configure gssproxy for apache
   copy:
     src: files/httpd/gssproxy.conf
