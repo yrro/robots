@@ -119,7 +119,7 @@
     mode: 0644
     owner: root
     group: root
-  notify: 'mailserver : systemctl daemon-reload'
+  register: _mailserver_httpd_md_reload_path
 
 - name: create mod_md certificate httpd reloader
   copy:
@@ -136,13 +136,12 @@
     group: root
   notify: 'mailserver : systemctl daemon-reload'
 
-- meta: flush_handlers
-
 - name: start/enable mod_md certificate watcher
   systemd_service:
     name: httpd-md-reload.path
-    state: started
-    enabled: yes
+    state: '{{ "restarted" if _mailserver_httpd_md_reload_path.changed else "started" }}'
+    enabled: true
+    daemon_reload: true
 
 - name: check apache config
   command: apachectl configtest
