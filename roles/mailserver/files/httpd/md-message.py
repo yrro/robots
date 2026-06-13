@@ -38,22 +38,19 @@ def main(argv):
         logger.error("expected 2 arguments; got %r", argv[1:])
         return 1
 
-    log_msg = "event=%s euid=%s context=%r domain=%s"
-    # I can't find any docs describing what the number returned by getcon is.
-    # I'm pretty sure it raises an exception if there is an error, so it
-    # shouldn't be the return code of getcon(3). Just log it and by done.
-    log_args = [event, os.geteuid(), ",".join(str(x) for x in selinux.getcon()), domain]
+    log_msg = "event=%s euid=%s context=%s domain=%s"
+    log_args = [event, os.geteuid(), selinux.getcon()[1], domain]
 
     try:
-        result = drive(event, domain)
+        action = drive(event, domain)
     except Exception as e:
-        log_msg += " result=ERROR error=%r"
+        log_msg += " action=ERROR error=%r"
         log_args.append(str(e))
         logger.exception(log_msg, *log_args)
         return 1
     else:
-        log_msg += " result=%s"
-        log_args.append(result)
+        log_msg += " action=%s"
+        log_args.append(action)
         logger.info(log_msg, *log_args)
 
     return 0
