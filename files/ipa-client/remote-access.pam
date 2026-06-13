@@ -1,4 +1,8 @@
+# This stack MUST be invoked as a substack, NOT included!
+
+# Local users must satisfy access-remote.conf.
+# Non-local users skip the following rule.
 account [perm_denied=1 success=ignore] pam_localuser.so
-account required pam_succeed_if.so user ingroup remote-access
+account required pam_access.so nodefgroup accessfile=/etc/security/access-remote.conf
 
 # vim: ft=pamconf

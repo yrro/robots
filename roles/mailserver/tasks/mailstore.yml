@@ -14,7 +14,6 @@
   user:
     name: mailstore
     group: mailstore
-    groups: remote-access  # temporary to allow replicator to SSH in
     system: true
     create_home: false
     home: /srv/mail
@@ -50,11 +49,11 @@
     setype: _default
 
 - name: permit remote access for mail storage user
-  copy:
-    content: |
+  blockinfile:
+    block: |
       +:mailstore:2a03:b0c0:0:1010::64:e001
       +:mailstore:37.139.10.94
-    dest: /etc/security/access.d/10_mailstore-dsync.conf
-    mode: 0644
-    owner: root
-    group: root
+    path: /etc/security/access-remote.conf
+    marker: '# {mark} dovecot dsync'
+    state: present
+    insertbefore: BOF

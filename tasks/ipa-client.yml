@@ -116,28 +116,27 @@
   - local_users_only
   - deny = 6
 
-- name: create remote-access group
+- name: remove obsolete remote-access group
   group:
     local: true
     name: remote-access
-    state: present
+    state: absent
 
-- name: create pam_access config directory
+- name: remove obsolete pam_access config file
   file:
-    path: /etc/security/access.d
-    state: directory
-    owner: root
-    group: root
-    mode: 0755
+    path: /etc/security/access.d/zz_deny-remote-access.conf
+    state: absent
 
-- name: restrict remote-access group via pam_access
-  copy:
-    content: |
-      -:(remote-access):ALL EXCEPT LOCAL
-    dest: /etc/security/access.d/zz_deny-remote-access.conf
+- name: restrict remote-access services for local users
+  lineinfile:
+    path: /etc/security/access-remote.conf
+    line: -:ALL:ALL EXCEPT LOCAL
+    insertafter: EOF
+    mode: 0644
     owner: root
     group: root
-    mode: 0644
+    state: present
+    create: true
 
 - name: create remote-access PAM substack
   copy:
