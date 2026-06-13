@@ -8,7 +8,7 @@
   notify: 'mailserver : reload apache'
   loop:
   - md.conf
-  - mta-sts.conf
+  - ~mta-sts.conf
 
 - name: create mta-sts content directories
   file:

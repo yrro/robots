@@ -3,6 +3,9 @@
     Require all granted
 </DirectoryMatch>
 
+# This file is named _mta-sts.conf so that it sorts after ssl.conf, which
+# defines the default virtual host.
+
 {% for domain in mta_sts_domains %}
 MDomain mta-sts.{{ domain }} manual
 
