@@ -59,10 +59,7 @@ def main(argv):
         logger.error("expected 3 arguments; got %r", argv[1:])
         return 1
     
-    target = resolve_target(dns.name.from_text(domain))
-    target_zone = dns.resolver.zone_for_name(target)
-    target_relative = target.relativize(target_zone)
-
+    target_zone, target_relative = resolve_target(dns.name.from_text(domain))
     target_zone_soa = dns.resolver.resolve(target_zone, dns.rdatatype.SOA)
     target_zone_mname = target_zone_soa.rrset[0].mname
 
@@ -115,14 +112,10 @@ def main(argv):
 
 def resolve_target(name):
     challenge_name = dns.name.from_text(f"_acme-challenge", origin=None) + name
-    try:
-        ans = dns.resolver.resolve(challenge_name, dns.rdatatype.TXT)
-    except dns.resolver.NoAnswer as e:
-        return e.canonical_name()
-    except dns.resolver.NXDOMAIN as e:
-        return e.canonical_name
-    else:
-        return ans.canonical_name
+    challenge_name_canonical = dns.resolver.canonical_name(challenge_name)
+    target_zone = dns.resolver.zone_for_name(challenge_name_canonical)
+    target_relative = challenge_name_canonical.relativize(target_zone)
+    return target_zone, target_relative
 
 
 def gss_tsig_negotiate(server_name, server_addr, creds=None):
