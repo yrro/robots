@@ -1,4 +1,4 @@
-#!/usr/bin/python -P
+#!/usr/bin/python -I
 
 # DNS updates are possible because of this update policy in the zone:
 #
