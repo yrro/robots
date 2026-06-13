@@ -33,7 +33,6 @@
 # <https://stackoverflow.com/questions/55900836/generate-tsig-keyring-as-encoded-byte-string-for-dns-update>
 
 import logging
-import logging.handlers
 import os
 import socket
 import sys
@@ -44,6 +43,7 @@ import dns.resolver
 import dns.tsig
 import dns.update
 import gssapi
+from systemd.journal import JournalHandler
 
 
 logger = logging.getLogger("md-challenge-dns")
@@ -173,13 +173,10 @@ def handle_exception(exc_type, exc_value, exc_traceback):
 
 
 if __name__ == "__main__":
-    log_config = {}
-    if not sys.stdin:
-        # mod_md discards what we write to only logs our stderr if its LogLevel
-        # is set to debug.  SELinux policy prevents httpd_t writing to syslog.
-        # So boring old log files it will have to be.
-        log_config["handlers"] = [logging.handlers.RotatingFileHandler("/var/log/md-challenge-dns/md-challenge-dns.log", maxBytes=2**20, backupCount=2)]
-        log_config["format"] = "%(asctime)s %(levelname)s:%(name)s %(message)s"
+    if sys.stdin:
+        log_config = {}
+    else:
+        log_config = {"handlers": [JournalHandler(SYSLOG_IDENTIFIER="md-challenge-dns")], "format": "%(message)s"}
     logging.basicConfig(level="INFO", **log_config)
     sys.excepthook = handle_exception
     sys.exit(main(sys.argv))

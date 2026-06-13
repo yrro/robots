@@ -69,13 +69,6 @@
     owner: root
     group: root
 
-- name: create md-challenge-dns log directory
-  file:
-    path: /var/log/md-challenge-dns
-    state: directory
-    mode: 0700
-    owner: apache
-    group: root
 
 - name: create mta-sts vhost log directories
   file:
