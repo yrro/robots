@@ -30,6 +30,30 @@
     query_filter: objectClass=mailAlias
     result_attribute: mailRoutingAddress
 
+- name: configure local alias for root
+  lineinfile:
+    line: 'root:    sam@robots.org.uk'
+    path: /etc/aliases
+    state: present
+    regexp: '^#root:'
+    insertafter: EOF
+
+- name: stat /etc/aliases
+  stat:
+    path: /etc/aliases
+  register: _mailserver_aliases
+
+- name: stat aliases db
+  stat:
+    path: /etc/aliases.lmdb
+  register: _mailserver_aliases_db
+
+- name: rebuild aliases db
+  command: newaliases
+  when: |
+    not _mailserver_aliases_db.stat.exists
+    or _mailserver_aliases.stat.mtime > _mailserver_aliases_db.stat.mtime
+
 - name: start postfix
   systemd_service:
     name: postfix.service
