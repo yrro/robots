@@ -1,5 +1,7 @@
-(optional mailstore_labelling
-    (context mailstore_context (system_u object_r dovecot_spool_t ((s0) (s0))))
-    (filecon "/srv/mail(/.*)?" any mailstore_context)
-)
+(context mailstore (system_u object_r dovecot_spool_t ((s0) (s0))))
+(filecon "/srv/mail(/.*)?" any mailstore)
+
+(context ssh_home (system_u object_r ssh_home_t ((s0) (s0))))
+(filecon "/srv/mail/\.ssh(/.*)?" any ssh_home)
+
 ; vim: ts=8 sts=4 sw=4 et

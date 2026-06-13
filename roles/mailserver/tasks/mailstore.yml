@@ -37,6 +37,7 @@
     mode: 0500
     owner: mailstore
     group: mailstore
+    setype: _default
 
 - name: configure mail storage authorized_keys
   copy:
@@ -46,6 +47,7 @@
     mode: 0400
     owner: mailstore
     group: mailstore
+    setype: _default
 
 - name: permit remote access for mail storage user
   copy:
