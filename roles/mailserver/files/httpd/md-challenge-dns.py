@@ -40,7 +40,6 @@ import sys
 import time
 import uuid
 
-import dns.rdtypes.ANY.TKEY
 import dns.resolver
 import dns.tsig
 import dns.update
@@ -70,7 +69,7 @@ def main(argv):
     target_zone_soa = dns.resolver.resolve(target_zone, dns.rdatatype.SOA)
     target_zone_mname = target_zone_soa.rrset[0].mname
 
-    update = dns.update.Update(target_zone)
+    update = dns.update.UpdateMessage(target_zone)
     match command:
         case "setup":
             update.add(target_relative, 10, dns.rdatatype.TXT, token)
@@ -111,7 +110,7 @@ def main(argv):
         return 1
 
     if command == "setup":
-        # XXX poll all nameservers until the recors is available?
+        # XXX poll all nameservers until the record is available?
         time.sleep(5)
 
     return 0
