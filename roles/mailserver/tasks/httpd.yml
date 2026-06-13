@@ -128,7 +128,11 @@
       Description=mod_md httpd reloader
 
       [Service]
-      Type=exec
+      Type=oneshot
+      # Multiple certificates may be staged within a short period of time.
+      # We only want to reload httpd once.
+      ExecStart=/bin/echo "will reload httpd in 30 seconds..."
+      ExecStart=/bin/sleep 30
       ExecStart=/usr/bin/systemctl try-reload-or-restart httpd.service
     dest: /etc/systemd/system/httpd-md-reload.service
     mode: 0644
