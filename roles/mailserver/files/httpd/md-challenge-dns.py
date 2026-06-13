@@ -53,13 +53,10 @@ def main(argv):
     os.environ["GSS_USE_PROXY"] = "1"
     os.environ["GSSPROXY_SOCKET"] = "/var/lib/gssproxy/md-challenge.sock"
 
-    if len(argv[1:]) == 3:
-        command, domain, token = argv[1:4]
-    elif len(argv[1:]) == 2:
-        command, domain = argv[1:3]
-        token = None
-    else:
-        logger.error("expected 2 or 3 arguments; got %r", argv[1:])
+    try:
+        command, domain, token = argv[1:]
+    except ValueError:
+        logger.error("expected 3 arguments; got %r", argv[1:])
         return 1
     
     target = resolve_target(dns.name.from_text(domain))
@@ -74,7 +71,7 @@ def main(argv):
         case "setup":
             update.add(target_relative, 10, dns.rdatatype.TXT, token)
         case "teardown":
-            update.delete(target_relative, dns.rdatatype.TXT)
+            update.delete(target_relative, dns.rdatatype.TXT, token)
         case _:
             logger.error("Unknown command %r", command)
             return 1
