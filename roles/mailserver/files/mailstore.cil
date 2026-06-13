@@ -1,5 +1,5 @@
 (context mailstore (system_u object_r dovecot_spool_t ((s0) (s0))))
-(filecon "/srv/mail(/.*)?" any mailstore)
+(filecon "/srv/mail/domains(/.*)?" any mailstore)
 
 (context ssh_home (system_u object_r ssh_home_t ((s0) (s0))))
 (filecon "/srv/mail/\.ssh(/.*)?" any ssh_home)
