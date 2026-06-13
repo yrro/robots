@@ -72,7 +72,7 @@
   - md-challenge-dns
   - md-message
 
-- name: install polkit rule to allow apache to start md-message-installed2@.service
+- name: allow apache to start start md-message-renewed2.service
   copy:
     src: httpd/apache-md-message.rules
     dest: /etc/polkit-1/rules.d
@@ -86,14 +86,20 @@
   vars:
     module_src: httpd/md-message.cil
 
-- name: create md-message-installed2 service
+- name: create systemd services to invoke md-message
   copy:
-    src: httpd/md-message-installed2@.service
+    src: httpd/{{ item }}
     dest: /etc/systemd/system
     mode: 0644
     owner: root
     group: root
   notify: 'mailserver : systemctl daemon-reload'
+  loop:
+  - md-message-renewed2.service
+  - md-message-installed2@.service
+
+# mod_md may renew certificates as soon as it starts
+- meta: flush_handlers
 
 - name: create mta-sts vhost log directories
   file:
@@ -103,49 +109,6 @@
     owner: root
     group: root
   loop: '{{ mta_sts_domains }}'
-
-- name: create mod_md certificate watcher
-  copy:
-    content: |
-      [Unit]
-      Description=mod_md staging area watcher
-
-      [Path]
-      PathExistsGlob=/var/lib/httpd/md/staging/*/pubcert.pem
-
-      [Install]
-      WantedBy=httpd.service
-    dest: /etc/systemd/system/httpd-md-reload.path
-    mode: 0644
-    owner: root
-    group: root
-  register: _mailserver_httpd_md_reload_path
-
-- name: create mod_md certificate httpd reloader
-  copy:
-    content: |
-      [Unit]
-      Description=mod_md httpd reloader
-
-      [Service]
-      Type=oneshot
-      # Multiple certificates may be staged within a short period of time.
-      # We only want to reload httpd once.
-      ExecStart=/bin/echo "will reload httpd in 30 seconds..."
-      ExecStart=/bin/sleep 30
-      ExecStart=/usr/bin/systemctl try-reload-or-restart httpd.service
-    dest: /etc/systemd/system/httpd-md-reload.service
-    mode: 0644
-    owner: root
-    group: root
-  notify: 'mailserver : systemctl daemon-reload'
-
-- name: start/enable mod_md certificate watcher
-  systemd_service:
-    name: httpd-md-reload.path
-    state: '{{ "restarted" if _mailserver_httpd_md_reload_path.changed else "started" }}'
-    enabled: true
-    daemon_reload: true
 
 - name: check apache config
   command: apachectl configtest

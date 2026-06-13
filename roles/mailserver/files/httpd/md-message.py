@@ -3,9 +3,11 @@
 import logging
 import os
 from pathlib import Path
+import selinux
 import shutil
 from subprocess import run
 import sys
+import time
 
 import dbus
 from systemd.journal import JournalHandler
@@ -36,8 +38,11 @@ def main(argv):
         logger.error("expected 2 arguments; got %r", argv[1:])
         return 1
 
-    log_msg = "event=%s domain=%s"
-    log_args = [event, domain]
+    log_msg = "event=%s euid=%s context=%r domain=%s"
+    # I can't find any docs describing what the number returned by getcon is.
+    # I'm pretty sure it raises an exception if there is an error, so it
+    # shouldn't be the return code of getcon(3). Just log it and by done.
+    log_args = [event, os.geteuid(), ",".join(str(x) for x in selinux.getcon()), domain]
 
     try:
         result = drive(event, domain)
@@ -56,27 +61,45 @@ def main(argv):
 
 def drive(event, domain):
     domain_data = domains.get(domain)
-    if event == "installed" and domain_data:
-        bus = dbus.SystemBus()
-        systemd = bus.get_object(
-            'org.freedesktop.systemd1',
-            '/org/freedesktop/systemd1'
-        )
-        manager = dbus.Interface(
-            systemd,
-            'org.freedesktop.systemd1.Manager'
-        )
-        # 'replace' is the standard mode
-        manager.StartUnit(f"md-message-installed2@{domain}.service", 'replace')
-        return "OK"
-    elif event == "__installed2" and domain_data:
-        # shutil.copy preserves file mode
-        shutil.copy(md_domains_dir/domain/"privkey.pem", domain_data["privkey_file"])
-        shutil.copy(md_domains_dir/domain/"pubcert.pem", domain_data["pubcert_file"])
-        run(["/usr/bin/systemctl", "try-reload-or-restart", domain_data["systemd_unit"]], check=True)
-        return "OK"
+    man = get_systemd_manager()
+
+    match event:
+        case "renewed":
+            # We have been invoked by httpd (running as apache).
+            # A certificate is staged. Schedule an httpd restart.
+            if domain_data:
+                man.StartUnit("md-message-renewed2.service", "replace")
+                return "RELOAD_SCHEDULED"
+        case "_renewed2":
+            # We have been invoked within md-message-renewed2.service.
+            # Wait before reload httpd, in case mod_md is busy driving other certificates.
+            time.sleep(15)
+            man.ReloadOrTryRestartUnit("httpd.service", "replace")
+            return "RELOAD_TRIGGERED"
+        case "installed":
+            # We have been invoked by httpd. We can't directly install
+            # certificates because we're confined by httpd_t.
+            if domain_data:
+                man.StartUnit(f"md-message-installed2@{domain}.service", "replace")
+                return "INSTALL_TRIGGERED"
+        case "_installed2":
+            if domain_data:
+                # shutil.copy preserves file mode
+                shutil.copy(md_domains_dir/domain/"privkey.pem", domain_data["privkey_file"])
+                shutil.copy(md_domains_dir/domain/"pubcert.pem", domain_data["pubcert_file"])
+                man.ReloadOrTryRestartUnit(domain_data["systemd_unit"], "replace")
+                return "INSTALLED"
+        case event_name if event_name.startswith("_"):
+            raise ValueError(f"Invalid event {event_name!r}")
 
     return "NONE"
+
+
+def get_systemd_manager():
+    bus = dbus.SystemBus()
+    systemd = bus.get_object("org.freedesktop.systemd1", "/org/freedesktop/systemd1")
+    manager = dbus.Interface(systemd, "org.freedesktop.systemd1.Manager")
+    return manager
 
 
 def excepthook(exc_type, exc_value, exc_traceback):

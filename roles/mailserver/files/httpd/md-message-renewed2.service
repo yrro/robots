@@ -1,0 +1,7 @@
+[Unit]
+Description=md-message _renewed2 invoker
+
+[Service]
+Type=exec
+ExecStart=/usr/local/libexec/httpd/md-message _renewed2 -
+Environment=MD_MESSAGE_LOGGER=journal

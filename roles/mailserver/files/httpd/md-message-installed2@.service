@@ -1,0 +1,7 @@
+[Unit]
+Description=md-message _installed2 invoker
+
+[Service]
+Type=exec
+ExecStart=/usr/local/libexec/httpd/md-message _installed2 %I
+Environment=MD_MESSAGE_LOGGER=journal
