@@ -1,0 +1,4 @@
+[Service]
+Type=exec
+ExecStart=/usr/local/libexec/httpd/md-message __installed2 %I
+Environment=MD_MESSAGE_LOGGER=journal

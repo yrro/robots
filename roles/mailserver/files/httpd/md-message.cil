@@ -1,0 +1,11 @@
+(optional md-message_systemd
+    ; These are needed to allow md-message to run systemctl start
+    (allow httpd_t self (capability (sys_ptrace net_admin)))
+
+    ; Allow introspection of systemd manager
+    (allow httpd_t init_t (system (status)))
+
+    ; Allow units to be started
+    (allow httpd_t systemd_unit_file_t (service (start)))
+)
+; vim: ts=8 sts=4 sw=4 et
