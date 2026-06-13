@@ -1,3 +1,7 @@
+- name: validate mod_md authority
+  assert:
+    that: mod_md_authority in ["staging", "production"]
+
 - name: configure apache
   template:
     src: httpd/{{ item }}.j2
