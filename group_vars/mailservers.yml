@@ -42,4 +42,7 @@ postfix_config:
 
   smtpd_tls_security_level: may
 
+  smtp_bind_address_enforce: 'yes'
+  smtp_bind_address6: '2a01:4f8:1c19:ad06::25'
+
   #smtpd_recipient_limit = 1  # required for per-user statistics to work when rspamd is called as a milter?
