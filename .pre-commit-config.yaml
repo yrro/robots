@@ -15,3 +15,11 @@ repos:
   - id: ruff-check
     args: ["--fix", "--target-version", "py312"]
   - id: ruff-format
+- repo: local
+  hooks:
+  - id: shellcheck
+    name: shellcheck
+    entry: shellcheck
+    language: system
+    types: [shell]
+    require_serial: true
