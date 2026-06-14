@@ -5,7 +5,6 @@ import os
 from pathlib import Path
 import selinux
 import shutil
-from subprocess import run
 import sys
 import time
 
@@ -87,8 +86,12 @@ def drive(event, domain):
         case "_installed2":
             if domain_data:
                 # shutil.copy preserves file mode
-                shutil.copy(md_domains_dir/domain/"privkey.pem", domain_data["privkey_file"])
-                shutil.copy(md_domains_dir/domain/"pubcert.pem", domain_data["pubcert_file"])
+                shutil.copy(
+                    md_domains_dir / domain / "privkey.pem", domain_data["privkey_file"]
+                )
+                shutil.copy(
+                    md_domains_dir / domain / "pubcert.pem", domain_data["pubcert_file"]
+                )
                 man.ReloadOrTryRestartUnit(domain_data["systemd_unit"], "replace")
                 return "INSTALLED"
         case event_name if event_name.startswith("_"):
@@ -113,7 +116,10 @@ def excepthook(exc_type, exc_value, exc_traceback):
 
 if __name__ == "__main__":
     if not sys.stdin or os.environ.get("MD_MESSAGE_LOGGER") == "journal":
-        log_config = {"handlers": [JournalHandler(SYSLOG_IDENTIFIER="md-message")], "format": "%(message)s"}
+        log_config = {
+            "handlers": [JournalHandler(SYSLOG_IDENTIFIER="md-message")],
+            "format": "%(message)s",
+        }
     else:
         log_config = {}
     logging.basicConfig(level="INFO", **log_config)

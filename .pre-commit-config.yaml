@@ -7,3 +7,9 @@ repos:
   - id: trailing-whitespace
   - id: check-yaml
     args: ["--unsafe"]
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.15.17
+  hooks:
+  - id: ruff-check
+    args: ["--fix", "--target-version", "py312"]
+  - id: ruff-format

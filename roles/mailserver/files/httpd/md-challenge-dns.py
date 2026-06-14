@@ -34,7 +34,6 @@
 
 import logging
 import os
-import socket
 import sys
 import time
 import uuid
@@ -78,10 +77,19 @@ def main(argv):
     excs = []
     for addr in target_server.addresses():
         log_msg = "operation=%s opcode=%s rr=%s zone=%s master=%s address=%s"
-        log_args = [command, dns.opcode.to_text(update.opcode()), target_relative, target_zone, target_zone_mname, addr]
+        log_args = [
+            command,
+            dns.opcode.to_text(update.opcode()),
+            target_relative,
+            target_zone,
+            target_zone_mname,
+            addr,
+        ]
         try:
             key_name, key_ring = gss_tsig_negotiate(target_zone_mname, addr, None)
-            update.use_tsig(keyring=key_ring, keyname=key_name, algorithm=dns.tsig.GSS_TSIG)
+            update.use_tsig(
+                keyring=key_ring, keyname=key_name, algorithm=dns.tsig.GSS_TSIG
+            )
             response = dns.query.tcp(update, addr, timeout=5)
             log_msg += " rcode=%s"
             log_args.append(dns.rcode.to_text(response.rcode()))
@@ -111,7 +119,7 @@ def main(argv):
 
 
 def resolve_target(name):
-    challenge_name = dns.name.from_text(f"_acme-challenge", origin=None) + name
+    challenge_name = dns.name.from_text("_acme-challenge", origin=None) + name
     challenge_name_canonical = dns.resolver.canonical_name(challenge_name)
     target_zone = dns.resolver.zone_for_name(challenge_name_canonical)
     target_relative = challenge_name_canonical.relativize(target_zone)
@@ -147,11 +155,27 @@ def gss_tsig_negotiate(server_name, server_addr, creds=None):
 
 def build_tkey_query(token, keyring, keyname):
     from dns.rdtypes.ANY.TKEY import TKEY
+
     datum = int(time.time())
-    tkey = TKEY(rdclass=dns.rdataclass.ANY, rdtype=dns.rdatatype.TKEY, algorithm=dns.tsig.GSS_TSIG, inception=datum, expiration=datum, mode=TKEY.GSSAPI_NEGOTIATION, error=dns.rcode.NOERROR, key=token)
+    tkey = TKEY(
+        rdclass=dns.rdataclass.ANY,
+        rdtype=dns.rdatatype.TKEY,
+        algorithm=dns.tsig.GSS_TSIG,
+        inception=datum,
+        expiration=datum,
+        mode=TKEY.GSSAPI_NEGOTIATION,
+        error=dns.rcode.NOERROR,
+        key=token,
+    )
     query = dns.message.make_query(keyname, dns.rdatatype.TKEY, dns.rdataclass.ANY)
     query.keyring = keyring
-    query.find_rrset(dns.message.ADDITIONAL, keyname, dns.rdataclass.ANY, dns.rdatatype.TKEY, create=True).add(tkey)
+    query.find_rrset(
+        dns.message.ADDITIONAL,
+        keyname,
+        dns.rdataclass.ANY,
+        dns.rdatatype.TKEY,
+        create=True,
+    ).add(tkey)
     return query
 
 
@@ -166,7 +190,10 @@ if __name__ == "__main__":
     if sys.stdin:
         log_config = {}
     else:
-        log_config = {"handlers": [JournalHandler(SYSLOG_IDENTIFIER="md-challenge-dns")], "format": "%(message)s"}
+        log_config = {
+            "handlers": [JournalHandler(SYSLOG_IDENTIFIER="md-challenge-dns")],
+            "format": "%(message)s",
+        }
     logging.basicConfig(level="INFO", **log_config)
     sys.excepthook = handle_exception
     sys.exit(main(sys.argv))

@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 from datetime import date, datetime, timedelta
-from itertools import chain
 import os
 from pathlib import Path
 import sys
@@ -40,21 +39,26 @@ def get_instance_subsystem_log_path(instance, subsystem):
 
 
 def get_rlf_paths(log_dir, datum):
-    '''
+    """
     com.netscape.cms.logging.RollingLogFile logs are rotated after 30 days or
     2000 KiB. There is an 'expirationTime' property for each instance of
     com.netscape.cms.logging.RollingLogFile in </etc/pki/pki-tomcat/*/CS.cfg>
     but a comment in RollingLogFile.java says that it is not supported, and
     there's no CS.cfg file for acma/pki subsystems so this property can't be
     set for them anyway.
-    '''
+    """
     rlf_retention = int(os.environ.get("RLF_RETAIN_DAYS", "90"))
     assert rlf_retention > 0
     cutoff = datum - timedelta(days=rlf_retention)
 
     # TODO: remove expiration of 'system' and 'transactions' logs, which were
     # removed in v11.2.0-beta3-656-g043515bd9d
-    for glob in ["selftests.log.??????????????", "signedAudit/*.??????????????", "system.??????????????", "transactions.??????????????"]:
+    for glob in [
+        "selftests.log.??????????????",
+        "signedAudit/*.??????????????",
+        "system.??????????????",
+        "transactions.??????????????",
+    ]:
         for path in log_dir.glob(glob):
             path_date = datetime.strptime(path.name[-14:-6], "%Y%m%d")
             if path_date.date() < cutoff:
@@ -62,14 +66,14 @@ def get_rlf_paths(log_dir, datum):
 
 
 def get_debug_paths(log_dir, datum):
-    '''
+    """
     debug logs are rotated daily. According to
     <https://github.com/dogtagpki/pki/wiki/Configuring-Subsystem-Debug-Log>
     they are purged after 7 days, and even though maxDays is set to 7 in
     </usr/share/pki/*/webapps/*/WEB-INF/classes/logging.properties>, they
     aren't being purged on RHEL 8 or 9
     <https://github.com/dogtagpki/pki/issues/3731>.
-    '''
+    """
     debug_retention = int(os.environ.get("DEBUG_RETAIN_DAYS", "21"))
     assert debug_retention > 0
     cutoff = datum - timedelta(days=debug_retention)

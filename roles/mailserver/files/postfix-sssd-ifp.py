@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 bus = None
 
+
 def main():
     DBusGMainLoop(set_as_default=True)
 
@@ -48,7 +49,7 @@ def cb_accept(ls, condition):
         logger.debug("Accept from %r", caddr)
         state["cs"].setblocking(False)
         GLib.io_add_watch(state["cs"], GLib.IO_IN, cb_read, state)
-    except Exception as e:
+    except Exception:
         logger.exception("Failed to accept connection")
         if "cs" in state:
             close_connection(state)
@@ -57,7 +58,7 @@ def cb_accept(ls, condition):
 
 def cb_read(cs, condition, state):
     try:
-        if condition & (GLib.IO_HUP| GLib.IO_ERR):
+        if condition & (GLib.IO_HUP | GLib.IO_ERR):
             close_connection(state)
             return False
 
@@ -72,7 +73,7 @@ def cb_read(cs, condition, state):
         state["buffer"] += chunk
 
         return not process_buffer(state)
-    except:
+    except Exception:
         logger.exception("Read error")
         close_connection(state)
         return False
@@ -110,7 +111,7 @@ def process_buffer(state):
         return False
 
     payload = remainder[:nbytes]
-    if remainder[nbytes:nbytes+1] != b",":
+    if remainder[nbytes : nbytes + 1] != b",":
         logger.error("Request not terminated")
         close_connection(state)
         return True
@@ -148,13 +149,19 @@ def close_connection(state):
 def dispatch_ifp_request(state):
     local_part, _, domain = state["key"].partition("@")
     if domain not in ("", socket.gethostname()):
-        logger.info("mapname=%r key=%r NOTFOUND (external domain)", state["mapname"], state["key"])
+        logger.info(
+            "mapname=%r key=%r NOTFOUND (external domain)",
+            state["mapname"],
+            state["key"],
+        )
         respond(state, "NOTFOUND", "")
         close_connection(state)
         return
 
     if local_part == "root":
-        logger.info("mapname=%r key=%r NOTFOUND (root user)", state["mapname"], state["key"])
+        logger.info(
+            "mapname=%r key=%r NOTFOUND (root user)", state["mapname"], state["key"]
+        )
         respond(state, "NOTFOUND", "")
         close_connection(state)
         return
@@ -166,7 +173,11 @@ def dispatch_ifp_request(state):
             pass
         else:
             if pwent.pw_uid <= 999:  # SYS_UID_MAX
-                logger.info("mapname=%r key=%r OK root (system user)", state["mapname"], state["key"])
+                logger.info(
+                    "mapname=%r key=%r OK root (system user)",
+                    state["mapname"],
+                    state["key"],
+                )
                 respond(state, "OK", "root")
                 close_connection(state)
                 return
@@ -190,7 +201,7 @@ def handle_reply_find_by_name(state, user_path):
         "extraAttributes",
         dbus_interface="org.freedesktop.DBus.Properties",
         reply_handler=lambda attrs: handle_reply_get_attributes(state, attrs),
-        error_handler=lambda err: handle_dbus_generic_error(state, err),
+        error_handler=lambda err: handle_error_generic(state, err),
     )
 
 
@@ -217,7 +228,11 @@ def handle_reply_get_attributes(state, attrs):
     requested_attrs = attrs.get(state["mapname"], [])
 
     if not requested_attrs:
-        logger.info("mapname=%r key=%r NOTFOUND (missing attribute)", state["mapname"], state["key"])
+        logger.info(
+            "mapname=%r key=%r NOTFOUND (missing attribute)",
+            state["mapname"],
+            state["key"],
+        )
         respond(state, "NOTFOUND", "")
         close_connection(state)
         return

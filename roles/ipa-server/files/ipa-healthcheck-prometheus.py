@@ -8,12 +8,23 @@ import subprocess
 
 from prometheus_client import CollectorRegistry, Enum, write_to_textfile
 
-p = subprocess.run(["ipa-healthcheck", "--output-type=json", "--all"], check=False, stdout=subprocess.PIPE, universal_newlines=True)
+p = subprocess.run(
+    ["ipa-healthcheck", "--output-type=json", "--all"],
+    check=False,
+    stdout=subprocess.PIPE,
+    universal_newlines=True,
+)
 results = json.loads(p.stdout)
 
 prom_reg = CollectorRegistry()
-states=["SUCCESS", "WARNING", "ERROR", "CRITICAL"]
-ipa_healthcheck_state = Enum("ipa_healthcheck_state", "State of an ipa-healthcheck check", labelnames=["source", "check", "key"], registry=prom_reg, states=states)
+states = ["SUCCESS", "WARNING", "ERROR", "CRITICAL"]
+ipa_healthcheck_state = Enum(
+    "ipa_healthcheck_state",
+    "State of an ipa-healthcheck check",
+    labelnames=["source", "check", "key"],
+    registry=prom_reg,
+    states=states,
+)
 
 # Some health checks don't have a unique key; keep track of the worst value
 # we've seen so far in this dict.

@@ -4,6 +4,7 @@ from subprocess import run
 import sys
 import tempfile
 
+
 def main():
     with tempfile.NamedTemporaryFile(prefix="akinit-ccache-") as ccache:
         for _ in range(5):
@@ -19,6 +20,7 @@ def main():
             pt = run(["kinit", "-V", "-T", ccache.name])
             if pt.returncode == 0:
                 return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

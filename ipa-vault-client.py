@@ -20,15 +20,18 @@ def main(argv):
     if config._config_file:
         vault_args["username"] = config._get_ini_config_value(
             config._config_file,
-            section="ipa-vault", option="username",
+            section="ipa-vault",
+            option="username",
         )
         vault_args["service"] = config._get_ini_config_value(
             config._config_file,
-            section="ipa-vault", option="service",
+            section="ipa-vault",
+            option="service",
         )
         vault_args["shared"] = config._get_ini_config_value(
             config._config_file,
-            section="ipa-vault", option="shared",
+            section="ipa-vault",
+            option="shared",
         )
         if vault_args["shared"]:
             vault_args["shared"] = boolean(vault_args["shared"])
