@@ -3,6 +3,7 @@
 set -eEu -o pipefail
 
 armor_cc=$(mktemp --tmpdir="${XDG_RUNTIME_DIR}" krbcc_anon.XXXXXXXXXX)
+# shellcheck disable=SC2064
 trap "rm -f ${armor_cc}" EXIT
 
 if ! kinit -V -n -l 5m -a -F -P -c "$armor_cc"; then
