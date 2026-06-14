@@ -1,0 +1,11 @@
+ansible-navigator:
+  ansible:
+    playbook:
+      path: site.yml
+  execution-environment:
+    enabled: false
+  logging:
+    file:
+      .navigator/ansible-navigator.log
+  playbook-artifact:
+    save-as: "{playbook_dir}/.navigator/{playbook_name}-artifact-{time_stamp}.json"
