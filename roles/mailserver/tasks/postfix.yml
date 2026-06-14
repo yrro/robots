@@ -23,7 +23,7 @@
     - postconf
     - -ep
     - "{{ item.key }}={{ item.value }}"
-  when: postfix_postconf[item.key] != item.value
+  when: postfix_postconf[item.key] != item.value|string
   loop: "{{ postfix_config | dict2items }}"
   notify: 'mailserver : reload postfix'
 
