@@ -17,14 +17,27 @@
         )
       }}
 
-- name: figure postconf(5) differences
+- name: figure postconf(5) changes
   set_fact:
     _postfix_postconf_edit_args: >-
       {{
         (_postfix_postconf_edit_args | default([]))
-        + [item.key ~ "=" ~ item.value]
+        + (
+            [item.key ~ "=" ~ item.value]
+            if item.value is not none
+              and (item.value | string) != (postfix_postconf.get(item.key))
+            else []
+          )
       }}
-  when: "(item.value | string) != postfix_postconf.get(item.key)"
+    _postfix_postconf_unset_args: >-
+      {{
+        (_postfix_postconf_unset_args | default([]))
+        + (
+          [item.key]
+          if item.value is none
+          else []
+        )
+      }}
   loop: "{{ postfix_config | dict2items }}"
 
 - name: edit postconf(5) values
@@ -32,16 +45,6 @@
     argv: "{{ ['postconf', '-ep'] + _postfix_postconf_edit_args }}"
   when: _postfix_postconf_edit_args | default([]) | length > 0
   register: _postfix_postconf_e
-
-- name: figure postconf(5) unsets
-  set_fact:
-    _postfix_postconf_unset_args: >-
-      {{
-        (_postfix_postconf_unset_args | default([]))
-        + [item.key]
-      }}
-  loop: "{{ postfix_config | dict2items }}"
-  when: item.value is none
 
 - name: unset postconf(5) values
   command:
