@@ -7,10 +7,18 @@
   - ipa-client
   - libuser
 
-- name: install ipa-client scripts
+- name: install akinit script
   copy:
     src: files/ipa-client/akinit.py
     dest: /usr/local/bin/akinit
+    mode: 0755
+    owner: root
+    group: root
+
+- name: install sckinit script
+  copy:
+    src: files/ipa-client/sckinit.sh
+    dest: /usr/local/bin/sckinit
     mode: 0755
     owner: root
     group: root
