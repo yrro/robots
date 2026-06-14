@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import selinux
 import shutil
+import subprocess
 import sys
 import time
 
@@ -23,14 +24,14 @@ domains = {
         "systemd_unit": "dovecot.service",
     },
     "smtp.robots.org.uk": {
-        "privkey_file": Path("/etc/pki/tls/private/postfix.key"),
-        "pubcert_file": Path("/etc/pki/tls/certs/postfix.pem"),
-        "systemd_unit": "dovecot.service",
+        "privkey_file": Path("/etc/pki/tls/private/postfix-msa.key"),
+        "pubcert_file": Path("/etc/pki/tls/certs/postfix-msa.pem"),
+        "systemd_unit": "postfix.service",
     },
     "mail-in.robots.org.uk": {
-        "privkey_file": Path("/etc/pki/tls/private/mail-in.key"),
-        "pubcert_file": Path("/etc/pki/tls/certs/mail-in.pem"),
-        "systemd_unit": "postfix.service",
+        "privkey_file": Path("/etc/pki/tls/private/postfix.key"),
+        "pubcert_file": Path("/etc/pki/tls/certs/postfix.pem"),
+        "postfix_tls": True,
     },
 }
 
@@ -81,18 +82,35 @@ def drive(event, domain):
             # We have been invoked by httpd. We can't directly install
             # certificates because we're confined by httpd_t.
             if domain_data:
-                man.StartUnit(f"md-message-installed2@{domain}.service", "replace")
+                domain_escaped = systemd_escape(domain)
+                man.StartUnit(
+                    f"md-message-installed2@{domain_escaped}.service", "replace"
+                )
                 return "INSTALL_TRIGGERED"
         case "_installed2":
             if domain_data:
+                new_privkey_file = md_domains_dir / domain / "privkey.pem"
+                new_pubkey_file = md_domains_dir / domain / "pubcert.pem"
                 # shutil.copy preserves file mode
-                shutil.copy(
-                    md_domains_dir / domain / "privkey.pem", domain_data["privkey_file"]
-                )
-                shutil.copy(
-                    md_domains_dir / domain / "pubcert.pem", domain_data["pubcert_file"]
-                )
-                man.ReloadOrTryRestartUnit(domain_data["systemd_unit"], "replace")
+                shutil.copy(new_privkey_file, domain_data["privkey_file"])
+                shutil.copy(new_pubkey_file, domain_data["pubcert_file"])
+                if systemd_unit := domain_data.get("systemd_unit"):
+                    man.ReloadOrTryRestartUnit(systemd_unit, "replace")
+                if domain_data.get("postfix_tls"):
+                    p = subprocess.run(
+                        [
+                            "postfix",
+                            "tls",
+                            "deploy-server-cert",
+                            domain_data["pubcert_file"],
+                            domain_data["privkey_file"],
+                        ],
+                        text=True,
+                        capture_output=True,
+                        check=False,
+                    )
+                    if p.returncode != 0:
+                        raise RuntimeError(p.stderr)
                 return "INSTALLED"
         case event_name if event_name.startswith("_"):
             raise ValueError(f"Invalid event {event_name!r}")
@@ -105,6 +123,15 @@ def get_systemd_manager():
     systemd = bus.get_object("org.freedesktop.systemd1", "/org/freedesktop/systemd1")
     manager = dbus.Interface(systemd, "org.freedesktop.systemd1.Manager")
     return manager
+
+
+def systemd_escape(s):
+    p = subprocess.run(
+        ["systemd-escape", s], text=True, capture_output=True, check=False
+    )
+    if p.returncode != 0:
+        raise RuntimeError(p.stderr)
+    return p.stdout.rstrip()
 
 
 def excepthook(exc_type, exc_value, exc_traceback):
