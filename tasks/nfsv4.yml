@@ -47,7 +47,7 @@
   - name: create nfs-mountd override directory
     file:
       path: /etc/systemd/system/nfs-mountd.service.d
-      state: directory 
+      state: directory
       mode: 0755
       owner: root
       group: root

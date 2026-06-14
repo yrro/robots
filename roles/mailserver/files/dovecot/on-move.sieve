@@ -10,7 +10,7 @@ if environment :is "vnd.dovecot.mailbox-from" ["Spam"] {
   if environment :is "vnd.dovecot.mailbox-to" ["Spam", "Trash"] {
     stop;
   }
-  
+
   debug_log "on-move spam -> elsewhere";
   pipe :copy "rspamd-report" [ "ham", "${user}"];
 

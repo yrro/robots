@@ -53,4 +53,3 @@
     name: selinux_policy
   vars:
     module_src: postfix-sssd-ifp.cil
-

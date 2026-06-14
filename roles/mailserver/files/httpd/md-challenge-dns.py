@@ -58,7 +58,7 @@ def main(argv):
     except ValueError:
         logger.error("expected 3 arguments; got %r", argv[1:])
         return 1
-    
+
     target_zone, target_relative = resolve_target(dns.name.from_text(domain))
     target_zone_soa = dns.resolver.resolve(target_zone, dns.rdatatype.SOA)
     target_zone_mname = target_zone_soa.rrset[0].mname

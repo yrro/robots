@@ -25,7 +25,7 @@
   set_fact:
     _selinux_policy_module_name: "{{ module_src.rstrip('.cil') | basename }}"
   when: module_src.endswith(".cil")
-  
+
 - name: install sssd ifp selinux module
   command: semodule -i /etc/selinux/local/{{ module_src | basename }}
   when: |

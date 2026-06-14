@@ -1,7 +1,7 @@
 - name: create insights-client override directory
   file:
     path: /etc/systemd/system/insights-client.timer.d
-    state: directory 
+    state: directory
     mode: 0755
     owner: root
     group: root
