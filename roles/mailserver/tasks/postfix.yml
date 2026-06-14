@@ -17,20 +17,41 @@
         )
       }}
 
-- name: configure postconf(5)
-  command:
-    argv:
-    - postconf
-    - -ep
-    - "{{ item.key }}={{ item.value }}"
-  when: postfix_postconf[item.key] != item.value|string
+- name: figure postconf(5) differences
+  set_fact:
+    _postfix_postconf_edit_args: >-
+      {{
+        (_postfix_postconf_edit_args | default([]))
+        + [item.key ~ "=" ~ item.value]
+      }}
+  when: "(item.value | string) != postfix_postconf.get(item.key)"
   loop: "{{ postfix_config | dict2items }}"
-  notify: 'mailserver : reload postfix'
 
-- name: check postconf(5)
-  shell: postconf > /dev/null
-  check_mode: false
-  changed_when: false
+- name: edit postconf(5) values
+  command:
+    argv: "{{ ['postconf', '-ep'] + _postfix_postconf_edit_args }}"
+  when: _postfix_postconf_edit_args | default([]) | length > 0
+  register: _postfix_postconf_e
+
+- name: figure postconf(5) unsets
+  set_fact:
+    _postfix_postconf_unset_args: >-
+      {{
+        (_postfix_postconf_unset_args | default([]))
+        + [item.key]
+      }}
+  loop: "{{ postfix_config | dict2items }}"
+  when: item.value is none
+
+- name: unset postconf(5) values
+  command:
+    argv: "{{ ['postconf', '-Xp'] + _postfix_postconf_unset_args }}"
+  when: _postfix_postconf_unset_args | default([]) | length > 0
+  register: _postfix_postconf_X
+
+- name: reload postconf(5)
+  command: postfix reload
+  when: _postfix_postconf_e.changed or _postfix_postconf_X.changed
 # }}}
 
 # {{{ ldap lookups
