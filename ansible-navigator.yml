@@ -6,6 +6,6 @@ ansible-navigator:
     enabled: false
   logging:
     file:
-      .navigator/ansible-navigator.log
+      .ansible/navigator/ansible-navigator.log
   playbook-artifact:
-    save-as: "{playbook_dir}/.navigator/{playbook_name}-artifact-{time_stamp}.json"
+    save-as: "{playbook_dir}/.ansible/navigator/{playbook_name}-artifact-{time_stamp}.json"
