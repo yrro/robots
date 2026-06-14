@@ -1,11 +1,39 @@
-- include_tasks: postfix-postconf.yml
+# {{{  postconf(5)
+- name: recon postconf(5)
+  command: postconf -p
+  check_mode: false
+  changed_when: false
+  register: _mailserver_postfix_postconf
+
+- name: parse postconf(5)
+  set_fact:
+    postfix_postconf: >-
+      {{
+        dict(
+          _mailserver_postfix_postconf.stdout_lines
+          | map('split', '=', 1)
+          | map('map', 'trim')
+          | list
+        )
+      }}
+
+- name: configure postconf(5)
+  command:
+    argv:
+    - postconf
+    - -ep
+    - "{{ item.key }}={{ item.value }}"
+  when: postfix_postconf[item.key] != item.value
   loop: "{{ postfix_config | dict2items }}"
+  notify: 'mailserver : reload postfix'
 
 - name: check postconf(5)
   shell: postconf > /dev/null
   check_mode: false
   changed_when: false
+# }}}
 
+# {{{ ldap lookups
 - name: configure ldap_table for virtual_mailbox_domains
   template:
     src: postfix/ldap_table.cf.j2
@@ -29,7 +57,9 @@
     search_base: mail=%s,cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
     query_filter: objectClass=mailAlias
     result_attribute: mailRoutingAddress
+# }}}
 
+# {{{ /etc/aliases
 - name: configure local alias for root
   lineinfile:
     line: 'root:    sam@robots.org.uk'
@@ -53,9 +83,12 @@
   when: |
     not _mailserver_aliases_db.stat.exists
     or _mailserver_aliases.stat.mtime > _mailserver_aliases_db.stat.mtime
+# }}}
 
 - name: start postfix
   systemd_service:
     name: postfix.service
     state: started
     enabled: true
+
+# vim: fdm=marker
