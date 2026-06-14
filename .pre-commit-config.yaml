@@ -7,6 +7,8 @@ repos:
   - id: trailing-whitespace
   - id: check-yaml
     args: ["--unsafe"]
+  - id: debug-statements
+  - id: mixed-line-ending
 - repo: https://github.com/astral-sh/ruff-pre-commit
   rev: v0.15.17
   hooks:
