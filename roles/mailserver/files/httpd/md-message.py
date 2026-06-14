@@ -28,6 +28,11 @@ domains = {
         "pubcert_file": Path("/etc/pki/tls/certs/postfix.pem"),
         "systemd_unit": "dovecot.service",
     },
+    "mail-in.robots.org.uk": {
+        "privkey_file": Path("/etc/pki/tls/private/mail-in.key"),
+        "pubcert_file": Path("/etc/pki/tls/certs/mail-in.pem"),
+        "systemd_unit": "postfix.service",
+    },
 }
 
 

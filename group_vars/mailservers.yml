@@ -3,6 +3,7 @@ mod_md_authority: staging
 mod_md_extra_domains:
 - imap.robots.org.uk
 - smtp.robots.org.uk
+- mail-in.robots.org.uk
 
 mta_sts_domains:
 - robots.org.uk
