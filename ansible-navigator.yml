@@ -1,7 +1,4 @@
 ansible-navigator:
-  ansible:
-    playbook:
-      path: site.yml
   execution-environment:
     enabled: false
   logging:
