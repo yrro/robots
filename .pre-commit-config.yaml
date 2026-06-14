@@ -20,6 +20,6 @@ repos:
   - id: shellcheck
     name: shellcheck
     entry: shellcheck
-    language: system
+    language: unsupported
     types: [shell]
     require_serial: true
