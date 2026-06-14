@@ -1,9 +1,4 @@
-protocols = imap lmtp sieve submission
-
-submission_relay_host = localhost
-submission_relay_trusted = yes
-#submission_relay_user= ...
-#submission_relay_password = ...
+protocols = imap lmtp sieve
 
 mail_debug = no
 auth_debug = no
@@ -92,20 +87,6 @@ service lmtp {
   unix_listener lmtp {
     mode = 0660
     group = postfix
-  }
-}
-
-service submission-login {
-  # Disable the ESMTPS listener on port 587, which does not obey
-  # disable_plaintext_auth
-  inet_listener submission {
-    port = 0
-  }
-
-  # Additional SSMTP listener
-  inet_listener submissions {
-    port = 465
-    ssl = yes
   }
 }
 
