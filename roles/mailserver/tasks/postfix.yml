@@ -57,6 +57,12 @@
   when: _postfix_postconf_e.changed or _postfix_postconf_X.changed
 # }}}
 
+- name: start postfix
+  systemd_service:
+    name: postfix.service
+    state: started
+    enabled: true
+
 # {{{ ldap lookups
 - name: configure ldap_table for virtual_mailbox_domains
   template:
@@ -117,10 +123,5 @@
     or _mailserver_aliases.stat.mtime > _mailserver_aliases_db.stat.mtime
 # }}}
 
-- name: start postfix
-  systemd_service:
-    name: postfix.service
-    state: started
-    enabled: true
 
 # vim: fdm=marker
