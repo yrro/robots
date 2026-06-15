@@ -20,7 +20,7 @@ MDomain mta-sts.{{ domain }} manual
   CustomLog logs/mta-sts.{{ domain }}/ssl_request_log \
     "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
 
-  <Directory /srv/www/{{ domain }}/html>
+  <Directory /srv/www/mta-sts/html>
       AllowOverride None
       Require all granted
   </Directory>
