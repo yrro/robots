@@ -26,8 +26,20 @@ postfix_services:
       smtpd_sasl_type: dovecot
       smtpd_sasl_path: /run/dovecot/postfix
       smtpd_sasl_tls_security_options: noanonymous
+      smtpd_helo_restrictions: ""
+      smtpd_sender_restrictions: >-
+        reject_authenticated_sender_login_mismatch
+        reject_unverified_sender
+      smtpd_relay_restrictions: >-
+        permit_sasl_authenticated
+        reject
+      smtpd_recipient_restrictions: >-
+        reject_unknown_recipient_domain
+        permit_sasl_authenticated
 
 postfix_config:
+  inet_interfaces: all
+
   virtual_alias_domains: ''
   virtual_alias_maps: >-
     proxy:socketmap:unix:/run/postfix-sssd-ifp.sock:mail
@@ -42,10 +54,21 @@ postfix_config:
 
   smtpd_authorized_xclient_hosts: ~
 
-  smtpd_recipient_restrictions: >-
-    permit_sasl_authenticated
+  smtpd_client_restrictions: >-
+    reject_unauth_pipelining
+  smtpd_helo_required: 'yes'
+  smtpd_helo_restrictions: >-
+    reject_invalid_helo_hostname
+    reject_non_fqdn_helo_hostname
+    reject_unknown_helo_hostname
+  strict_rfc821_envelopes: 'yes'
+  smtpd_reject_unlisted_sender: 'yes'
+  smtpd_sender_restrictions: >-
+    reject_unknown_sender_domain
+  smtpd_relay_restrictions: >-
     reject_unauth_destination
-    reject_unverified_recipient
+  smtpd_reject_unlisted_recipient: 'yes'  # on by default anyway
+  smtpd_recipient_restrictions: ~  # RBLs would go here
 
   # the default is still bdb:
   address_verify_map: $default_database_type:$data_directory/verify_cache
@@ -65,5 +88,7 @@ postfix_config:
 
   smtp_bind_address_enforce: 'yes'
   smtp_bind_address6: '2a01:4f8:1c19:ad06::25'
+
+  smtpd_sasl_authenticated_header: 'no'  # default anyway
 
   #smtpd_recipient_limit = 1  # required for per-user statistics to work when rspamd is called as a milter?
