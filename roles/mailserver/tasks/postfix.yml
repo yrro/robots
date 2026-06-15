@@ -1,9 +1,15 @@
 # {{{  postconf(5)
-- name: recon postconf(5)
+- name: recon postconf(5) effective settings
   command: postconf -p
   check_mode: false
   changed_when: false
   register: _mailserver_postfix_postconf
+
+- name: recon postconf(5) explicit settings
+  command: postconf -n
+  check_mode: false
+  changed_when: false
+  register: _mailserver_postfix_postconf_n
 
 - name: parse postconf(5)
   set_fact:
@@ -16,33 +22,56 @@
           | list
         )
       }}
+    postfix_postconf_explicit: >-
+      {{
+        dict(
+          _mailserver_postfix_postconf_n.stdout_lines
+          | map('split', '=', 1)
+          | map('map', 'trim')
+          | list
+        )
+      }}
 
 - name: figure postconf(5) changes
   set_fact:
     _postfix_postconf_edit_args: >-
       {{
-        (_postfix_postconf_edit_args | default([]))
-        + (
-            [item.key ~ "=" ~ item.value]
+        (_postfix_postconf_edit_args | default({}))
+        |
+        combine(
+          {item.key: item.value}
             if item.value is not none
               and (item.value | string) != (postfix_postconf.get(item.key))
-            else []
-          )
+          else {}
+        )
       }}
     _postfix_postconf_unset_args: >-
       {{
         (_postfix_postconf_unset_args | default([]))
-        + (
+        +
+        (
           [item.key]
-          if item.value is none
+            if item.value is none
+              and item.key in postfix_postconf_explicit
           else []
         )
+      }}
+    _postfix_postconf_args_needing_restart: >-
+      {{
+        (_postfix_postconf_args_needing_restart | default([]))
+        +
+        ([item.key] if item.key in _postfix_postconf_needs_restart else [])
       }}
   loop: "{{ postfix_config | dict2items }}"
 
 - name: edit postconf(5) values
   command:
-    argv: "{{ ['postconf', '-ep'] + _postfix_postconf_edit_args }}"
+    argv: >-
+      {% set args = ['postconf', '-ep'] -%}
+      {% for k, v in _postfix_postconf_edit_args.items() -%}
+        {% set _ = args.append(k ~ '=' ~ v) -%}
+      {% endfor -%}
+      {{ args }}
   when: _postfix_postconf_edit_args | default([]) | length > 0
   register: _postfix_postconf_e
 
@@ -52,8 +81,8 @@
   when: _postfix_postconf_unset_args | default([]) | length > 0
   register: _postfix_postconf_X
 
-- name: reload postconf(5)
-  command: postfix reload
+- name: reload/restart postconf(5)
+  command: systemctl {{ (_postfix_postconf_args_needing_restart | length > 0) | ternary("try-restart", "try-reload-or-restart") }} postfix.service
   when: _postfix_postconf_e.changed or _postfix_postconf_X.changed
 # }}}
 

@@ -1,0 +1,2 @@
+_postfix_postconf_needs_restart:
+- inet_interfaces
