@@ -18,7 +18,10 @@
         {{ service.value.process_limit|default("-") }}
         {{ service.value.command }}
         {%- for flag in service.value.flags | dict2items %}
-        -o {{ flag.key }}={{ flag.value }}
+        -o
+        {% if " " in flag.value|trim %} { {%- endif -%}
+        {{ flag.key }}={{ flag.value|trim }}
+        {%- if " " in flag.value|trim -%} } {%- endif %}
         {%- endfor %}
 
   - name: configure {{ service.name }} service
