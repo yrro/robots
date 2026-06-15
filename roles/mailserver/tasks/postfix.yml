@@ -83,6 +83,14 @@
     result_attribute: mailRoutingAddress
 # }}}
 
+# {{{ master(5) services
+- name: configure master(5) services
+  include_tasks: postfix-service.yml
+  loop: '{{ postfix_services|dict2items("name", "value") }}'
+  loop_control:
+    loop_var: service
+# }}}
+
 # {{{ /etc/aliases
 - name: configure local alias for root
   lineinfile:

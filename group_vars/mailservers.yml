@@ -10,6 +10,20 @@ mta_sts_domains:
 - meights.co.uk
 - velse.co.uk
 
+postfix_services:
+  submissions/inet:
+    command: smtpd
+    private: 'n'
+    flags:
+      syslog_name: postfix/submissions
+      smtpd_tls_wrappermode: 'yes'
+      smtpd_sasl_auth_enable: 'yes'
+      local_header_rewrite_clients: static:all
+      smtpd_reject_unlisted_recipient: 'no'
+      milter_macro_daemon_name: ORIGINATING
+      smtpd_tls_cert_file: /etc/pki/tls/certs/postfix-msa.pem
+      smtpd_tls_key_file: /etc/pki/tls/private/postfix-msa.key
+
 postfix_config:
   virtual_alias_domains: ''
   virtual_alias_maps: >-

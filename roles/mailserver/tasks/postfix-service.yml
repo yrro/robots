@@ -1,0 +1,27 @@
+- name: recon {{ service.name }} service
+  command: postconf -M {{ service.name }}
+  register: _postfix_service_existing
+  check_mode: false
+  changed_when: false
+
+- name: build {{ service.name }} definition
+  set_fact:
+    _postfix_service_desired: >-
+      {{ service.name | replace("/", " ", count=1) }}
+      {{ service.value.private|default("-") }}
+      {{ service.value.unprivileged|default("-") }}
+      {{ service.value.chroot|default("n") }}
+      {{ service.value.wakeup|default("-") }}
+      {{ service.value.process_limit|default("-") }}
+      {{ service.value.command }}
+      {%- for flag in service.value.flags | dict2items %}
+      -o {{ flag.key }}={{ flag.value }}
+      {%- endfor %}
+
+- name: configure {{ service.name }} service
+  command:
+    argv: [postconf, -M, "{{ service.name }}={{ _postfix_service_desired }}"]
+  when: >-
+    _postfix_service_existing.rc != 0
+    or _postfix_service_existing.stdout.split() != _postfix_service_desired.split()
+  notify: 'mailserver : reload postfix'
