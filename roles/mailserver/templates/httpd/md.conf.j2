@@ -3,7 +3,7 @@ MDCertificateAgreement accepted
 {% if mod_md_authority == "staging" %}
 MDCertificateAuthority https://acme-staging-v02.api.letsencrypt.org/directory
 {% elif mod_md_authority == "production" %}
-MDCertificateAuthority https://acme-v02.api.letsencrypt.org/
+MDCertificateAuthority https://acme-v02.api.letsencrypt.org/directory
 {% endif %}
 MDChallengeDns01 /usr/local/libexec/httpd/md-challenge-dns
 MDChallengeDns01Version 2
