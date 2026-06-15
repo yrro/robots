@@ -103,7 +103,7 @@
     line: 'root:    sam@robots.org.uk'
     path: /etc/aliases
     state: present
-    regexp: '^#root:'
+    regexp: '^#?root:'
     insertafter: EOF
 
 - name: stat /etc/aliases
