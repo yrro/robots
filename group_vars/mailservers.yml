@@ -23,6 +23,9 @@ postfix_services:
       milter_macro_daemon_name: ORIGINATING
       smtpd_tls_cert_file: /etc/pki/tls/certs/postfix-msa.pem
       smtpd_tls_key_file: /etc/pki/tls/private/postfix-msa.key
+      smtpd_sasl_type: dovecot
+      smtpd_sasl_path: /run/dovecot/postfix
+      smtpd_sasl_tls_security_options: noanonymous
 
 postfix_config:
   virtual_alias_domains: ''
@@ -32,6 +35,10 @@ postfix_config:
 
   virtual_mailbox_domains: ldap:/etc/postfix/ldap-domains.cf
   virtual_transport: lmtp:unix:/run/dovecot/lmtp
+
+  smtpd_tls_auth_only: 'yes'
+  smtpd_sasl_security_options: noanonymous noplaintext
+  smtpd_sasl_tls_security_options: noanonymous mutual_auth
 
   smtpd_authorized_xclient_hosts: ~
 
