@@ -1,9 +1,8 @@
+mail_debug = no
+
 protocols = imap lmtp sieve
 
-# [[[ debugging
-mail_debug = no
-auth_debug = no
-# ]]]
+postmaster_address = postmaster@robots.org.uk
 
 # [[[ mail storage
 mail_home = /srv/mail/domains/%d/users/%n
@@ -110,10 +109,6 @@ service lmtp {
   }
 }
 # ]]]
-
-postmaster_address = postmaster@robots.org.uk
-
-mail_max_userip_connections = 10
 
 # [[[ mailboxes
 #
