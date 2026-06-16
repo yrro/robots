@@ -152,5 +152,12 @@
     or _mailserver_aliases.stat.mtime > _mailserver_aliases_db.stat.mtime
 # }}}
 
+- name: allow smtp/submissions through firewall
+  firewalld:
+    service: "{{ item }}"
+    state: enabled
+    permanent: true
+    immediate: true
+  loop: [smtp, smtps]
 
 # vim: fdm=marker
