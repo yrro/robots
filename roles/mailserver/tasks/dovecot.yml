@@ -82,8 +82,43 @@
   loop:
   - rspamd-report.sh
 
-- name: start dovecot
+- name: flush handlers
+  meta: flush_handlers
+
+- name: (re)start dovecot
   systemd_service:
     name: dovecot.service
+    #state: '{{ _mailserver_dovecot_gssproxy.changed | ternary("restarted", "started") }}'
     state: started
     enabled: yes
+
+- name: configure gssproxy for dovecot
+  copy:
+    src: dovecot/gssproxy.conf
+    dest: /etc/gssproxy/80-dovecot.conf
+    mode: 0600
+    owner: root
+    group: root
+  notify: 'mailserver : reload gssproxy'
+
+- name: create keytab for dovecot
+  shell:
+    cmd: |
+      export KRB5CCNAME=$(mktemp) && kinit -V -k host/{{ inventory_hostname }} && ipa-getkeytab -p imap/imap.robots.org.uk -k /etc/gssproxy/imap.keytab && kdestroy
+    creates: /etc/gssproxy/imap.keytab
+
+- name: md-challenge keytab permissions
+  file:
+    path: /etc/gssproxy/imap.keytab
+    mode: 0600
+    owner: root
+    group: root
+
+- name: create dovecot's own copy of the keytab
+  copy:
+    remote_src: true
+    src: /etc/gssproxy/imap.keytab
+    dest: /etc/dovecot/imap.keytab
+    mode: 0640
+    owner: root
+    group: dovecot

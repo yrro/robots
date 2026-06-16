@@ -18,7 +18,7 @@ user_attrs = memberPrincipal=k5principals,mailQuota=quota_rule=*:storage=%$
 
 user_filter = (&(objectClass=mailBox)(mail=%u))
 
-#pass_attrs = mail=user,memberPrincipal=userdb_k5principals,mailQuota=userdb_quota_rule=*:storage=%$
+pass_attrs = mail=user,memberPrincipal=k5principals,mailQuota=quota_rule=*:storage=%$
 
 pass_filter = (&(objectClass=mailBox)(mail=%u))
 

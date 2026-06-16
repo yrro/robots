@@ -34,12 +34,20 @@ plugin {
 # ]]]
 
 # [[[ authentication
-#auth_krb5_keytab =
+auth_debug = no
+auth_krb5_keytab = /etc/dovecot/imap.keytab
+auth_gssapi_hostname = "$ALL"
 auth_mechanisms = plain gssapi
+import_environment = $import_environment GSS_USE_PROXY=yes
+import_environment = $import_environment GSSPROXY_SOCKET=/var/lib/gssproxy/dovecot.sock
 
 passdb {
   driver = ldap
   args = /etc/dovecot/ldap.conf.ext
+}
+
+userdb {
+  driver = prefetch
 }
 
 userdb {
