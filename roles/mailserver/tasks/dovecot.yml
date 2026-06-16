@@ -10,7 +10,7 @@
     mode: 0644
     owner: root
     group: root
-  notify: 'mailserver : reload dovecot'
+  notify: 'mailserver : reload dovecot'  # some settings need a restart
 
 - name: configure dovecot ldap
   template:
@@ -85,10 +85,9 @@
 - name: flush handlers
   meta: flush_handlers
 
-- name: (re)start dovecot
+- name: start dovecot
   systemd_service:
     name: dovecot.service
-    #state: '{{ _mailserver_dovecot_gssproxy.changed | ternary("restarted", "started") }}'
     state: started
     enabled: yes
 
