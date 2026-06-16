@@ -25,6 +25,9 @@
   - import_tasks: tasks/etckeeper.yml
     tags: etckeeper
 
+  - import_tasks: tasks/sshd.yml
+    tags: sshd
+
   - import_tasks: tasks/ipa-client.yml
     tags: ipa-client
 

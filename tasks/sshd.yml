@@ -1,0 +1,15 @@
+- name: configure sshd logging
+  copy:
+    content: |
+      LogLevel VERBOSE
+    dest: /etc/ssh/sshd_config.d/10-logging.conf
+    mode: 0644
+    owner: root
+    group: root
+  register: _sshd_logging
+
+- name: reload sshd
+  systemd_service:
+    name: sshd.service
+    state: reloaded
+  when: _sshd_logging.changed
