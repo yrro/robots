@@ -1,7 +1,6 @@
 (type dovecot_keytab_t)
 (roletype object_r dovecot_keytab_t)
 
-(context dovecot_keytab (system_u object_r dovecot_keytab_t ((s0) (s0))))
-(filecon "/etc/dovecot/krb5\.keytab" file dovecot_keytab)
+(filecon "/etc/dovecot/krb5\.keytab" file (system_u object_r dovecot_keytab_t ((s0) (s0))))
 
 (allow dovecot_auth_t dovecot_keytab_t (file (getattr open read ioctl lock)))
