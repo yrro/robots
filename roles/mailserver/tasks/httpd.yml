@@ -40,7 +40,7 @@
   copy:
     src: files/httpd/gssproxy.conf
     dest: /etc/gssproxy/80-httpd.conf
-    mode: 0644
+    mode: 0600
     owner: root
     group: root
   notify: 'mailserver : reload gssproxy'
@@ -50,6 +50,13 @@
     cmd: |
       export KRB5CCNAME=$(mktemp) && kinit -V -k host/{{ inventory_hostname }} && ipa-getkeytab -p host/mail0.acme-challenge.ipa.robots.org.uk -k /etc/gssproxy/acme-challenge.keytab && kdestroy
     creates: /etc/gssproxy/acme-challenge.keytab
+
+- name: md-challenge keytab permissions
+  file:
+    path: /etc/gssproxy/acme-challenge.keytab
+    mode: 0600
+    owner: root
+    group: root
 
 - name: allow apache to make network connections
   seboolean:
