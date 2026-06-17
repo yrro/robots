@@ -3,7 +3,7 @@
     content: |
       [default]
       # https://github.com/freeipa/freeipa-healthcheck/issues/380
-      timeout=12
+      timeout=20
     dest: /etc/ipahealthcheck/ipahealthcheck.conf
     mode: 0644
     owner: root
