@@ -16,9 +16,9 @@
   template:
     src: dovecot/ldap.conf.ext.j2
     dest: /etc/dovecot/ldap.conf.ext
-    mode: 0640
-    owner: root
-    group: dovecot
+    mode: 0400
+    owner: dovecot
+    group: root
   notify: 'mailserver : reload dovecot'
 
 - name: disable dovecot system authentication
@@ -124,9 +124,9 @@
     remote_src: true
     src: /etc/gssproxy/imap.keytab
     dest: /etc/dovecot/krb5.keytab
-    mode: 0640
-    owner: root
-    group: dovecot
+    mode: 0400
+    owner: dovecot
+    group: root
     setype: _default
 
 - name: allow smtp/submissions through firewall
