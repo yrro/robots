@@ -58,6 +58,7 @@
         nameserver = ["[::1]:53"]
       }
       enable_test_patterns = false;
+      local_addrs = [];  # keep this in sync with postfix's mynetworks
   - filename: classifier-bayes.conf
     content: |
       per_user = false;  # unclear how this works when rspamd is called as a milter

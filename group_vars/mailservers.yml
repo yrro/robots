@@ -70,6 +70,8 @@ postfix_config:
   smtpd_reject_unlisted_recipient: 'yes'  # on by default anyway
   smtpd_recipient_restrictions: ~  # RBLs would go here
 
+  mynetworks: ''  # keep in sync with rspamd local_addrs
+
   # the default is still bdb:
   address_verify_map: $default_database_type:$data_directory/verify_cache
 
