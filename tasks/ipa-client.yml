@@ -120,9 +120,12 @@
   lineinfile:
     path: /etc/security/faillock.conf
     line: '{{ item }}'
+    state: present
+    insertafter: EOF
   loop:
   - local_users_only
   - deny = 6
+  - audit
 
 - name: remove obsolete remote-access group
   group:
