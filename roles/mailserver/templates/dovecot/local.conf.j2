@@ -34,7 +34,6 @@ plugin {
 
 # [[[ authentication
 auth_debug = no
-auth_krb5_keytab = /etc/dovecot/krb5.keytab
 auth_gssapi_hostname = "$ALL"
 auth_mechanisms = plain gssapi
 import_environment = $import_environment GSS_USE_PROXY=yes
@@ -96,6 +95,7 @@ plugin {
 
 # [[[ additional listeners for postfix
 service auth {
+  executable = /usr/local/libexec/dovecot/wrap-auth
   unix_listener postfix {
     mode = 0660
     group = postfix

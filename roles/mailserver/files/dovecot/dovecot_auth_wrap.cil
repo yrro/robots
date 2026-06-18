@@ -1,0 +1,15 @@
+(filecon "/usr/local/libexec/dovecot/wrap-auth" file (system_u object_r dovecot_auth_exec_t ((s0) (s0))))
+
+; normally dovecot_auth can't launch itself
+(allow dovecot_auth_t dovecot_auth_exec_t (file (execute_no_trans)))
+
+; allow dovecot-auth to use gssproxy
+(allow dovecot_auth_t gssproxy_t (unix_stream_socket (connectto)))
+(allow dovecot_auth_t gssproxy_var_lib_t (dir (search)))
+(allow dovecot_auth_t gssproxy_var_lib_t (sock_file (write)))
+
+; not sure about this one... possibly this is doveot trying to shut down a
+; misbehaving auth server which normally doesn't happen when the auth server is
+; working, but when my wrapping script misbehaved dovecot tried to kill it
+; which is blocked by the default policy?
+(allow dovecot_t dovecot_auth_t (process (sigkill)))

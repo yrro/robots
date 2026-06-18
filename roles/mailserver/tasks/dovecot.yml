@@ -64,6 +64,15 @@
     owner: root
     group: root
 
+- name: create dovecot auth wrapper
+  copy:
+    src: dovecot/wrap-auth.sh
+    dest: /usr/local/libexec/dovecot/wrap-auth
+    mode: 0755
+    owner: root
+    group: root
+    setype: _default
+
 - name: create dovecot sieve pipe script directory
   file:
     path: /usr/local/libexec/dovecot/sieve
@@ -119,15 +128,10 @@
   vars:
     module_src: dovecot/dovecot_keytab.cil
 
-- name: create dovecot's own copy of the keytab
-  copy:
-    remote_src: true
-    src: /etc/gssproxy/imap.keytab
-    dest: /etc/dovecot/krb5.keytab
-    mode: 0400
-    owner: dovecot
-    group: root
-    setype: _default
+- name: remove up dovecot's copy of the keytab
+  file:
+    path: /etc/dovecot/krb5.keytab
+    state: absent
 
 - name: allow smtp/submissions through firewall
   firewalld:
