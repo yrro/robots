@@ -43,6 +43,13 @@
   - import_tasks: tasks/firewalld.yml
     tags: firewalld
 
+  handlers:
+
+  - name: sshd reload
+    systemd_service:
+      name: sshd.service
+      state: reloaded
+
 - name: configure servers
   hosts: servers
   tasks:

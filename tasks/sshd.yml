@@ -6,10 +6,22 @@
     mode: 0644
     owner: root
     group: root
-  register: _sshd_logging
+  notify: sshd reload
 
-- name: reload sshd
-  systemd_service:
-    name: sshd.service
-    state: reloaded
-  when: _sshd_logging.changed
+- name: configure sshd per-source block size
+  copy:
+    content: |
+      PerSourceNetBlockSize 24:56
+    dest: /etc/ssh/sshd_config.d/10-per-source.conf
+    mode: 0644
+    owner: root
+    group: root
+  notify: sshd reload
+
+- name: check sshd config
+  command:
+    cmd: sshd -G
+  check_mode: false
+  changed_when: false
+
+- meta: flush_handlers
