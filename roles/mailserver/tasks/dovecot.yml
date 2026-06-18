@@ -122,7 +122,7 @@
       export KRB5CCNAME=$(mktemp) && kinit -V -k host/{{ inventory_hostname }} && ipa-getkeytab -p imap/imap.robots.org.uk -k /etc/gssproxy/imap.keytab && kdestroy
     creates: /etc/gssproxy/imap.keytab
 
-- name: md-challenge keytab permissions
+- name: apply restrictive permissions to dovecot keytab
   file:
     path: /etc/gssproxy/imap.keytab
     mode: 0600
