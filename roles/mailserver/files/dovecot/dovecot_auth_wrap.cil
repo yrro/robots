@@ -1,10 +1,9 @@
 ; label the wrapper script
 (filecon "/usr/local/libexec/dovecot/wrap-auth" file (system_u object_r dovecot_auth_exec_t ((s0) (s0))))
 
-; dovecot_exec_t may not execute a file labelled dovecot_exec_t; dovecot will
-; no longer be executing the original executable so apply the same label
-; applied to the other Dovecot executables that don't transition.
-(filecon "/usr/libexec/dovecot/auth" file (system_u object_r dovecot_auth_bin_t ((s0) (s0))))
+; normally, dovecot_exec_t is not allowed to execute a file labelled
+; dovecot_exec_t; but our wrapper script needs to do so.
+(allow dovecot_auth_t dovecot_auth_exec_t (file (execute_no_trans)))
 
 ; allow dovecot-auth to use gssproxy
 (allow dovecot_auth_t gssproxy_t (unix_stream_socket (connectto)))
