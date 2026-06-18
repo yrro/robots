@@ -49,7 +49,7 @@
     enabled: true
 
 - name: load sssd ifp selinux policy module
-  include_role:
+  import_role:
     name: selinux_policy
   vars:
     module_src: postfix-sssd-ifp.cil

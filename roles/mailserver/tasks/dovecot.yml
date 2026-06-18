@@ -130,7 +130,7 @@
     group: root
 
 - name: remove dovecot_keytab policy module
-  include_role:
+  import_role:
     name: selinux_policy
   vars:
     module_src: dovecot/dovecot_keytab.cil

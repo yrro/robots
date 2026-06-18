@@ -92,7 +92,7 @@
     group: root
 
 - name: install selinux policy module to allow apache to start systemd services
-  include_role:
+  import_role:
     name: selinux_policy
   vars:
     module_src: httpd/md-message.cil

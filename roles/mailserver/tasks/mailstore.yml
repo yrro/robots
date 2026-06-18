@@ -1,5 +1,5 @@
 - name: load mailstore selinux policy module
-  include_role:
+  import_role:
     name: selinux_policy
   vars:
     module_src: mailstore.cil
