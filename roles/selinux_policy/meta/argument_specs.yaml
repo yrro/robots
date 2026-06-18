@@ -1,0 +1,13 @@
+argument_specs:
+
+  main:
+    author: Sam Morris <sam@robots.org.uk>
+
+    options:
+      state:
+        required: true
+        choices: [present, absent]
+
+      module_src:
+        required: true
+        description: File name of the SELinux policy module, including extension.

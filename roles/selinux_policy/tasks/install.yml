@@ -1,0 +1,22 @@
+- name: Assert that SELinux policy module {{ _selinux_policy_module_name }} is not loaded
+  when: not _selinux_policy_module_src.stat.exists
+  assert:
+    that: _selinux_policy_module_name not in _selinux_policy_semodule_l.stdout_lines
+    success_msg: SELinux policy module {{ _selinux_policy_module_name }} is not loaded.
+    fail_msg: Loaded SELinux policy module {{ _selinux_policy_module_name }} is not managed by us; refusing to install it!
+
+- name: Install SELinux policy module {{ _selinux_policy_module_name }} source code
+  copy:
+    src: "{{ module_src }}"
+    dest: /etc/selinux/local/{{ module_src | basename }}
+    mode: 0644
+    owner: root
+    group: root
+  register: _module_src
+  when: state == "present"
+
+- name: Load module {{ _selinux_policy_module_name }} into SELinux policy
+  command: semodule -i /etc/selinux/local/{{ module_src | basename }}
+  when: |
+    _module_src.changed
+    or _selinux_policy_module_name not in _selinux_policy_semodule_l.stdout_lines

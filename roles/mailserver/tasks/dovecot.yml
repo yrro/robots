@@ -73,6 +73,13 @@
     group: root
     setype: _default
 
+- name: install dovecot_auth_wrap SELinux policy module
+  include_role:
+    name: selinux_policy
+  vars:
+    module_src: dovecot/dovecot_auth_wrap.cil
+    state: present
+
 - name: create dovecot sieve pipe script directory
   file:
     path: /usr/local/libexec/dovecot/sieve
@@ -122,11 +129,12 @@
     owner: root
     group: root
 
-- name: install dovecot keytab policy module
+- name: remove dovecot_keytab policy module
   include_role:
     name: selinux_policy
   vars:
     module_src: dovecot/dovecot_keytab.cil
+    state: absent
 
 - name: remove up dovecot's copy of the keytab
   file:

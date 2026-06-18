@@ -1,0 +1,19 @@
+Local SELinux policy module directory
+=====================================
+
+This directory is the staging area for locally-written SELinux policy modules.
+
+Locally-installed modules have priority 400 by default.
+
+ To see modules & their priorities:
+
+  # semodule -lfull | grep '^400\s'
+
+Modules can be installed for the fist time, or replaced with a newer version,
+with the same command:
+
+  # semodule -i mymodule.cil
+
+To remove a module:
+
+  # semodule -r mymodule

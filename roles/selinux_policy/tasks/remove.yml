@@ -1,0 +1,16 @@
+- name: Remove SELinux policy module {{ _selinux_policy_module_name }} if we manage it
+  when: _selinux_policy_module_name in _selinux_policy_semodule_l.stdout_lines
+  block:
+  - name: Assert that we manage SELinux policy module {{ _selinux_policy_module_name }}
+    assert:
+      that: _selinux_policy_module_src.stat.exists
+      fail_msg: SELinux policy module {{ _selinux_policy_module_name }} is not managed by us; refusing to remove it! }}
+      success_msg: SELinux policy module {{ _selinux_policy_module_name }} is managed by us; removing,
+
+  - name: Unload module {{ _selinux_policy_module_name }} from SELinux policy
+    command: semodule -r {{ _selinux_policy_module_name }}
+
+- name: Remove module {{ _selinux_policy_module_name }} source code
+  file:
+    path: /etc/selinux/local/{{ module_src | basename }}
+    state: absent

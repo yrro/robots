@@ -96,6 +96,7 @@
     name: selinux_policy
   vars:
     module_src: httpd/md-message.cil
+    state: present
 
 - name: create systemd services to invoke md-message
   copy:

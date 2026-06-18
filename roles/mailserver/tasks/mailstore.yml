@@ -3,6 +3,7 @@
     name: selinux_policy
   vars:
     module_src: mailstore.cil
+    state: present
 
 - name: create mail storage group
   group:

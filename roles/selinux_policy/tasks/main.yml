@@ -1,4 +1,18 @@
-- name: create SELinux local policy directory
+# {{{ validate
+- name: Figure SELinux module name
+  set_fact:
+    _selinux_policy_module_name: "{{ module_src.rstrip('.cil') | basename }}"
+  when: module_src.endswith(".cil")
+
+- name: Validate SELinux policy module name
+  assert:
+    that: _selinux_policy_module_name is defined
+    fail_msg: SELinux policy module must be a .cil file
+    success_msg: "module name: {{ _selinux_policy_module_name }}"
+# }}}
+
+# {{{ prep
+- name: Create local SELinux policy module source code directory
   file:
     path: /etc/selinux/local
     state: directory
@@ -6,28 +20,32 @@
     group: root
     mode: 0700
 
-- name: copy sssd ifp selinux module source
+- name: Install local SELinux policy module README
   copy:
-    src: "{{ module_src }}"
-    dest: /etc/selinux/local/{{ module_src | basename }}
+    src: README
+    dest: /etc/selinux/local/README
     mode: 0644
     owner: root
     group: root
-  register: _module_src
+# }}}}
 
-- name: recon SELinux modules
+# {{{ recon
+- name: List installed SELinux policy modules
   command: semodule -l
   check_mode: false
   changed_when: false
-  register: _semodule_l
+  register: _selinux_policy_semodule_l
 
-- name: figure SELinux module name
-  set_fact:
-    _selinux_policy_module_name: "{{ module_src.rstrip('.cil') | basename }}"
-  when: module_src.endswith(".cil")
+- name: Check for SELinux policy module {{ _selinux_policy_module_name }} source code
+  stat:
+    path: /etc/selinux/local/{{ module_src | basename }}
+  register: _selinux_policy_module_src
+# }}}
 
-- name: install sssd ifp selinux module
-  command: semodule -i /etc/selinux/local/{{ module_src | basename }}
-  when: |
-    _module_src.changed
-    or _selinux_policy_module_name not in _semodule_l.stdout_lines
+- name: Remove module actions
+  when: state == "absent"
+  include_tasks: remove.yml
+
+- name: Install module actions
+  when: state == "present"
+  include_tasks: install.yml
