@@ -1,15 +1,16 @@
+; label the wrapper script
 (filecon "/usr/local/libexec/dovecot/wrap-auth" file (system_u object_r dovecot_auth_exec_t ((s0) (s0))))
 
-; normally dovecot_auth can't launch itself
-(allow dovecot_auth_t dovecot_auth_exec_t (file (execute_no_trans)))
+; dovecot_exec_t may not execute a file labelled dovecot_exec_t; dovecot will
+; no longer be executing the original executable so apply the same label
+; applied to the other Dovecot executables that don't transition.
+(filecon "/usr/libexec/dovecot/auth" file (system_u object_r dovecot_auth_bin_t ((s0) (s0))))
 
 ; allow dovecot-auth to use gssproxy
 (allow dovecot_auth_t gssproxy_t (unix_stream_socket (connectto)))
 (allow dovecot_auth_t gssproxy_var_lib_t (dir (search)))
 (allow dovecot_auth_t gssproxy_var_lib_t (sock_file (write)))
 
-; not sure about this one... possibly this is doveot trying to shut down a
-; misbehaving auth server which normally doesn't happen when the auth server is
-; working, but when my wrapping script misbehaved dovecot tried to kill it
-; which is blocked by the default policy?
+; Dovecot's master process kills its child processes when they misbehave.
+; Normally this is rare, so was probably missed by the policy authors.
 (allow dovecot_t dovecot_auth_t (process (sigkill)))
