@@ -29,13 +29,15 @@ postfix_services:
       smtpd_helo_restrictions: ""
       smtpd_sender_restrictions: >-
         reject_authenticated_sender_login_mismatch
-        reject_unverified_sender
+        reject
+      smtpd_sender_login_maps: >-
+        ldap:/etc/postfix/ldap-aliases.cf
+        ldap:/etc/postfix/ldap-mailbox-logins.cf
       smtpd_relay_restrictions: >-
         permit_sasl_authenticated
         reject
       smtpd_recipient_restrictions: >-
         reject_unknown_recipient_domain
-        permit_sasl_authenticated
       smtpd_banner: 'smtp.robots.org.uk ESMTP $mail_name'
 
 postfix_config:

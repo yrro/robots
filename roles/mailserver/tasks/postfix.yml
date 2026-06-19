@@ -93,7 +93,7 @@
     enabled: true
 
 # {{{ ldap lookups
-- name: configure ldap_table for virtual_mailbox_domains
+- name: configure ldap_table to look up virtual mailbox domains
   template:
     src: postfix/ldap_table.cf.j2
     dest: /etc/postfix/ldap-domains.cf
@@ -101,11 +101,12 @@
     owner: root
     group: postfix
   vars:
+    scope: base
     search_base: mailDomainName=%s,cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
     query_filter: objectClass=mailDomain
     result_attribute: mailDomainName
 
-- name: configure ldap_table for virtual_alias_maps
+- name: configure ldap_table to look up virtual aliases
   template:
     src: postfix/ldap_table.cf.j2
     dest: /etc/postfix/ldap-aliases.cf
@@ -113,9 +114,23 @@
     owner: root
     group: postfix
   vars:
+    scope: base
     search_base: mail=%s,cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
     query_filter: objectClass=mailAlias
     result_attribute: mailRoutingAddress
+
+- name: configure ldap_table to look up a mailbox's logins
+  template:
+    src: postfix/ldap_table.cf.j2
+    dest: /etc/postfix/ldap-mailbox-logins.cf
+    mode: 0640
+    owner: root
+    group: postfix
+  vars:
+    scope: base
+    search_base: mail=%s,cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
+    query_filter: (&(objectClass=mailBox))
+    result_attribute: mail, memberPrincipal
 # }}}
 
 # {{{ master(5) services
