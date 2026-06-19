@@ -112,7 +112,7 @@
     loop_var: domain
 
 - name: check rspamd config
-  shell: rspamadm configdump > /dev/null
+  shell: rspamadm configtest --strict
   check_mode: false
   changed_when: false
 
