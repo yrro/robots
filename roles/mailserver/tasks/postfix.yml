@@ -103,7 +103,7 @@
   vars:
     scope: base
     search_base: mailDomainName=%s,cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
-    query_filter: objectClass=mailDomain
+    query_filter: (&(objectClass=mailDomain)(mailDomainName=%s))
     result_attribute: mailDomainName
 
 - name: configure ldap_table to look up virtual aliases
@@ -116,7 +116,7 @@
   vars:
     scope: base
     search_base: mail=%s,cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
-    query_filter: objectClass=mailAlias
+    query_filter: (&(objectClass=mailAlias)(mail=%s))
     result_attribute: mailRoutingAddress
 
 - name: configure ldap_table to look up a mailbox's logins
