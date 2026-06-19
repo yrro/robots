@@ -98,6 +98,27 @@
   loop:
   - rspamd-report.sh
 
+- name: create dovecot.service local configuration directory
+  file:
+    path: /etc/systemd/system/dovecot.service.d
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+
+- name: configure dovecot to require /srv/mail is mounted
+  copy:
+    content: |
+      [Unit]
+      ConditionPathIsMountPoint=/srv/mail
+      ConditionPathIsDirectory=/srv/mail/domains
+    dest:
+      /etc/systemd/system/dovecot.service.d/require-mount.conf
+    mode: 0644
+    owner: root
+    group: root
+  notify: 'mailserver : systemctl daemon-reload'
+
 - name: flush handlers
   meta: flush_handlers
 
