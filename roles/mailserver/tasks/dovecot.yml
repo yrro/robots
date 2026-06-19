@@ -21,10 +21,10 @@
     group: root
   notify: 'mailserver : reload dovecot'
 
-- name: disable dovecot system authentication
+- name: disable dovecot authentication includes
   replace:
     path: /etc/dovecot/conf.d/10-auth.conf
-    regexp: ^(!include auth-system.conf\.ext)
+    regexp: ^(!include\s.*)
     replace: '#\1'
 
 - name: create dovecot sieve script directory

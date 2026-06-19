@@ -129,7 +129,7 @@
   vars:
     scope: base
     search_base: mail=%s,cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
-    query_filter: (&(objectClass=mailBox))
+    query_filter: (&(objectClass=mailBox)(mail=%s))
     result_attribute: mail, memberPrincipal
 # }}}
 
