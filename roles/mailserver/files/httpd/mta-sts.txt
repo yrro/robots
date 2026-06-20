@@ -3,3 +3,4 @@ max_age: 86400
 mode: testing
 mx: smtp.robots.org.uk
 mx: mail-in.robots.org.uk
+mx: traxus.robots.org.uk
