@@ -39,6 +39,7 @@ postfix_services:
       smtpd_recipient_restrictions: >-
         reject_unknown_recipient_domain
       smtpd_banner: 'smtp.robots.org.uk ESMTP $mail_name'
+      line_length_limit: 4096  # for GSSAPI with large session tickets
 
 postfix_config:
   inet_interfaces: all
