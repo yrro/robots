@@ -1,0 +1,67 @@
+# {{{ recon
+- name: check whether keytab {{ path }} exists
+  stat:
+    path: '{{ path }}'
+  register: _keytab_stat
+
+- name: list keys in keytab {{ path }}
+  command:
+    cmd: klist -k {{ path }}
+  check_mode: false
+  changed_when: false
+  when: _keytab_stat.stat.exists
+  register: _keytab_klist
+# }}}
+
+# {{{ figure
+- name: extract principals in keytab {{ path }}
+  set_fact:
+    _keytab_principals: >-
+      {{
+        _keytab_klist.stdout
+        | regex_findall('^\s*(\d+)\s+(\S+)', multiline=True)
+        | unique
+      }}
+  when: _keytab_stat.stat.exists
+
+- name: figure missing principals in keytab {{ path }}
+  set_fact:
+    _keytab_missing_principals: >-
+      {{ principals | difference(_keytab_principals | default([]) | map('last')) }}
+# }}}
+#
+# {{{ act
+- name: populate keytab {{ path }}
+  when: _keytab_missing_principals | length > 0
+  block:
+
+  - name: create credential cache file
+    tempfile:
+      state: file
+      path: /run
+      prefix: host-
+      suffix: .krb5cc
+    register: _keytab_cc
+
+  - name: obtain ticket-granting ticket
+    command:
+      cmd: >-
+        kinit -V
+        -l 30s
+        -FP
+        -k -t /etc/krb5.keytab
+        -c {{ _keytab_cc.path | default("/nonexistant") }}
+        host/{{ inventory_hostname }}
+
+  - name: populate keytab {{ path }}
+    command:
+      cmd: ipa-getkeytab {{ extra_args|join(" ") }} -k {{ path }} -p {{ item }}
+    environment:
+      KRB5CCNAME: '{{ _keytab_cc.path | default("/nonexistant") }}'
+    loop: '{{ _keytab_missing_principals }}'
+
+  always:
+  - name: destroy credential cache file
+    command:
+      cmd: kdestroy -c {{ _keytab_cc.path | default("/nonexistant") }}
+# }}}

@@ -138,14 +138,19 @@
   notify: 'mailserver : reload gssproxy'
 
 - name: create keytab for dovecot
-  shell:
-    cmd: |
-      export KRB5CCNAME=$(mktemp) && kinit -V -k host/{{ inventory_hostname }} && ipa-getkeytab -p imap/imap.robots.org.uk -k /etc/gssproxy/imap.keytab && kdestroy
-    creates: /etc/gssproxy/imap.keytab
+  import_role:
+    name: keytab
+  vars:
+    mode: retrieve
+    path: /etc/gssproxy/dovecot.keytab
+    principals:
+      - smtp/smtp.robots.org.uk@IPA.ROBOTS.ORG.UK
+      - imap/imap.robots.org.uk@IPA.ROBOTS.ORG.UK
+    extra_args: [-r]
 
 - name: apply restrictive permissions to dovecot keytab
   file:
-    path: /etc/gssproxy/imap.keytab
+    path: /etc/gssproxy/dovecot.keytab
     mode: 0600
     owner: root
     group: root

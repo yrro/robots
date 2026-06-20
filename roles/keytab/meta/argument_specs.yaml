@@ -1,0 +1,14 @@
+argument_specs:
+
+  main:
+    author: Sam Morris <sam@robots.org.uk>
+
+    options:
+      extra_args:
+        type: list
+        default: []
+        description: Extra args to pass to ipa-getkeytab
+
+      path:
+        required: true
+        description: Path of the keytab file.
