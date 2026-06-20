@@ -74,7 +74,7 @@
     setype: _default
 
 - name: install dovecot_auth_wrap SELinux policy module
-  include_role:
+  import_role:
     name: selinux_policy
   vars:
     module_src: dovecot/dovecot_auth_wrap.cil
