@@ -26,6 +26,8 @@ postfix_services:
       smtpd_sasl_type: dovecot
       smtpd_sasl_path: /run/dovecot/postfix
       smtpd_sasl_tls_security_options: noanonymous
+      smtpd_client_restrictions: >-
+        reject_unauth_pipelining
       smtpd_helo_restrictions: ""
       smtpd_sender_restrictions: >-
         reject_authenticated_sender_login_mismatch
