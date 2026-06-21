@@ -55,7 +55,7 @@
 
   - name: populate keytab {{ path }}
     command:
-      cmd: ipa-getkeytab {{ extra_args|join(" ") }} -k {{ path }} -p {{ item }}
+      cmd: ipa-getkeytab {{ extra_args|default([])|join(" ") }} -k {{ path }} -p {{ item }}
     environment:
       KRB5CCNAME: '{{ _keytab_cc.path | default("/nonexistant") }}'
     loop: '{{ _keytab_missing_principals }}'
