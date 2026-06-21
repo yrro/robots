@@ -61,6 +61,7 @@ postfix_config:
 
   smtpd_client_restrictions: >-
     reject_unauth_pipelining
+    reject_unknown_client_hostname
   smtpd_helo_required: 'yes'
   smtpd_helo_restrictions: >-
     reject_invalid_helo_hostname
