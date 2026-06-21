@@ -1,3 +1,24 @@
+- name: create httpd.service override directory
+  file:
+    path: /etc/systemd/system/httpd.service.d
+    state: directory
+    mode: 0644
+    owner: root
+    group: root
+
+- name: configure httpd to use gss-proxy
+  copy:
+    content: |
+      [Service]
+      Environment=GSS_USE_PROXY=yes
+    dest: /etc/systemd/system/httpd.service.d/gssproxy.conf
+    mode: 0644
+    owner: root
+    group: root
+  notify:
+  - 'mailserver : systemctl daemon-reload'
+  - 'mailserver : restart apache'
+
 - name: validate mod_md authority
   assert:
     that: mod_md_authority in ["staging", "production"]
@@ -13,6 +34,7 @@
   loop:
   - md.conf
   - ~mta-sts.conf
+  - gssapi.inc
 
 - name: create mta-sts content directories
   file:

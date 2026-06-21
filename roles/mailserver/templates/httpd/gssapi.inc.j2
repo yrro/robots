@@ -1,0 +1,10 @@
+AuthType GSSAPI
+AuthName "IPA.ROBOTS.ORG.UK"
+
+#GssapiCredStore keytab:/etc/httpd/krb5.keytab
+GssapiSSLOnly On
+GssapiLocalName on
+
+RequestHeader set Remote-User expr=%{REMOTE_USER}
+
+# vim: ft=apache

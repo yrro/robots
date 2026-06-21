@@ -11,6 +11,7 @@
     - unbound
     - valkey
     - httpd
+    - mod_auth_gssapi
     - mod_md
     state: present
   tags: slow

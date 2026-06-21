@@ -33,6 +33,11 @@
     name: rspamd.service
     state: reloaded
 
+- name: restart apache
+  systemd_service:
+    name: httpd.service
+    state: restarted
+
 - name: reload apache
   systemd_service:
     name: httpd.service
