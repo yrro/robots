@@ -29,6 +29,7 @@ postfix_services:
       smtpd_helo_restrictions: ""
       smtpd_sender_restrictions: >-
         reject_authenticated_sender_login_mismatch
+        permit_sasl_authenticated
         reject
       smtpd_sender_login_maps: >-
         ldap:/etc/postfix/ldap-aliases.cf
