@@ -141,7 +141,6 @@
   import_role:
     name: keytab
   vars:
-    mode: retrieve
     path: /etc/gssproxy/dovecot.keytab
     principals:
       - smtp/smtp.robots.org.uk@IPA.ROBOTS.ORG.UK
