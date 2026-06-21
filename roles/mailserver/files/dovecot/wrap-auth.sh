@@ -6,7 +6,7 @@ set -eEuo pipefail
 # from dovecot_t → dovecot_auth_t.
 
 # Audit the original environment
-(echo "Launching with environment:"; /usr/bin/printenv) | /usr/bin/logger -t wrap-auth
+#(echo "Launching with environment:"; /usr/bin/printenv) | /usr/bin/logger -t wrap-auth
 
 # Sanitize the environment. ld-linux has already removed LD_PRELOAD and
 # friends.
