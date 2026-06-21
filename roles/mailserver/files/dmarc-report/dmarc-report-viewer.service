@@ -1,0 +1,22 @@
+[Unit]
+Description=DMARC Report Viewer
+After=nss-lookup.target
+
+[Service]
+Type=exec
+User=dmarc-report-viewer
+NoNewPrivileges=yes
+ProtectSystem=strict
+ExecStart=/usr/local/libexec/wrap-dmarc-report-viewer
+Environment=IMAP_HOST=imap.robots.org.uk
+Environment=IMAP_USER=rpt@mta.robots.org.uk
+Environment=HTTP_SERVER_BINDING=[::1]
+Environment=HTTP_SERVER_PORT=8581
+LoadCredential=dmarc-report-viewer.imap-password
+LoadCredential=dmarc-report-viewer.http-server-password
+MemoryMax=64M
+
+[Install]
+WantedBy=multi-user.target
+
+# vim: ft=systemd

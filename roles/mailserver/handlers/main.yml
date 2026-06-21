@@ -47,3 +47,8 @@
   systemd_service:
     name: gssproxy.service
     state: reloaded
+
+- name: restart dmarc-report-viewer
+  systemd_service:
+    name: dmarc-report-viewer
+    state: restarted

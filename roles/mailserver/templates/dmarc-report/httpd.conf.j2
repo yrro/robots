@@ -1,0 +1,31 @@
+<VirtualHost _default_:443>
+ServerName dmarc-reports.robots.org.uk
+
+ErrorLog logs/dmarc-reports.robots.org.uk/ssl_error_log
+TransferLog logs/dmarc-reports.robots.org.uk/ssl_access_log
+LogLevel warn
+
+SSLEngine on
+SSLHonorCipherOrder on
+SSLCipherSuite PROFILE=SYSTEM
+SSLProxyCipherSuite PROFILE=SYSTEM
+#SSLCertificateFile /etc/pki/tls/dmarc-reports.crt
+#SSLCertificateKeyFile /etc/pki/tls/private/dmarc-reports.key
+SSLCertificateFile /etc/pki/tls/certs/localhost.crt
+SSLCertificateKeyFile /etc/pki/tls/private/localhost.key
+CustomLog logs/dmarc-reports.robots.org.uk/ssl_request_log \
+          "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+
+<Location />
+Include conf.d/gssapi.inc
+Require user sam
+</Location>
+
+ProxyPass / http://localhost:8581/
+ProxyPassReverse / http://localhost:8581/
+RequestHeader set "X-Forwarded-Proto" expr=%{REQUEST_SCHEME}
+RequestHeader set Authorization "expr=Basic {{ ('dmarc:' ~ dmarc_report_viewer_http_server_password) | b64encode }}"
+
+
+</VirtualHost>
+# vim: ft=apache

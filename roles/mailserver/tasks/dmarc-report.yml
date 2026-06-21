@@ -1,0 +1,138 @@
+# {{{ credentials
+- name: Create dmarc-report-viewer.imap-password credential
+  copy:
+    content: '{{ dmarc_report_viewer_imap_password }}'
+    dest: /etc/credstore/dmarc-report-viewer.imap-password
+    mode: 0600
+    owner: root
+    group: root
+
+- name: Create dmarc-report-viewer.http-server-password credential
+  copy:
+    content: '{{ dmarc_report_viewer_http_server_password }}'
+    dest: /etc/credstore/dmarc-report-viewer.http-server-password
+    mode: 0600
+    owner: root
+    group: root
+# }}}
+
+# {{{ httpd
+- name: Populate httpd keytab for dmarc-reports
+  import_role:
+    name: keytab
+  vars:
+    path: /etc/gssproxy/httpd.keytab
+    principals: [HTTP/dmarc-reports.robots.org.uk@IPA.ROBOTS.ORG.UK]
+
+#/etc/pki/tls/dmarc-reports.crt
+#/etc/pki/tls/private/dmarc-reports.crt
+
+- name: Create dmarc-report-viewer httpd vhost
+  template:
+    src: dmarc-report/httpd.conf.j2
+    dest: /etc/httpd/conf.d/dmarc-report-viewer.conf
+    mode: 0600
+    owner: root
+    group: root
+  notify: 'mailserver : reload apache'
+  no_log: true
+
+- name: Create dmarc-report-viewer httpd log directory
+  file:
+    path: /var/log/httpd/dmarc-reports.robots.org.uk
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+# }}}
+
+# {{{ download
+- name: recon dmarc-report-viewer executable
+  stat:
+    path: /usr/local/libexec/dmarc-report-viewer
+  register: _dmarc_report_bin
+
+- name: download dmarc-report-viewer zip file
+  when: not _dmarc_report_bin.stat.exists
+  block:
+  - name: Download dmarc-report-viewer v{{ version }}
+    get_url:
+      checksum: sha256:5ed0183c0c4dbb69015b4aaa4795d5509f501276811ca684b98a18d2cce43f2f
+      dest: /usr/local/libexec/dmarc-report-viewer.zip
+      url: https://github.com/cry-inc/dmarc-report-viewer/releases/download/{{ version }}/linux-x86_64.zip
+    vars:
+      version: 2.5.1
+
+  - name: Extract dmarc-report-viewer executable
+    unarchive:
+      src: /usr/local/libexec/dmarc-report-viewer.zip
+      remote_src: true
+      include: linux-x86_64/dmarc-report-viewer
+      dest: /usr/local/libexec
+      mode: 0755
+      owner: root
+      group: root
+
+  - name: Install dmarc-report-viewer executable
+    file:
+      state: hard
+      src: /usr/local/libexec/linux-x86_64/dmarc-report-viewer
+      dest: /usr/local/libexec/dmarc-report-viewer
+    notify: 'mailserver : retart dmarc-report-viewer'
+
+- name: Remove empty directory
+  file:
+    path: /usr/local/libexec/linux-x86_64
+    state: absent
+
+- name: Remove dmarc-report-viewer zip file
+  file:
+    path: /usr/local/libexec/dmarc-report-viewer.zip
+    state: absent
+# }}}
+
+# {{{ systemd service
+- name: create dmarc-report-viewer group
+  group:
+    name: dmarc-report-viewer
+    system: true
+    state: present
+
+- name: create dmarc-report-viewer user
+  user:
+    name: dmarc-report-viewer
+    group: dmarc-report-viewer
+    system: true
+    create_home: false
+    home: /var/empty
+    password: '!*'
+    state: present
+
+- name: Create dmarc-report-viewer wrapper script
+  copy:
+    src: dmarc-report/wrap-dmarc-report-viewer.sh
+    dest: /usr/local/libexec/wrap-dmarc-report-viewer
+    mode: 0755
+    owner: root
+    group: root
+  notify: 'mailserver : restart dmarc-report-viewer'
+
+- name: Define dmarc-report-viewer systemd service
+  copy:
+    src: dmarc-report/dmarc-report-viewer.service
+    dest: /etc/systemd/system
+    mode: 0644
+    owner: root
+    group: root
+  notify:
+  - 'mailserver : systemctl daemon-reload'
+  - 'mailserver : retart dmarc-report-viewer'
+
+- meta: flush_handlers
+
+- name: Start/enable dmarc-report-viewer
+  systemd_service:
+    name: dmarc-report-viewer.service
+    state: started
+    enabled: true
+# }}}
