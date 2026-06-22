@@ -44,6 +44,10 @@ postfix_services:
         reject_unknown_recipient_domain
       smtpd_banner: 'smtp.robots.org.uk ESMTP $mail_name'
       line_length_limit: 4096  # for GSSAPI with large session tickets
+      smtpd_tls_security_level: encrypt
+      smtpd_tls_mandatory_protocols: '>=TLSv1.2'
+      smtpd_tls_mandatory_ciphers: high
+      tls_high_cipherlist: PROFILE=SYSTEM
 
 postfix_config:
   inet_interfaces: all
