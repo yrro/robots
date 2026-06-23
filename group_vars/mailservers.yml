@@ -47,7 +47,7 @@ postfix_services:
       smtpd_tls_security_level: encrypt
       smtpd_tls_mandatory_protocols: '>=TLSv1.2'
       smtpd_tls_mandatory_ciphers: high
-      tls_high_cipherlist: PROFILE=SYSTEM
+      tls_high_cipherlist: '{{ cipher_list }}'
 
 postfix_config:
   inet_interfaces: all
@@ -110,6 +110,9 @@ postfix_config:
   smtpd_sasl_authenticated_header: 'no'  # default anyway
 
   #smtpd_recipient_limit = 1  # required for per-user statistics to work when rspamd is called as a milter?
+
+cipher_list: PROFILE=SYSTEM:!kRSA:!SHA1:!SHA256:!SHA384:!AESCCM
+
 
 dmarc_report_viewer_imap_password: !vault |
           $ANSIBLE_VAULT;1.2;AES256;robots-ansible

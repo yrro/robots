@@ -18,7 +18,7 @@ last_valid_gid = {{ _mailserver_dovecot_mailstore_user.group }}
 # [[[ tls
 ssl = required
 ssl_prefer_server_ciphers = yes
-ssl_cipher_list = PROFILE=SYSTEM:!kRSA:!SHA1
+ssl_cipher_list = {{ cipher_list }}
 # ]]]
 
 # [[[ quota
