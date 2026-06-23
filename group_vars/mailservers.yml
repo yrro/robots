@@ -100,6 +100,7 @@ postfix_config:
   recipient_delimiter: +-
 
   smtpd_tls_security_level: may
+  tls_preempt_cipherlist: 'yes'
 
   smtp_helo_name: 'mail-out.robots.org.uk'
   smtp_bind_address_enforce: 'yes'
@@ -112,7 +113,6 @@ postfix_config:
   #smtpd_recipient_limit = 1  # required for per-user statistics to work when rspamd is called as a milter?
 
 cipher_list: PROFILE=SYSTEM:!kRSA:!SHA1:!SHA256:!SHA384:!AESCCM
-
 
 dmarc_report_viewer_imap_password: !vault |
           $ANSIBLE_VAULT;1.2;AES256;robots-ansible
