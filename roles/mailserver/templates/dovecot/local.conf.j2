@@ -19,6 +19,7 @@ last_valid_gid = {{ _mailserver_dovecot_mailstore_user.group }}
 ssl = required
 ssl_prefer_server_ciphers = yes
 ssl_cipher_list = {{ cipher_list }}
+ssl_dh = </etc/dovecot/dhparams-ffdhe3072.pem
 # ]]]
 
 # [[[ quota
