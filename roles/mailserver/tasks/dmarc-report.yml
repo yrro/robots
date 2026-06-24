@@ -30,7 +30,7 @@
 - name: Create dmarc-report-viewer httpd vhost
   template:
     src: dmarc-report/httpd.conf.j2
-    dest: /etc/httpd/conf.d/dmarc-report-viewer.conf
+    dest: /etc/httpd/conf.d/~dmarc-report-viewer.conf
     mode: 0600
     owner: root
     group: root
