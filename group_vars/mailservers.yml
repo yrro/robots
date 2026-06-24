@@ -82,6 +82,13 @@ postfix_config:
     reject_unauth_destination
   smtpd_reject_unlisted_recipient: 'yes'  # on by default anyway
   smtpd_recipient_restrictions: ~  # RBLs would go here
+  smtpd_tls_cert_file: ~
+  smtpd_tls_key_file: ~
+  smtpd_tls_chain_files: >-
+    /etc/pki/tls/private/postfix-mta-ecdsa.key
+    /etc/pki/tls/certs/postfix-mta-ecdsa.crt
+    /etc/pki/tls/private/postfix-mta-rsa.key
+    /etc/pki/tls/certs/postfix-mta-rsa.crt
 
   mynetworks: ''  # keep in sync with rspamd local_addrs
 

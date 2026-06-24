@@ -29,9 +29,11 @@ domains = {
         "systemd_unit": "postfix.service",
     },
     "mail-in.robots.org.uk": {
-        "privkey_file": Path("/etc/pki/tls/private/postfix.key"),
-        "pubcert_file": Path("/etc/pki/tls/certs/postfix.pem"),
-        "postfix_tls": True,
+        "rsa_privkey_file": Path("/etc/pki/tls/private/postfix-mta-rsa.key"),
+        "rsa_pubcert_file": Path("/etc/pki/tls/certs/postfix-mta-rsa.crt"),
+        "ecdsa_privkey_file": Path("/etc/pki/tls/private/postfix-mta-ecdsa.key"),
+        "ecdsa_pubcert_file": Path("/etc/pki/tls/certs/postfix-mta-ecdsa.crt"),
+        "systemd_unit": "postfix.service",
     },
 }
 
@@ -89,28 +91,36 @@ def drive(event, domain):
                 return "INSTALL_TRIGGERED"
         case "_installed2":
             if domain_data:
-                new_privkey_file = md_domains_dir / domain / "privkey.pem"
-                new_pubkey_file = md_domains_dir / domain / "pubcert.pem"
+                new_rsa_privkey_file = md_domains_dir / domain / "privkey.pem"
+                new_rsa_pubcert_file = md_domains_dir / domain / "pubcert.pem"
+                new_ecdsa_privkey_file = (
+                    md_domains_dir / domain / "privkey.secp256r1.pem"
+                )
+                new_ecdsa_pubcert_file = (
+                    md_domains_dir / domain / "pubcert.secp256r1.pem"
+                )
+
+                if rsa_privkey_file := domain_data.get("rsa_privkey_file"):
+                    rsa_pubcert_file = domain_data["rsa_pubcert_file"]
+                else:
+                    rsa_privkey_file = domain_data["privkey_file"]
+                    rsa_pubcert_file = domain_data["pubcert_file"]
+
+                if ecdsa_privkey_file := domain_data.get("ecdsa_privkey_file"):
+                    ecdsa_pubcert_file = domain_data["ecdsa_pubcert_file"]
+
                 # shutil.copy preserves file mode
-                shutil.copy(new_privkey_file, domain_data["privkey_file"])
-                shutil.copy(new_pubkey_file, domain_data["pubcert_file"])
+                if rsa_privkey_file:
+                    shutil.copy(new_rsa_privkey_file, rsa_privkey_file)
+                    shutil.copy(new_rsa_pubcert_file, rsa_pubcert_file)
+
+                if ecdsa_privkey_file:
+                    shutil.copy(new_ecdsa_privkey_file, ecdsa_privkey_file)
+                    shutil.copy(new_ecdsa_pubcert_file, ecdsa_pubcert_file)
+
                 if systemd_unit := domain_data.get("systemd_unit"):
                     man.ReloadOrTryRestartUnit(systemd_unit, "replace")
-                if domain_data.get("postfix_tls"):
-                    p = subprocess.run(
-                        [
-                            "postfix",
-                            "tls",
-                            "deploy-server-cert",
-                            domain_data["pubcert_file"],
-                            domain_data["privkey_file"],
-                        ],
-                        text=True,
-                        capture_output=True,
-                        check=False,
-                    )
-                    if p.returncode != 0:
-                        raise RuntimeError(p.stderr)
+
                 return "INSTALLED"
         case event_name if event_name.startswith("_"):
             raise ValueError(f"Invalid event {event_name!r}")
