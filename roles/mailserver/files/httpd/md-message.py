@@ -24,8 +24,10 @@ domains = {
         "systemd_unit": "dovecot.service",
     },
     "smtp.robots.org.uk": {
-        "privkey_file": Path("/etc/pki/tls/private/postfix-msa.key"),
-        "pubcert_file": Path("/etc/pki/tls/certs/postfix-msa.pem"),
+        "rsa_privkey_file": Path("/etc/pki/tls/private/postfix-msa-rsa.key"),
+        "rsa_pubcert_file": Path("/etc/pki/tls/certs/postfix-msa-rsa.crt"),
+        "ecdsa_privkey_file": Path("/etc/pki/tls/private/postfix-msa-ecdsa.key"),
+        "ecdsa_pubcert_file": Path("/etc/pki/tls/certs/postfix-msa-ecdsa.crt"),
         "systemd_unit": "postfix.service",
     },
     "mail-in.robots.org.uk": {

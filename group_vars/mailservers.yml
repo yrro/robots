@@ -21,8 +21,13 @@ postfix_services:
       local_header_rewrite_clients: static:all
       smtpd_reject_unlisted_recipient: 'no'
       milter_macro_daemon_name: ORIGINATING
-      smtpd_tls_cert_file: /etc/pki/tls/certs/postfix-msa.pem
-      smtpd_tls_key_file: /etc/pki/tls/private/postfix-msa.key
+      smtpd_tls_cert_file: ~
+      smtpd_tls_key_file: ~
+      smtpd_tls_chain_files: >-
+        /etc/pki/tls/private/postfix-msa-ecdsa.key
+        /etc/pki/tls/certs/postfix-msa-ecdsa.crt
+        /etc/pki/tls/private/postfix-msa-rsa.key
+        /etc/pki/tls/certs/postfix-msa-rsa.crt
       smtpd_sasl_type: dovecot
       smtpd_sasl_path: /run/dovecot/postfix
       smtpd_sasl_tls_security_options: noanonymous
