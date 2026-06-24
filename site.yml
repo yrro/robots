@@ -2,6 +2,7 @@
 - name: assert limit is specified
   hosts: all
   gather_facts: no
+  force_handlers: yes
   tasks:
 
   - name: assert limit
@@ -14,6 +15,7 @@
 
 - name: configure hosts
   hosts: all
+  force_handlers: yes
   tasks:
 
   - import_tasks: tasks/crb.yml
@@ -52,6 +54,7 @@
 
 - name: configure servers
   hosts: servers
+  force_handlers: yes
   tasks:
 
   - import_role:
@@ -67,6 +70,7 @@
 
 - name: configure internet-facing ipa servers
   hosts: ipaservers_public
+  force_handlers: yes
   tasks:
 
   - import_role:
@@ -75,6 +79,7 @@
 
 - name: configure ipa servers
   hosts: ipaservers
+  force_handlers: yes
   tasks:
 
   - import_role:
@@ -87,6 +92,7 @@
 
 - name: configure mail servers
   hosts: mailservers
+  force_handlers: yes
   tasks:
 
   - import_role:
