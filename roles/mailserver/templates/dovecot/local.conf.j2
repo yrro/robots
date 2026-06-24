@@ -20,6 +20,10 @@ ssl = required
 ssl_prefer_server_ciphers = yes
 ssl_cipher_list = {{ cipher_list }}
 ssl_dh = </etc/dovecot/dhparams-ffdhe3072.pem
+ssl_cert = </etc/pki/dovecot/certs/dovecot-rsa.crt
+ssl_key = </etc/pki/dovecot/private/dovecot-rsa.key
+ssl_alt_cert = </etc/pki/dovecot/certs/dovecot-ecdsa.crt
+ssl_alt_key = </etc/pki/dovecot/private/dovecot-ecdsa.key
 # ]]]
 
 # [[[ quota

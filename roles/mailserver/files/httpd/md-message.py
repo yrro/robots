@@ -19,8 +19,10 @@ md_domains_dir = Path("/var/lib/httpd/md/domains")
 
 domains = {
     "imap.robots.org.uk": {
-        "privkey_file": Path("/etc/pki/dovecot/private/dovecot.pem"),
-        "pubcert_file": Path("/etc/pki/dovecot/certs/dovecot.pem"),
+        "rsa_privkey_file": Path("/etc/pki/dovecot/private/dovecot-rsa.key"),
+        "rsa_pubcert_file": Path("/etc/pki/dovecot/certs/dovecot-rsa.crt"),
+        "ecdsa_privkey_file": Path("/etc/pki/dovecot/private/dovecot-ecdsa.key"),
+        "ecdsa_pubcert_file": Path("/etc/pki/dovecot/certs/dovecot-ecdsa.crt"),
         "systemd_unit": "dovecot.service",
     },
     "smtp.robots.org.uk": {
@@ -102,16 +104,13 @@ def drive(event, domain):
                     md_domains_dir / domain / "pubcert.secp256r1.pem"
                 )
 
+                # shutil.copy preserves file mode
                 if rsa_privkey_file := domain_data.get("rsa_privkey_file"):
                     rsa_pubcert_file = domain_data["rsa_pubcert_file"]
-                else:
-                    rsa_privkey_file = domain_data["privkey_file"]
-                    rsa_pubcert_file = domain_data["pubcert_file"]
 
                 if ecdsa_privkey_file := domain_data.get("ecdsa_privkey_file"):
                     ecdsa_pubcert_file = domain_data["ecdsa_pubcert_file"]
 
-                # shutil.copy preserves file mode
                 if rsa_privkey_file:
                     shutil.copy(new_rsa_privkey_file, rsa_privkey_file)
                     shutil.copy(new_rsa_pubcert_file, rsa_pubcert_file)
