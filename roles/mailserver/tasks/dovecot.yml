@@ -12,10 +12,10 @@
     group: root
   notify: 'mailserver : reload dovecot'  # some settings need a restart
 
-- name: create DH parameters for dovecot
-  command:
-    cmd: openssl genpkey -genparam -algorithm DH -pkeyopt group:ffdhe3072 -out /etc/dovecot/dhparams-ffdhe3072.pem
-    creates: /etc/dovecot/dhparams-ffdhe3072.pem
+- name: Remove Dovecot DH parameters
+  file:
+    path: /etc/dovecot/dhparams-ffdhe3072.pem
+    state: absent
 
 - name: configure dovecot ldap
   template:
