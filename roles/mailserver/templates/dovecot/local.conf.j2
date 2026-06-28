@@ -40,11 +40,21 @@ plugin {
 
 # [[[ authentication
 auth_debug = no
+auth_verbose = yes
 auth_gssapi_hostname = "$ALL"
 auth_mechanisms = plain gssapi
+auth_username_chars = abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890.-_@/
 import_environment = $import_environment GSS_USE_PROXY=yes
 import_environment = $import_environment GSSPROXY_SOCKET=/var/lib/gssproxy/dovecot.sock
 
+passdb {
+  driver = static
+  args = nopassword=yes
+  username_filter = "smtp/*"
+  mechanisms = "gssapi"
+  result_failure = return-fail
+  result_internalfail = return-fail
+}
 passdb {
   driver = ldap
   args = /etc/dovecot/ldap.conf.ext
