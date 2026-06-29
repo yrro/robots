@@ -68,6 +68,9 @@ userdb {
   driver = ldap
   args = /etc/dovecot/ldap.conf.ext
 }
+
+# Where a user authenticates with GSSAPI, %{original_user} will record the Kerberos principal name that authenticated.
+login_log_format_elements = user=<%u> method=%m rip=%r lip=%l mpid=%e %c session=<%{session}> k5p=<%{original_user}>
 # ]]]
 
 # [[[ imap
