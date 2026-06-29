@@ -14,11 +14,11 @@ base = cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
 
 scope = onelevel
 
-user_attrs = memberPrincipal=k5principals,mailQuota=quota_rule=*:storage=%$
+user_attrs = memberPrincipal=k5principals,mailQuota=quota_rule=*:storage=%$,mail=user
 
 user_filter = (&(objectClass=mailBox)(mail=%u))
 
-pass_attrs = mail=user,memberPrincipal=k5principals,mailQuota=quota_rule=*:storage=%$
+pass_attrs = mail=user,memberPrincipal=k5principals,mailQuota=quota_rule=*:storage=%$,mail=user
 
 pass_filter = (&(objectClass=mailBox)(mail=%u))
 

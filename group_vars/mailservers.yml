@@ -41,7 +41,7 @@ postfix_services:
         reject
       smtpd_sender_login_maps: >-
         ldap:/etc/postfix/ldap-aliases.cf
-        ldap:/etc/postfix/ldap-mailbox-logins.cf
+        regexp:{ { /^(.+)$$/ $$1 } }
       smtpd_relay_restrictions: >-
         permit_sasl_authenticated
         reject
