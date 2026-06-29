@@ -45,8 +45,6 @@ postfix_services:
       smtpd_relay_restrictions: >-
         permit_sasl_authenticated
         reject
-      smtpd_recipient_restrictions: >-
-        reject_unknown_recipient_domain
       smtpd_banner: 'smtp.robots.org.uk ESMTP $mail_name'
       line_length_limit: 4096  # for GSSAPI with large session tickets
       smtpd_tls_security_level: encrypt
@@ -86,7 +84,8 @@ postfix_config:
   smtpd_relay_restrictions: >-
     reject_unauth_destination
   smtpd_reject_unlisted_recipient: 'yes'  # on by default anyway
-  smtpd_recipient_restrictions: ~  # RBLs would go here
+  smtpd_recipient_restrictions: >-
+    reject_unknown_recipient_domain
   smtpd_tls_cert_file: ~
   smtpd_tls_key_file: ~
   smtpd_tls_chain_files: >-
