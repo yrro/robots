@@ -40,6 +40,7 @@ postfix_services:
         permit_sasl_authenticated
         reject
       smtpd_sender_login_maps: >-
+        regexp:{ { /@(.+)\.ipa\.robots\.org\.uk$$/ = smtp/$$1.ipa.robots.org.uk@ipa.robots.org.uk }  }
         ldap:/etc/postfix/ldap-aliases.cf
         regexp:{ { /^(.+)$$/ $$1 } }
       smtpd_relay_restrictions: >-
