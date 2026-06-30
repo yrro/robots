@@ -58,6 +58,8 @@ passdb {
 passdb {
   driver = ldap
   args = /etc/dovecot/ldap.conf.ext
+  result_failure = return-fail
+  result_internalfail = return-fail
 }
 
 userdb {
