@@ -119,10 +119,18 @@
     query_filter: (&(objectClass=mailAlias)(mail=%s))
     result_attribute: mailRoutingAddress
 
-- name: remove obsolete ldap-mailbox-logins.cf map
-  file:
-    path: /etc/postfix/ldap-mailbox-logins.cf
-    state: absent
+- name: configure ldap_table to look up a mailbox's logins
+  template:
+    src: postfix/ldap_table.cf.j2
+    dest: /etc/postfix/ldap-mailbox-logins.cf
+    mode: 0640
+    owner: root
+    group: postfix
+  vars:
+    scope: base
+    search_base: mail=%s,cn=mail,dc=ipa,dc=robots,dc=org,dc=uk
+    query_filter: (&(objectClass=mailBox)(mail=%s))
+    result_attribute: mail, memberPrincipal
 # }}}
 
 # {{{ master(5) services
