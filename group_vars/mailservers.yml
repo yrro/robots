@@ -81,7 +81,7 @@ postfix_config:
     reject_non_fqdn_helo_hostname
     reject_unknown_helo_hostname
   strict_rfc821_envelopes: 'yes'
-  smtpd_reject_unlisted_sender: 'yes'
+  smtpd_reject_unlisted_sender: ~
   smtpd_sender_restrictions: >-
     reject_unknown_sender_domain
   smtpd_relay_restrictions: >-
