@@ -21,10 +21,6 @@ if environment :is "vnd.dovecot.mailbox-from" ["Spam"] {
 
   debug_log "on-move elsewhere -> spam";
   pipe :copy "rspamd-report" [ "spam", "${user}"];
-
-} else {
-  debug_log "on-move is confused!";
-  stop;
 }
 
 # vim: ts=8 sts=2 sw=2 et
