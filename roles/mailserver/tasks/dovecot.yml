@@ -142,7 +142,7 @@
     group: root
   notify: 'mailserver : reload gssproxy'
 
-- name: create keytab for dovecot
+- name: populate keytab with kerberos keys for smtp/imap
   import_role:
     name: keytab
   vars:
@@ -151,6 +151,14 @@
       - smtp/smtp.robots.org.uk@IPA.ROBOTS.ORG.UK
       - imap/imap.robots.org.uk@IPA.ROBOTS.ORG.UK
     extra_args: [-r]
+
+- name: populate keytab with kerberos keys for sieve
+  import_role:
+    name: keytab
+  vars:
+    path: /etc/gssproxy/dovecot.keytab
+    principals:
+      - sieve/imap.robots.org.uk@IPA.ROBOTS.ORG.UK
 
 - name: apply restrictive permissions to dovecot keytab
   file:
