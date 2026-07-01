@@ -74,6 +74,9 @@
       }
   - filename: milter_headers.conf
     content: |
+      default_headers_order = 1;
+      headers_modify_mode = "override";
+
       extended_spam_headers = true;  # x-spamd-result, x-rspamd-server, x-rspamd-queue-id, x-rspamd-action
       # not clear if these are pre-defined or whether we have to add the definitions to the use section...
       use = ["x-spamd-bar", "x-spam-level", "x-spam-status", "authentication-results"];
