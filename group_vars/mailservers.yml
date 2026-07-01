@@ -89,6 +89,7 @@ postfix_config:
   smtpd_reject_unlisted_recipient: 'yes'  # on by default anyway
   smtpd_recipient_restrictions: >-
     reject_unverified_recipient
+  smtpd_tls_received_header: 'yes'
   smtpd_tls_cert_file: ~
   smtpd_tls_key_file: ~
   smtpd_tls_chain_files: >-
