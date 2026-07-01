@@ -126,6 +126,7 @@ postfix_config:
   smtpd_sasl_authenticated_header: 'no'  # default anyway
 
   #smtpd_recipient_limit = 1  # required for per-user statistics to work when rspamd is called as a milter?
+  message_size_limit: '{{ 51 * 2**20 }}'
 
 cipher_list: PROFILE=SYSTEM:!kRSA:!SHA1:!SHA256:!SHA384:!AESCCM
 
