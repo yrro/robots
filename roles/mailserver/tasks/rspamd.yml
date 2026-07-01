@@ -61,7 +61,17 @@
       local_addrs = [];  # keep this in sync with postfix's mynetworks
   - filename: classifier-bayes.conf
     content: |
-      per_user = false;  # unclear how this works when rspamd is called as a milter
+      expiry = 250 * 24 * 60 * 60;
+
+      # rspamd as a milter gets called once per message, not per user
+      per_user = false;
+
+      autolearn {
+        spam_threshold = 20; # vs default reject threshold (15)
+        junk_threshold = 11; # vs default add_header threshold (6)
+        ham_threshold = -0.5;
+        check_balance = true;
+      }
   - filename: milter_headers.conf
     content: |
       extended_spam_headers = true;  # x-spamd-result, x-rspamd-server, x-rspamd-queue-id, x-rspamd-action
