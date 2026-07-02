@@ -26,6 +26,7 @@
     owner: root
     group: "{{ item.private|default(false) | ternary('_rspamd', 'root') }}"
   notify: 'mailserver : reload rspamd'
+  no_log: '{{ item.private|default(false) }}'
   loop:
   - filename: redis.conf
     content: |
@@ -42,6 +43,11 @@
         default = yes;
         self_scan = yes;
       }
+  - filename: worker-controller.inc
+    private: true
+    content: |
+      password = "{{ lookup('ipa_vault', 'rspamd-password', service='host/' ~ inventory_hostname) }}";
+      enable_password = "{{ lookup('ipa_vault', 'rspamd-enable-password', service='host/' ~ inventory_hostname) }}";
   - filename: worker-normal.inc
     content: |
       enabled = false;
@@ -49,9 +55,6 @@
     content: |
       timeout = 10min;
       message = "Temporary local problem. Sorry.";
-      #servers = "[::1]:6379";
-      #password = "?";
-    private: true
   - filename: options.inc
     content: |
       dns {
