@@ -86,6 +86,33 @@
       #skip_authenticated = true;
       # remove-spam-flag is activated by default, which only removes X-Spam; what about other headers?
 
+- name: Populate httpd keytab for rspamd
+  import_role:
+    name: keytab
+  vars:
+    path: /etc/gssproxy/httpd.keytab
+    principals: [HTTP/rspamd.robots.org.uk@IPA.ROBOTS.ORG.UK]
+
+#/etc/pki/tls/rspamd.crt
+#/etc/pki/tls/private/rspamd.crt
+
+- name: Create rspamd httpd vhost
+  copy:
+    src: rspamd/httpd.conf
+    dest: /etc/httpd/conf.d/~rspamd.conf
+    mode: 0644
+    owner: root
+    group: root
+  notify: 'mailserver : reload apache'
+
+- name: Create rspamd httpd log directory
+  file:
+    path: /var/log/httpd/rspamd.robots.org.uk
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+
 - name: recon mailbox domains
   community.general.ldap_search:
     server_uri: '{{ groups["ipaservers_public"] | map("regex_replace", "^", "ldaps://") | join(",") }}'

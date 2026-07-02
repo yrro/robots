@@ -7,14 +7,14 @@
   tags: valkey
 - import_tasks: unbound.yml
   tags: unbound
+- import_tasks: httpd.yml
+  tags: httpd
 - import_tasks: rspamd.yml
   tags: rspamd
 - import_tasks: mailstore.yml
   tags: mailstore
 - import_tasks: dovecot.yml
   tags: dovecot
-- import_tasks: httpd.yml
-  tags: httpd
 - import_tasks: dmarc-report.yml
   tags: dmarc-report
 
