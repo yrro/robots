@@ -63,7 +63,9 @@ class LookupModule(LookupBase):
         elif shared:
             vault_kwargs = {"shared": shared}
 
-        ipalib.api.bootstrap(context="client")
+        if not ipalib.api.isdone("bootstrap"):
+            ipalib.api.bootstrap(context="client")
+
         with ipalib.api:
             # lookups in general are expected to both take a list as input and output a list
             # this is done so they work with the looping construct 'with_'.
