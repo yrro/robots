@@ -62,7 +62,7 @@
         nameserver = ["[::1]:53"]
       }
       enable_test_patterns = false;
-      local_addrs = [];  # keep this in sync with postfix's mynetworks
+      local_addrs = ["[::1]/128", "127.0.0.0/8"];  # keep this in sync with postfix's mynetworks
   - filename: classifier-bayes.conf
     content: |
       expiry = 250 * 24 * 60 * 60;
@@ -86,6 +86,20 @@
       #skip_local = false;
       #skip_authenticated = true;
       # remove-spam-flag is activated by default, which only removes X-Spam; what about other headers?
+  - filename: dmarc.conf
+    content: |
+      #actions = {
+      #  quarantine = "add_header";
+      #  reject = "reject";
+      #}
+
+      reporting {
+        enabled = true;
+        email = "rpt@mta.robots.org.uk";
+        domain = "robots.org.uk";
+        org_name = "robots.org.uk";
+        smtp = '::1';
+      }
 
 - name: Populate httpd keytab for rspamd
   import_role:
@@ -165,4 +179,52 @@
     state: started
     enabled: true
 
-# TODO rspamadm pw
+# {{{ dmarc reporting
+- name: create DMARC reporting timer
+  copy:
+    content: |
+      [Unit]
+      Description=rspamd DMARC reporting
+      Documentation=https://docs.rspamd.com/modules/dmarc/
+
+      [Timer]
+      OnCalendar=18:00
+      AccuracySec=1h
+      RandomizedDelaySec=1h
+
+      [Install]
+      WantedBy=timers.target
+    dest: /etc/systemd/system/rspamd-dmarc-report.timer
+    mode: 0o644
+    owner: root
+    group: root
+  notify: 'systemctl daemon-reload'
+  register: _mailserver_rspamd_dmarc_report_timer
+
+- name: create DMARC reporting service
+  copy:
+    content: |
+      [Unit]
+      Description=rspamd DMARC reporting
+      Documentation=https://docs.rspamd.com/modules/dmarc/
+
+      [Service]
+      Type=exec
+      ExecStart=/usr/bin/rspamadm dmarc_report
+      User=_rspamd
+    dest: /etc/systemd/system/rspamd-dmarc-report.service
+    mode: 0o644
+    owner: root
+    group: root
+  notify: 'systemctl daemon-reload'
+
+- meta: flush_handlers
+
+- name: enable/start DMARC reporting timer
+  systemd_service:
+    name: rspamd-dmarc-report.timer
+    state: '{{ _mailserver_rspamd_dmarc_report_timer.changed | ternary("restarted", "started") }}'
+    enabled: true
+# }}}
+
+# vim: foldmethod=marker

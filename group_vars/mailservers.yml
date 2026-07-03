@@ -85,9 +85,11 @@ postfix_config:
   smtpd_sender_restrictions: >-
     reject_unknown_sender_domain
   smtpd_relay_restrictions: >-
+    permit_mynetworks
     reject_unauth_destination
   smtpd_reject_unlisted_recipient: 'yes'  # on by default anyway
   smtpd_recipient_restrictions: >-
+    permit_mynetworks
     reject_unverified_recipient
   smtpd_tls_received_header: 'yes'
   smtpd_tls_cert_file: ~
@@ -98,7 +100,7 @@ postfix_config:
     /etc/pki/tls/private/postfix-mta-rsa.key
     /etc/pki/tls/certs/postfix-mta-rsa.crt
 
-  mynetworks: ''  # keep in sync with rspamd local_addrs
+  mynetworks: '[::1]/128 127.0.0.0/8'  # keep in sync with rspamd local_addrs
 
   # the default is still bdb:
   address_verify_map: $default_database_type:$data_directory/verify_cache
