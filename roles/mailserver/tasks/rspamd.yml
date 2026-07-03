@@ -32,8 +32,9 @@
     content: |
       servers = "[::1]:6379";
       timeout = 1s;
-      #db = "0";
-      #password = "?";
+      db = 0;
+      username = "rspamd";
+      password = "{{ lookup('ipa_vault', 'redis-password-rspamd', service='host/' ~ inventory_hostname) }}";
     private: true
   - filename: worker-proxy.inc
     content: |

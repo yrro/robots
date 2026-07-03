@@ -4,4 +4,20 @@
     state: started
     enabled: true
 
+- name: configure valkey passwords
+  lineinfile:
+    path: /etc/valkey/valkey.conf
+    regexp: ^\s*user\s+{{ item.username|regex_escape }}\s+
+    line: user {{ item.username }} on >{{ lookup('ipa_vault', 'redis-password-' ~ item.username, service='host/' ~ inventory_hostname) }} {{ item.rights }}
+    mode: 0o640
+    owner: valkey
+    group: root
+  notify: 'mailserver : restart valkey'
+  no_log: true
+  loop:
+  - username: rspamd
+    rights: ~* &* -@all +@read +@write +@scripting +select +script|load
+  - username: default
+    rights: ~* &* +@all
+
 # TODO: auth

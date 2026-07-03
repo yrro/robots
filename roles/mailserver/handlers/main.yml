@@ -3,6 +3,11 @@
     name: sssd.service
     state: restarted
 
+- name: restart valkey
+  systemd_service:
+    name: valkey.service
+    state: restarted
+
 - name: reload postfix
   systemd_service:
     name: postfix.service
