@@ -1,3 +1,4 @@
+# {{{ installation
 - name: import rspamd PGP key
   rpm_key:
     state: present
@@ -17,7 +18,9 @@
     name: rspamd
     state: present
   tags: slow
+# }}}
 
+# {{{ configuration
 - name: configure rspamd
   copy:
     content: "{{ item.content }}"
@@ -100,7 +103,9 @@
         org_name = "robots.org.uk";
         smtp = '::1';
       }
+# }}}
 
+# {{{ controller UI
 - name: Populate httpd keytab for rspamd
   import_role:
     name: keytab
@@ -127,7 +132,9 @@
     mode: 0755
     owner: root
     group: root
+# }}}
 
+# {{{ dkim signing
 - name: recon mailbox domains
   community.general.ldap_search:
     server_uri: '{{ groups["ipaservers_public"] | map("regex_replace", "^", "ldaps://") | join(",") }}'
@@ -167,6 +174,7 @@
   loop: '{{ mailserver_rspamd_mailbox_domains }}'
   loop_control:
     loop_var: domain
+# }}}
 
 - name: check rspamd config
   shell: rspamadm configtest --strict
