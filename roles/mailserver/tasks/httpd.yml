@@ -2,7 +2,7 @@
   file:
     path: /etc/systemd/system/httpd.service.d
     state: directory
-    mode: 0644
+    mode: 0o755
     owner: root
     group: root
 
