@@ -105,7 +105,7 @@ postfix_config:
   # the default is still bdb:
   address_verify_map: $default_database_type:$data_directory/verify_cache
 
-  unverified_recipient_reject_code: 450  # default; change to 550?
+  unverified_recipient_reject_code: 550
 
   relay_domains: ''
 
