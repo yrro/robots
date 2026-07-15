@@ -68,7 +68,7 @@
       local_addrs = ["[::1]/128", "127.0.0.0/8"];  # keep this in sync with postfix's mynetworks
   - filename: classifier-bayes.conf
     content: |
-      expiry = 250 * 24 * 60 * 60;
+      expiry = 720 * 24 * 60 * 60;
 
       # rspamd as a milter gets called once per message, not per user
       per_user = false;
