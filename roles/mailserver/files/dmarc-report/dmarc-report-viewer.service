@@ -1,6 +1,6 @@
 [Unit]
 Description=DMARC Report Viewer
-After=nss-lookup.target
+After=nss-lookup.target dovecot.service
 
 [Service]
 Type=exec
