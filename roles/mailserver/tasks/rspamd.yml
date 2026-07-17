@@ -103,6 +103,9 @@
         org_name = "robots.org.uk";
         smtp = '::1';
       }
+  - filename: known_senders.conf
+    content: |
+      enabled = true;
 
 - name: create rspamd local allowlist directory
   file:
