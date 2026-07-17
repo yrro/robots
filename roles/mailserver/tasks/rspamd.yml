@@ -103,6 +103,23 @@
         org_name = "robots.org.uk";
         smtp = '::1';
       }
+
+- name: create rspamd local allowlist directory
+  file:
+    path: /etc/rspamd/local.d/maps.d
+    state: directory
+    mode: 0o755
+    owner: root
+    group: root
+
+- name: configure rspamd surbl whitelist
+  copy:
+    content: |
+      sendgrid.net
+    dest: /etc/rspamd/local.d/maps.d/surbl-whitelist.inc.local
+    mode: 0o644
+    owner: root
+    group: root
 # }}}
 
 # {{{ controller UI
