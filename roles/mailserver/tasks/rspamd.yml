@@ -105,7 +105,7 @@
       }
   - filename: known_senders.conf
     content: |
-      enabled = true;
+      enabled = false;
 
 - name: create rspamd local allowlist directory
   file:
