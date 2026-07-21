@@ -4,6 +4,8 @@ protocols = imap lmtp sieve
 
 postmaster_address = postmaster@robots.org.uk
 
+recipient_delimiter = +-
+
 # [[[ mail storage
 mail_home = /srv/mail/domains/%d/users/%n
 mail_location = maildir:~/Maildir
@@ -88,10 +90,6 @@ protocol lmtp {
 
 lmtp_save_to_detail_mailbox = yes
 #lmtp_rcpt_check_quota = yes
-
-plugin {
-  recipient_delimiter = +-
-}
 # ]]]
 
 # [[[ sieve
