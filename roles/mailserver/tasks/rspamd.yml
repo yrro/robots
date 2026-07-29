@@ -116,6 +116,10 @@
         score = 20.0;
         description = "Block envelope sender domains"
       }
+  - filename: history_redis.conf
+    content: |
+      nrows = 2000;
+      subject_privacy = true;
 
 - name: create rspamd local allowlist directory
   file:
