@@ -106,6 +106,16 @@
   - filename: known_senders.conf
     content: |
       enabled = false;
+  - filename: multimap.conf
+    content: |
+      BLOCKED_SENDER_DOMAINS {
+        type = "from";
+        filter = "email:domain";
+        extract_from = "smtp";
+        map = "/etc/rspamd/maps.d/sender-domain-blocklist.map"
+        score = 20.0;
+        description = "Block envelope sender domains"
+      }
 
 - name: create rspamd local allowlist directory
   file:
@@ -115,11 +125,20 @@
     owner: root
     group: root
 
-- name: configure rspamd surbl whitelist
+- name: configure rspamd surbl allowlist
   copy:
     content: |
       sendgrid.net
     dest: /etc/rspamd/local.d/maps.d/surbl-whitelist.inc.local
+    mode: 0o644
+    owner: root
+    group: root
+
+- name: configure rspamd sender blocklist
+  copy:
+    content: |
+      learn-academy.motorcycles
+    dest: /etc/rspamd/maps.d/sender-domain-blocklist.map
     mode: 0o644
     owner: root
     group: root
