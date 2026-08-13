@@ -6,6 +6,7 @@
     - perl-Sys-Hostname  # swaks needs it
     - postfix
     - postfix-ldap
+    - postfix-perl-scripts
     - dovecot
     - dovecot-pigeonhole
     - unbound
