@@ -181,5 +181,17 @@
     new_module_path: remote-access
   loop: '{{ _ipa_client_pam_remote_services }}'
 
+- name: customize realm configuration
+  copy:
+    content: |
+      [realms]
+      IPA.ROBOTS.ORG.UK = {
+        auto_fast_armor = true
+      }
+    dest: /etc/krb5.conf.d/robots
+    mode: 0o644
+    user: root
+    group: root
+
 # TODO: dyndns pam_gssapi smartcard?
 ...
