@@ -8,6 +8,16 @@
     group: root
   notify: sshd reload
 
+- name: configure sftp
+  copy:
+    content: |
+      Subsystem  sftp  /usr/libexec/openssh/sftp-server -l INFO
+    dest: /etc/ssh/sshd_config.d/10-sftp.conf
+    mode: 0644
+    owner: root
+    group: root
+  notify: sshd reload
+
 - name: configure sshd per-source block size
   copy:
     content: |
