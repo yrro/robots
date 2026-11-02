@@ -190,7 +190,7 @@
       }
     dest: /etc/krb5.conf.d/robots
     mode: 0o644
-    user: root
+    owner: root
     group: root
 
 # TODO: dyndns pam_gssapi smartcard?
