@@ -15,4 +15,14 @@
     state: present
     install_weak_deps: false
   tags: slow
+
+- name: protect ipa-server packages
+  copy:
+    content: |
+      ipa-server
+      ipa-server-dns
+    dest: /etc/dnf/protected.d/ipa-server.conf
+    owner: root
+    group: root
+    mode: 0o644
 ...
