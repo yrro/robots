@@ -7,6 +7,18 @@
     group: root
   when: ansible_facts.distribution == "RedHat"
 
+- name: run insights-client on boot
+  copy:
+    content: |
+      [Timer]
+      OnBootSec=0
+    dest: /etc/systemd/system/insights-client.timer.d/on-boot.conf
+    mode: 0644
+    owner: root
+    group: root
+  register: _insights_client_on_boot
+  when: ansible_facts.distribution == "RedHat"
+
 - name: delay insights-client.timer
   copy:
     content: |
@@ -16,7 +28,7 @@
       # Move it after the daily dnf run.
       OnCalendar=
       OnCalendar=07:30:00
-      RandomizedDelaySec=0
+      RandomizedDelaySec=10min
     dest: /etc/systemd/system/insights-client.timer.d/delay.conf
     mode: 0644
     owner: root
@@ -27,7 +39,7 @@
 - name: reload systemd units
   systemd:
     daemon_reload: true
-  when: _insights_client_delay.changed
+  when: _insights_client_delay.changed or _insights_client_on_boot.changed
 
 - name: start insights-client timer
   systemd_service:
