@@ -169,3 +169,27 @@
     state: present
     server_uri: '{{ ipa_server_ldapi_uri }}'
   run_once: true
+
+- name: allow use of inChain matching rule
+  ldap_attrs:
+    dn: oid=1.2.840.113556.1.4.1941,cn=features,cn=config
+    attributes:
+      aci:
+      - (targetattr != "aci")
+        (
+          version 3.0;
+          acl "Allow admins to use inChain matching rule";
+          allow (read, search)
+          (groupdn = "ldap:///cn=admins,cn=groups,cn=accounts,dc=ipa,dc=robots,dc=org,dc=uk")
+          ;
+        )
+      - (targetattr != "aci")
+        (
+          version 3.0;
+          acl "Allow dex to use inChain matching rule";
+          allow (read, search)
+          (userdn = "ldap:///uid=dex,cn=sysaccounts,cn=etc,dc=ipa,dc=robots,dc=org,dc=uk")
+          ;
+        )
+    state: exact  # by default there is a deny aci which we want to remove
+    server_uri: '{{ ipa_server_ldapi_uri }}'

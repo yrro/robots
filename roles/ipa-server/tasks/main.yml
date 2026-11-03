@@ -7,6 +7,7 @@
   tags: always
 - import_tasks: root-ldaprc.yml
 - import_tasks: dirsrv.yml
+  tags: dirsrv
 - import_tasks: named.yml
 - import_tasks: pki.yml
 - import_tasks: pkinit-crl.yml
