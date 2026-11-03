@@ -166,7 +166,7 @@
           (userdn = "ldap:///uid=dex,cn=sysaccounts,cn=etc,dc=ipa,dc=robots,dc=org,dc=uk")
           ;
         )
-    state: present
+    state: absent
     server_uri: '{{ ipa_server_ldapi_uri }}'
   run_once: true
 
