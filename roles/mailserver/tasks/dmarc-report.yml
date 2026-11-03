@@ -24,6 +24,7 @@
     path: /etc/gssproxy/httpd.keytab
     principals: [HTTP/dmarc-reports.robots.org.uk@IPA.ROBOTS.ORG.UK]
 
+# ... the prometheus alert is silenced until we have a real cert - remove the silence once we have a real cert
 #/etc/pki/tls/dmarc-reports.crt
 #/etc/pki/tls/private/dmarc-reports.crt
 
