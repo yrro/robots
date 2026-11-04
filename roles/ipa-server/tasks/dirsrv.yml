@@ -51,7 +51,7 @@
 - name: configure dirsrv monitoring system account password
   ldap_passwd:
     dn: uid=dirsrv-mon,cn=sysaccounts,cn=etc,dc=ipa,dc=robots,dc=org,dc=uk
-    passwd: '{{ ipa_server_dirsrv_mon_password }}'
+    passwd: "{{ lookup('ipa_vault', 'dirsrv-mon-password', shared=true) }}"
     server_uri: '{{ ipa_server_ldapi_uri }}'
   run_once: true
 
@@ -99,7 +99,7 @@
 - name: store dirsrv-mon password in a secret
   containers.podman.podman_secret:
     name: dirsrv-mon-password
-    data: '{{ ipa_server_dirsrv_mon_password }}'
+    data: "{{ lookup('ipa_vault', 'dirsrv-mon-password', shared=true) }}"
     state: present
   register: ipa_server_dirsrv_exporter_secret_password
 
