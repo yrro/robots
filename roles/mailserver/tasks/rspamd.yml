@@ -5,6 +5,12 @@
     key: https://rspamd.com/apt-stable/gpg.key
     fingerprint: 3FA3 47D5 E599 BE45 95CA  2576 FFA2 32ED BF21 E25E
 
+# https://github.com/ansible/ansible/issues/65687
+- name: recon rspamd respository
+  stat:
+    path: /etc/yum.repos.d/rspamd.repo
+  register: _rspamd_repo
+
 - name: enable rspamd repository
   get_url:
     url: https://rspamd.com/rpm-stable/centos-{{ ansible_facts.distribution_major_version }}/rspamd.repo
@@ -12,6 +18,7 @@
     mode: 0644
     owner: root
     group: root
+  when: not _rspamd_repo.stat.exists
 
 - name: install rspamd
   package:
