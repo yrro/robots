@@ -11,7 +11,7 @@
   copy:
     content: |
       [Timer]
-      OnBootSec=0
+      OnBootSec=1min
     dest: /etc/systemd/system/insights-client.timer.d/on-boot.conf
     mode: 0644
     owner: root
@@ -28,7 +28,7 @@
       # Move it after the daily dnf run.
       OnCalendar=
       OnCalendar=07:30:00
-      RandomizedDelaySec=10min
+      RandomizedDelaySec=5min
     dest: /etc/systemd/system/insights-client.timer.d/delay.conf
     mode: 0644
     owner: root
