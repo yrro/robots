@@ -161,13 +161,14 @@ mail_attribute_dict = file:%h/Maildir/dovecot-attributes
 # ]]]
 
 # [[[ metrics
-#;; Assign TCP port 9900 to the existing mail_port_t type
-#(portcon tcp 9900 (system_u object_r mail_port_t (s0 s0)))
-#service stats {
-#  inet_listener http {
-#    port = 9900
-#  }
-#}
+# TCP port 9900 would need to be labelled for us to use it:
+# (portcon tcp 9900 (system_u object_r mail_port_t (s0 s0)))
+# ... or we can just use another port that already has the label
+service stats {
+  inet_listener http {
+    port = 2000
+  }
+}
 # ]]]
 
 # [[[ dsync
@@ -176,6 +177,29 @@ service auth {
   unix_listener auth-userdb {
     group = mailstore
   }
+}
+
+metric auth_success {
+  filter = event=auth_request_finished AND success=yes
+}
+
+metric auth_failures {
+  filter = event=auth_request_finished AND NOT success=yes
+}
+
+metric imap_command {
+  filter = event=imap_command_finished
+  group_by = cmd_name tagged_reply_state
+}
+
+metric smtp_command {
+  filter = event=smtp_server_command_finished
+  group_by = cmd_name status_code duration:exponential:1:5:10
+}
+
+metric mail_delivery {
+  filter = event=mail_delivery_finished
+  group_by = duration:exponential:1:5:10
 }
 # ]]]
 
