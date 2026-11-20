@@ -7,8 +7,7 @@ import sys
 
 from ansible.config.manager import ConfigManager
 from ansible.module_utils.parsing.convert_bool import boolean
-from ipalib import api
-import ipalib.errors
+import ipalib
 
 
 def main(argv):
@@ -36,17 +35,16 @@ def main(argv):
         if vault_args["shared"]:
             vault_args["shared"] = boolean(vault_args["shared"])
 
-    api.bootstrap(context="client")
-    api.finalize()
-
-    api.Backend.rpcclient.connect()
+    ipalib.api.bootstrap(context="client")
     try:
-        if args.archive:
-            rc = archive(args, vault_args)
-        else:
-            rc = retrieve(args, vault_args)
-    finally:
-        api.Backend.rpcclient.disconnect()
+        with ipalib.api as api:
+            if args.archive:
+                rc = archive(api, args, vault_args)
+            else:
+                rc = retrieve(api, args, vault_args)
+    except ipalib.errors.PublicError as e:
+        print(e, file=sys.stderr)
+        return 1
 
     return rc
 
@@ -80,7 +78,7 @@ def build_parser():
     return parser
 
 
-def archive(args, vault_args):
+def archive(api, args, vault_args):
     if args.random:
         data = secrets.token_urlsafe()
     else:
@@ -88,24 +86,17 @@ def archive(args, vault_args):
         if not data:
             print(f"refusing to store an empty password in vault {args.vault_id!r}")
             return 1
-    try:
-        result = api.Command.vault_archive(
-            args.vault_id, data=data.encode("ascii"), **vault_args
-        )
-    except ipalib.errors.PublicError as e:
-        print(e.message, file=sys.stderr)
-        return 1
+
+    result = api.Command.vault_archive(
+        args.vault_id, data=data.encode("ascii"), **vault_args
+    )
 
     print(result["summary"])
     return 0
 
 
-def retrieve(args, vault_args):
-    try:
-        result = api.Command.vault_retrieve(args.vault_id, **vault_args)
-    except ipalib.errors.PublicError as e:
-        print(e.message, file=sys.stderr)
-        return 1
+def retrieve(api, args, vault_args):
+    result = api.Command.vault_retrieve(args.vault_id, **vault_args)
 
     if not result["result"]["data"]:
         print(
