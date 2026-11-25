@@ -11,7 +11,8 @@
   copy:
     content: |
       [Timer]
-      OnBootSec=1min
+      OnBootSec=5min
+      RandonizedDelaySec=5min
     dest: /etc/systemd/system/insights-client.timer.d/on-boot.conf
     mode: 0644
     owner: root
